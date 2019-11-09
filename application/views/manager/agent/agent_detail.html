@@ -1,0 +1,202 @@
+{{include file='manager/public/head.html'}}
+<body class="no-skin">
+{{include file='manager/public/header.html'}}
+<div class="main-container" id="main-container">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('main-container', 'fixed')
+        } catch (e) {
+        }
+    </script>
+    <style>
+        pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+        .string { color: green; }
+        .number { color: darkorange; }
+        .boolean { color: blue; }
+        .null { color: magenta; }
+        .key { color: red; }
+    </style>
+    {{include file='manager/public/sidebar.html'}}
+    <div class="main-content">
+        <div class="main-content-inner">
+            <!-- #section:basics/content.breadcrumbs -->
+            {{include file='manager/public/breadcrumbs.html'}}
+
+            <!-- /section:basics/content.breadcrumbs -->
+            <div class="page-content">
+                {{include file='manager/public/set.html'}}
+
+                <!-- /section:settings.box -->
+                <div class="row">
+                    <div class="col-xs-12">
+                        <!-- PAGE CONTENT BEGINS -->
+                        <form id="save_form" class="form-horizontal" role="form" action="/manager/agent_save" method="post">
+                            <input type="hidden" name="id" value="{{$data.id|default:''}}">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="name"> 姓名 </label>
+                                <div class="col-sm-9">
+                                    <input type="text" id="name" name="name" required="required" class="rcol-xs-10 col-sm-5" value="{{$data.name|default:''}}">
+                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="job_code"> 职业证号 </label>
+                                <div class="col-sm-9">
+                                    <input type="text" id="job_code" name="job_code" required="required" class="rcol-xs-10 col-sm-5" value="{{$data.job_code|default:''}}">
+                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="card"> 身份证号 </label>
+                                <div class="col-sm-9">
+                                    <input type="text" id="card" name="card" required="required" class="rcol-xs-10 col-sm-5 js4IDcard" value="{{$data.card|default:''}}">
+                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                </div>
+                            </div>
+
+                            <div class="space-4"></div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="phone"> 联系电话 </label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="phone" id="phone" class="rcol-xs-10 col-sm-5" value="{{$data.phone|default:''}}">
+                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                </div>
+                            </div>
+                            {{if $data.id|default:'' != ''}}
+                            <div class="space-4"></div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="company_id"> 企业 </label>
+                                <div class="col-sm-9">
+                                    <input type="text" id="company_id" readonly="readonly" class="col-xs-10 col-sm-5" value="{{$data.company_id|default:''}}">
+                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                </div>
+                            </div>
+                            {{/if}}
+                            <div class="space-4"></div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="old_job_code"> 原职业证号 </label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="old_job_code" id="old_job_code" class="col-xs-10 col-sm-5" value="{{$data.old_job_code|default:''}}">
+                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="flag"> 状态 </label>
+                                <div class="col-sm-9 yy_m_7">
+                                    <input type="radio" name="flag" {{if $data.flag|default:'' == 2}}checked="checked"{{/if}}  value="2" >有效&nbsp;&nbsp;&nbsp;
+                                    <input type="radio" name="flag" {{if $data.flag|default:'' == -1}}checked="checked"{{/if}}  value="-1" >无效&nbsp;&nbsp;&nbsp;
+                                    <input type="radio" name="flag" {{if $data.flag|default:'' == 1}}checked="checked"{{/if}}  value="1" >离昆&nbsp;&nbsp;&nbsp;
+                                    <span class="lbl"></span>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-offset-2 col-md-9">
+                                <button id="save_btn" class="btn btn-info" type="button">
+
+                                    <i class="icon-ok bigger-110"></i>
+
+                                    保 存
+
+                                </button>
+                                &nbsp; &nbsp; &nbsp;
+                                <a href="/manager/agent_list" class="btn" type="reset">
+
+                                    <i class="icon-undo bigger-110"></i>
+
+                                    返 回
+
+                                </a>
+                            </div>
+                        </form>
+                        <!-- PAGE CONTENT ENDS -->
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.page-content -->
+        </div>
+    </div><!-- /.main-content -->
+    {{include file='manager/public/footer.html'}}
+
+</div><!-- /.main-container -->
+
+{{include file='manager/public/footerjs.html'}}
+<!-- inline scripts related to this page -->
+<script src="/manager_statics/qwadmin/js/date-time/bootstrap-datepicker.js"></script>
+<script src="/manager_statics/app/ajaxfileupload.js"></script>
+<script type="text/javascript">
+    window.onload = function() {
+        init();  //初始化
+
+    }
+    function init() {
+        //初始化图片上传
+        var btnImg = document.getElementById("btnUploadImg");
+        var img = document.getElementById("imgShow");
+        var hidImgName = document.getElementById("hidImgName");
+        g_AjxUploadImg(btnImg, img, hidImgName);
+    }
+
+
+    //图片上传
+    function g_AjxUploadImg(btn, img, hidPut) {
+        var button = btn, interval;
+        new AjaxUpload(button, {
+            action: "/ajax_api/upload_exam_head",
+            data: {},
+            name: 'userfile',
+            onSubmit: function(file, ext) {
+                if (!(ext && /^(jpg|JPG|png|PNG|gif|GIF)$/.test(ext))) {
+                    alert("您上传的图片格式不对，请重新选择！");
+                    return false;
+                }
+            },
+            onComplete: function(file, response) {
+                flagValue = response;
+                if (flagValue == "1") {
+                    alert("您上传的图片存在错误");
+                }
+                else {
+                    hidPut.value = response;
+                    img.src = response;
+
+                }
+            }
+        });
+    }
+
+
+
+    $("#save_btn").click(function(){
+        var name = $.trim($("#name").val());
+        if(name == "" ) {
+            layer.msg('姓名不能为空', {icon: 2});
+            return false;
+        }
+        var job_code = $.trim($("#job_code").val());
+        if(job_code == "" ) {
+            layer.msg('职业证号不能为空', {icon: 2});
+            return false;
+        }
+        var card = $.trim($("#card").val());
+        if(card == "" ) {
+            layer.msg('身份证不能为空', {icon: 2});
+            return false;
+        }
+        var flag = $("input[name='flag']:checked").val();
+        if(flag == null){
+            layer.msg('请选择状态!', {icon: 3});
+            return false;
+        }
+        $("#save_form").submit();
+    })
+
+
+</script>
+</body>
+</html>

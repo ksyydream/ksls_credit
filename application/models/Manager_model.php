@@ -484,4 +484,57 @@ class Manager_model extends MY_Model
         return $data;
     }
 
+    public function agent_edit($id){
+        $this->db->select('a.*')->from('agent a');
+        //$this->db->join('company_pending b','a.company_id = b.id','left');
+        //$this->db->join('company_pass c','c.company_id = b.id','left');
+        $this->db->where('a.id',$id);
+        $detail =  $this->db->get()->row_array();
+        if(!$detail)
+            return $detail;
+        //$this->db->select('a.*')->from('agent_ns_list a');
+        //$this->db->where('a.agent_id',$id);
+        //$this->db->order_by('a.year','desc');
+        //$detail['ns_list'] = $this->db->get()->result_array();
+        return $detail;
+    }
+
+    public function agent_save(){
+        $data = array(
+            'name'=>trim($this->input->post('name')),
+            'phone'=>trim($this->input->post('phone')) ? trim($this->input->post('phone')) : "",
+            'job_code'=>trim($this->input->post('job_code')),
+            'old_job_code'=>trim($this->input->post('old_job_code')),
+            'flag' => $this->input->post('flag'),
+            'card'=>trim($this->input->post('card')) ? trim($this->input->post('card')) : "",
+            'pwd'=>sha1("666666"),
+            'cdate' => date('Y-m-d H:i:s', time()),
+        );
+        $id = $this->input->post('id');
+        if(!$data['name'] || !$data['job_code'] || !$data['flag'] || !$data['card']){
+            return $this->fun_fail('缺少必要信息!');
+        }
+        if($id){
+            $chenk_job = $this->db->select()->from('agent')->where('job_code', $data['job_code'])->where('id <>', $id)->get()->row_array();
+            $chenk_card = $this->db->select()->from('agent')->where('card', $data['card'])->where('id <>', $id)->get()->row_array();
+            if($chenk_job)
+                return $this->fun_fail('此职业证号已存在!');
+            if($chenk_card)
+                return $this->fun_fail('此身份证号已存在!');
+            unset($data['pwd']);
+            unset($data['cdate']);
+            //这里还需要判断 如果是离昆或者无效时 需要解绑公司,解绑公司后可能会让公司状态变更 得分产生变化
+            $this->db->where('id', $id)->update('agent', $data);
+        }else{
+            $chenk_job = $this->db->select()->from('agent')->where('job_code', $data['job_code'])->get()->row_array();
+            $chenk_card = $this->db->select()->from('agent')->where('card', $data['card'])->get()->row_array();
+            if($chenk_job)
+                return $this->fun_fail('此职业证号已存在!');
+            if($chenk_card)
+                return $this->fun_fail('此身份证号已存在!');
+            $this->db->insert('agent', $data);
+        }
+        return $this->fun_success('保存成功!');
+    }
+
 }

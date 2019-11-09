@@ -346,7 +346,7 @@ class Manager extends MY_Controller {
 
 
     /**
-     * 经纪人列表
+     * 执业经纪人列表
      * @author yangyang
      * @date 2019-11-09
      */
@@ -358,6 +358,39 @@ class Manager extends MY_Controller {
         $this->assign('page', $page);
         $this->assign('data', $data);
         $this->display('manager/agent/agent_list.html');
+    }
+
+    /**
+     * 执业经纪人新增页面
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function agent_add(){
+
+        $this->display('manager/agent/agent_detail.html');
+    }
+
+    public function agent_edit($m_id){
+        $data = $this->manager_model->agent_edit($m_id);
+        if(!$data){
+            $this->show_message('未找到执业经纪人信息!');
+        }
+        $this->assign('data', $data);
+        $this->display('manager/agent/agent_detail.html');
+    }
+
+    /**
+     * 执业经纪人保存页面
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function agent_save(){
+        $res = $this->manager_model->agent_save();
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/manager/agent_list'));
+        }else{
+            $this->show_message($res['msg']);
+        }
     }
 
 
