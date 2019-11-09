@@ -532,9 +532,76 @@ class Manager_model extends MY_Model
                 return $this->fun_fail('此职业证号已存在!');
             if($chenk_card)
                 return $this->fun_fail('此身份证号已存在!');
+            //增加经纪人初始信用分
+            $data['score'] = $this->config->item('agent_score');
             $this->db->insert('agent', $data);
         }
         return $this->fun_success('保存成功!');
     }
 
+    /**
+     *********************************************************************************************
+     * 经纪人事件
+     *********************************************************************************************
+     */
+
+    /**
+     * 经纪人事件一级列表
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function event4agent_type_list($page = 1){
+        $data['limit'] = $this->limit;
+        //搜索条件
+        $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
+        //获取总记录数
+        $this->db->select('count(1) num')->from('event4agent_type a');
+        if($data['keyword']){
+            $this->db->like('a.event_type_name', $data['keyword']);
+        }
+        $num = $this->db->get()->row();
+        $data['total_rows'] = $num->num;
+
+        //获取详细列
+        $this->db->select('a.*')->from('event4agent_type a');
+        if($data['keyword']){
+            $this->db->like('a.event_type_name', $data['keyword']);
+        }
+        $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
+        $this->db->order_by('a.id','desc');
+        $data['res_list'] = $this->db->get()->result_array();
+        return $data;
+    }
+
+    /**
+     * 执业经纪人保存页面
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function event4agent_type_save(){
+        $data = array(
+            'event_type_name'=>trim($this->input->post('event_type_name')),
+            'type'=>trim($this->input->post('type')),
+            'status' => trim($this->input->post('status')) ? trim($this->input->post('status')) : -1,
+            'cdate' => date('Y-m-d H:i:s', time()),
+        );
+        $id = $this->input->post('id');
+        if(!$data['event_type_name'] || !$data['type']){
+            return $this->fun_fail('缺少必要信息!');
+        }
+        if($id){
+            unset($data['cdate']);
+            $this->db->where('id', $id)->update('event4agent_type', $data);
+        }else{
+            $this->db->insert('event4agent_type', $data);
+        }
+        return $this->fun_success('保存成功!');
+    }
+
+    public function event4agent_type_edit($id){
+        $this->db->select('a.*')->from('event4agent_type a');
+        $this->db->where('a.id',$id);
+        $detail =  $this->db->get()->row_array();
+        return $detail;
+    }
 }

@@ -393,5 +393,64 @@ class Manager extends MY_Controller {
         }
     }
 
+    /**
+     *********************************************************************************************
+     * 经纪人事件
+     *********************************************************************************************
+     */
+
+    /**
+     * 经纪人事件一级列表
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function event4agent_type_list($page = 1){
+        $data = $this->manager_model->event4agent_type_list($page);
+        $event4agent_type = $this->config->item('event4agent_type');
+        $base_url = "/manager/event4agent_1_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->assign('event4agent_type', $event4agent_type);
+        $this->display('manager/event_agent/event4agent_type_list.html');
+    }
+
+    /**
+     * 经纪人事件一级新增页面
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function event4agent_type_add(){
+        $event4agent_type = $this->config->item('event4agent_type');
+        $this->assign('event4agent_type', $event4agent_type);
+        $this->display('manager/event_agent/event4agent_type_detail.html');
+    }
+
+    /**
+     * 经纪人事件一级保存页面
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function event4agent_type_save(){
+        $res = $this->manager_model->event4agent_type_save();
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/manager/event4agent_type_list'));
+        }else{
+            $this->show_message($res['msg']);
+        }
+    }
+
+    public function event4agent_type_edit($m_id){
+        $data = $this->manager_model->event4agent_type_edit($m_id);
+        if(!$data){
+            $this->show_message('未找到信息!');
+        }
+        $event4agent_type = $this->config->item('event4agent_type');
+        $this->assign('event4agent_type', $event4agent_type);
+        $this->assign('data', $data);
+        $this->display('manager/event_agent/event4agent_type_detail.html');
+    }
+
 
 }
