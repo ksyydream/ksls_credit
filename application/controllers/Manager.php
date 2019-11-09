@@ -400,6 +400,27 @@ class Manager extends MY_Controller {
      */
 
     /**
+     * 经纪人信用等级
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function agent_grade_list($page = 1){
+        $data = $this->manager_model->agent_grade_list($page);
+        $base_url = "/manager/agent_grade_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('manager/event_agent/agent_grade_list.html');
+    }
+
+    public function agent_grade_add(){
+        $this->display('manager/event_agent/agent_grade_detail.html');
+    }
+
+
+
+    /**
      * 经纪人事件一级列表
      * @author yangyang
      * @date 2019-11-09
@@ -407,7 +428,7 @@ class Manager extends MY_Controller {
     public function event4agent_type_list($page = 1){
         $data = $this->manager_model->event4agent_type_list($page);
         $event4agent_type = $this->config->item('event4agent_type');
-        $base_url = "/manager/event4agent_1_list/";
+        $base_url = "/manager/event4agent_type_list/";
         $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
         $this->assign('pager', $pager);
         $this->assign('page', $page);

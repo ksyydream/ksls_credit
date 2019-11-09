@@ -550,6 +550,29 @@ class Manager_model extends MY_Model
      * @author yangyang
      * @date 2019-11-09
      */
+    public function agent_grade_list($page = 1){
+        $data['limit'] = $this->limit;
+
+        //获取总记录数
+        $this->db->select('count(1) num')->from('agent_grade a');
+
+        $num = $this->db->get()->row();
+        $data['total_rows'] = $num->num;
+
+        //获取详细列
+        $this->db->select('a.*')->from('agent_grade a');
+
+        $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
+        $this->db->order_by('a.min_score','desc');
+        $data['res_list'] = $this->db->get()->result_array();
+        return $data;
+    }
+
+    /**
+     * 经纪人事件一级列表
+     * @author yangyang
+     * @date 2019-11-09
+     */
     public function event4agent_type_list($page = 1){
         $data['limit'] = $this->limit;
         //搜索条件
