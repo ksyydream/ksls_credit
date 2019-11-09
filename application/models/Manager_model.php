@@ -438,5 +438,50 @@ class Manager_model extends MY_Model
         return $this->fun_success('保存成功!');
     }
 
+    /**
+     *********************************************************************************************
+     * 以下代码为经纪人管理
+     *********************************************************************************************
+     */
+
+    public function agent_list($page = 1){
+        $data['limit'] = $this->limit;
+        //搜索条件
+        $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
+        $data['flag'] = $this->input->get('flag')?trim($this->input->get('flag')):null;
+        //获取总记录数
+        $this->db->select('count(1) num')->from('agent a');
+        //$this->db->join('company_pending b','a.company_id = b.id','left');
+        //$this->db->join('company_pass c','b.id = c.company_id','left');
+        if($data['keyword']){
+            $this->db->group_start();
+            $this->db->like('a.name', $data['keyword']);
+            $this->db->or_like('a.job_code', $data['keyword']);
+            $this->db->group_end();
+        }
+        if($data['flag']){
+            $this->db->where('a.flag', $data['flag']);
+        }
+        $num = $this->db->get()->row();
+        $data['total_rows'] = $num->num;
+
+        //获取详细列
+        $this->db->select('a.*')->from('agent a');
+        //$this->db->join('company_pending b','a.company_id = b.id','left');
+        //$this->db->join('company_pass c','b.id = c.company_id','left');
+        if($data['keyword']){
+            $this->db->group_start();
+            $this->db->like('a.name', $data['keyword']);
+            $this->db->or_like('a.job_code', $data['keyword']);
+            $this->db->group_end();
+        }
+        if($data['flag']){
+            $this->db->where('a.flag', $data['flag']);
+        }
+        $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
+        $this->db->order_by('a.id','desc');
+        $data['res_list'] = $this->db->get()->result_array();
+        return $data;
+    }
 
 }

@@ -338,6 +338,27 @@ class Manager extends MY_Controller {
         redirect(base_url('/manager_login/index'));
     }
 
+    /**
+     *********************************************************************************************
+     * 以下代码为经纪人管理
+     *********************************************************************************************
+     */
+
+
+    /**
+     * 经纪人列表
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function agent_list($page = 1){
+        $data = $this->manager_model->agent_list($page);
+        $base_url = "/manager/agent_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('manager/agent/agent_list.html');
+    }
 
 
 }
