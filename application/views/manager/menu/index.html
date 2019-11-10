@@ -120,14 +120,12 @@
                 callback: function (result) {
                     if (result) {
                         $.getJSON("/manager/menu_del/"+id,function(data){
-                            if(data == 1){
+                            if(data.status == 1){
                                 var action = "/manager/menu_list"
                                 $('#search_form').attr('action',action);
                                 $('#search_form').submit();
-                            }else if(data == -99){
-                                layer.msg('你没有操作权限!', {icon: 2});
                             }else{
-                                layer.msg('删除失败!', {icon: 2});
+                                layer.msg(data.msg, {icon: 2});
                             }
                         })
                     }

@@ -157,7 +157,8 @@ class Manager extends MY_Controller {
      * @date 2018-04-01
      */
     public function menu_del($id){
-        echo $this->manager_model->menu_del($id);
+        $res = $this->manager_model->menu_del($id);
+        $this->ajaxReturn($res);
     }
 
     /**
