@@ -568,6 +568,20 @@ class Manager_model extends MY_Model
         return $data;
     }
 
+    public function agent_grade_delete($id){
+        if(!$id)
+            return $this->fun_fail('删除失败');
+        $info_= $this->db->from('agent_grade')->where('id', $id)->get()->row_array();
+        if(!$info_)
+            return $this->fun_fail('分数线不存在');
+        if($info_['min_score'] == 0)
+            return $this->fun_fail('0分分数线不可删除');
+        $res = $this->db->where('id', $id)->delete('agent_grade');
+        if($res)
+            return $this->fun_success('删除成功');
+        return $this->fun_fail('删除失败');
+    }
+
     /**
      * 经纪人事件一级列表
      * @author yangyang

@@ -423,6 +423,10 @@ class Manager extends MY_Controller {
         $this->display('manager/event_agent/agent_grade_detail.html');
     }
 
+    public function agent_grade_delete($id){
+        $res = $this->manager_model->agent_grade_delete($id);
+        $this->ajaxReturn($res);
+    }
 
 
     /**
