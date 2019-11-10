@@ -25,7 +25,9 @@ class Manager extends MY_Controller {
         if ($admin['group_id'] != 1 && !$this->manager_model->check($this->uri->segment(1) . '/' . $this->uri->segment(2), $admin_info['admin_id'])){
             if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
             {
-              echo -99;exit();
+              //echo -99;exit();
+                $err_ = $this->manager_model->fun_fail('你没有操作权限');
+                $this->ajaxReturn($err_);
             }
             else {
                 $this->show_message('没有权限访问本页面!');
@@ -227,7 +229,8 @@ class Manager extends MY_Controller {
      * @date 2018-04-01
      */
     public function admin_del($id){
-        echo $this->manager_model->admin_del($id);
+        $res =  $this->manager_model->admin_del($id);
+        $this->ajaxReturn($res);
     }
 
     /**
@@ -297,7 +300,8 @@ class Manager extends MY_Controller {
      * @date 2018-03-31
      */
     public function group_del($id){
-        echo $this->manager_model->group_del($id);
+        $res =  $this->manager_model->group_del($id);
+        $this->ajaxReturn($res);
     }
 
     /**

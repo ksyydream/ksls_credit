@@ -311,16 +311,16 @@ class Manager_model extends MY_Model
      */
     public function admin_del($id) {
         if (!$id)
-            return -1;
+            return $this->fun_fail('删除失败');
         $admin_info = $this->get_admin($id);
         if (!$admin_info)
-            return -1;
+            return $this->fun_fail('删除失败');
         if ($admin_info['group_id'] == 1)
-            return -2;
+            return $this->fun_fail('该管理员为超级管理员权限不可直接删除');
         $rs = $this->db->where('admin_id', $id)->delete('admin');
         if ($rs)
-            return 1;
-        return -1;
+            $this->fun_success('保存成功');
+        return $this->fun_fail('删除失败');
     }
 
     /**
@@ -396,13 +396,13 @@ class Manager_model extends MY_Model
      */
     public function group_del($id) {
         if (!$id)
-            return -1;
+            return $this->fun_fail('删除失败');
         if ($id == 1)
-            return -2;
+            return $this->fun_fail('超级管理员不可删除');
         $rs = $this->db->where('id', $id)->delete('auth_group');
         if ($rs)
-            return 1;
-        return -1;
+            return $this->fun_success('删除成功');
+        return $this->fun_fail('删除失败');
     }
 
     /**
