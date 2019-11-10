@@ -568,6 +568,57 @@ class Manager_model extends MY_Model
         return $data;
     }
 
+    public function agent_grade_edit($id){
+        $detail =  $this->readByID('agent_grade', 'id', $id);
+        return $detail;
+    }
+
+    public function agent_grade_save(){
+        $table_ = 'agent_grade';
+        $data =array(
+            'grade_name' => trim($this->input->post('grade_name')),
+            'min_score' => trim($this->input->post('min_score')) ? trim($this->input->post('min_score')) : 0,
+        );
+        if(!$data['grade_name']){
+            return $this->fun_fail('请输入等级名称');
+        }
+        if(!isset($data['min_score'])){
+            return $this->fun_fail('分数线设置异常');
+        }
+        if((int)$data['min_score'] < 0){
+            return $this->fun_fail('分数线设置异常');
+        }
+        $grade_id = $this->input->post('grade_id');
+        if($grade_id){
+            $info_ = $this->readByID($table_, 'id', $grade_id);
+            if(!$info_)
+                return $this->fun_fail('等级不存在');
+            if($info_['min_score'] == 0)
+                $data['min_score'] = 0;
+            $res = $this->db->select('')->from($table_)->where(array('grade_name'=>$data['grade_name'],'id <>' => $grade_id))->get()->row_array();
+            if($res)
+                return $this->fun_fail('存在相同等级名称');
+            $res1 = $this->db->select('')->from($table_)->where(array('min_score'=>$data['min_score'],'id <>' => $grade_id))->get()->row_array();
+            if($res1)
+                return $this->fun_fail('存在相同分数线');
+            $res2 = $this->db->where('id',$this->input->post('grade_id'))->update($table_,$data);
+        }else{
+            $res = $this->db->select('')->from($table_)->where('grade_name',$data['grade_name'])->get()->row_array();
+            if($res)
+                return $this->fun_fail('存在相同等级名称');
+            $res1 = $this->db->select('')->from($table_)->where('min_score',$data['min_score'])->get()->row_array();
+            if($res1)
+                return $this->fun_fail('存在相同分数线');
+            $res2 = $this->db->insert($table_,$data);
+        }
+
+        if($res2){
+            return $this->fun_success('保存成功');
+        }else{
+            return $this->fun_fail('保存失败');
+        }
+    }
+
     public function agent_grade_delete($id){
         if(!$id)
             return $this->fun_fail('删除失败');

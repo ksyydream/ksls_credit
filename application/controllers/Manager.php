@@ -423,6 +423,24 @@ class Manager extends MY_Controller {
         $this->display('manager/event_agent/agent_grade_detail.html');
     }
 
+    public function agent_grade_edit($id){
+        $data = $this->manager_model->agent_grade_edit($id);
+        if(!$data){
+            $this->show_message('未找到信息!');
+        }
+        $this->assign('data', $data);
+        $this->display('manager/event_agent/agent_grade_detail.html');
+    }
+
+    public function agent_grade_save(){
+        $res = $this->manager_model->agent_grade_save();
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/manager/agent_grade_list'));
+        }else{
+            $this->show_message($res['msg']);
+        }
+    }
+
     public function agent_grade_delete($id){
         $res = $this->manager_model->agent_grade_delete($id);
         $this->ajaxReturn($res);
