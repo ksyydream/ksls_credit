@@ -501,4 +501,106 @@ class Manager extends MY_Controller {
     }
 
 
+    /**
+     *********************************************************************************************
+     * 企业事件
+     *********************************************************************************************
+     */
+
+    /**
+     * 企业信用等级
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function company_grade_list($page = 1){
+        $data = $this->manager_model->company_grade_list($page);
+        $base_url = "/manager/company_grade_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('manager/event_company/company_grade_list.html');
+    }
+
+    public function company_grade_add(){
+        $this->display('manager/event_company/company_grade_detail.html');
+    }
+
+    public function company_grade_edit($id){
+        $data = $this->manager_model->company_grade_edit($id);
+        if(!$data){
+            $this->show_message('未找到信息!');
+        }
+        $this->assign('data', $data);
+        $this->display('manager/event_company/company_grade_detail.html');
+    }
+
+    public function company_grade_save(){
+        $res = $this->manager_model->company_grade_save();
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/manager/company_grade_list'));
+        }else{
+            $this->show_message($res['msg']);
+        }
+    }
+
+    public function company_grade_delete($id){
+        $res = $this->manager_model->company_grade_delete($id);
+        $this->ajaxReturn($res);
+    }
+
+
+    /**
+     * 经纪人事件一级列表
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function event4company_type_list($page = 1){
+        $data = $this->manager_model->event4company_type_list($page);
+        $event4company_type = $this->config->item('event4company_type');
+        $base_url = "/manager/event4company_type_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->assign('event4company_type', $event4company_type);
+        $this->display('manager/event_company/event4company_type_list.html');
+    }
+
+    /**
+     * 经纪人事件一级新增页面
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function event4company_type_add(){
+        $event4company_type = $this->config->item('event4company_type');
+        $this->assign('event4company_type', $event4company_type);
+        $this->display('manager/event_company/event4company_type_detail.html');
+    }
+
+    /**
+     * 经纪人事件一级保存页面
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function event4company_type_save(){
+        $res = $this->manager_model->event4company_type_save();
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/manager/event4company_type_list'));
+        }else{
+            $this->show_message($res['msg']);
+        }
+    }
+
+    public function event4company_type_edit($m_id){
+        $data = $this->manager_model->event4company_type_edit($m_id);
+        if(!$data){
+            $this->show_message('未找到信息!');
+        }
+        $event4company_type = $this->config->item('event4company_type');
+        $this->assign('event4company_type', $event4company_type);
+        $this->assign('data', $data);
+        $this->display('manager/event_company/event4company_type_detail.html');
+    }
+
 }

@@ -692,4 +692,158 @@ class Manager_model extends MY_Model
         $detail =  $this->db->get()->row_array();
         return $detail;
     }
+
+    /**
+     *********************************************************************************************
+     * 经纪人事件
+     *********************************************************************************************
+     */
+
+    /**
+     * 经纪人事件一级列表
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function company_grade_list($page = 1){
+        $data['limit'] = $this->limit;
+
+        //获取总记录数
+        $this->db->select('count(1) num')->from('company_grade a');
+
+        $num = $this->db->get()->row();
+        $data['total_rows'] = $num->num;
+
+        //获取详细列
+        $this->db->select('a.*')->from('company_grade a');
+
+        $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
+        $this->db->order_by('a.min_score','desc');
+        $data['res_list'] = $this->db->get()->result_array();
+        return $data;
+    }
+
+    public function company_grade_edit($id){
+        $detail =  $this->readByID('company_grade', 'id', $id);
+        return $detail;
+    }
+
+    public function company_grade_save(){
+        $table_ = 'company_grade';
+        $data =array(
+            'grade_name' => trim($this->input->post('grade_name')),
+            'min_score' => trim($this->input->post('min_score')) ? trim($this->input->post('min_score')) : 0,
+        );
+        if(!$data['grade_name']){
+            return $this->fun_fail('请输入等级名称');
+        }
+        if(!isset($data['min_score'])){
+            return $this->fun_fail('分数线设置异常');
+        }
+        if((int)$data['min_score'] < 0){
+            return $this->fun_fail('分数线设置异常');
+        }
+        $grade_id = $this->input->post('grade_id');
+        if($grade_id){
+            $info_ = $this->readByID($table_, 'id', $grade_id);
+            if(!$info_)
+                return $this->fun_fail('等级不存在');
+            if($info_['min_score'] == 0)
+                $data['min_score'] = 0;
+            $res = $this->db->select('')->from($table_)->where(array('grade_name'=>$data['grade_name'],'id <>' => $grade_id))->get()->row_array();
+            if($res)
+                return $this->fun_fail('存在相同等级名称');
+            $res1 = $this->db->select('')->from($table_)->where(array('min_score'=>$data['min_score'],'id <>' => $grade_id))->get()->row_array();
+            if($res1)
+                return $this->fun_fail('存在相同分数线');
+            $res2 = $this->db->where('id',$this->input->post('grade_id'))->update($table_,$data);
+        }else{
+            $res = $this->db->select('')->from($table_)->where('grade_name',$data['grade_name'])->get()->row_array();
+            if($res)
+                return $this->fun_fail('存在相同等级名称');
+            $res1 = $this->db->select('')->from($table_)->where('min_score',$data['min_score'])->get()->row_array();
+            if($res1)
+                return $this->fun_fail('存在相同分数线');
+            $res2 = $this->db->insert($table_,$data);
+        }
+
+        if($res2){
+            return $this->fun_success('保存成功');
+        }else{
+            return $this->fun_fail('保存失败');
+        }
+    }
+
+    public function company_grade_delete($id){
+        if(!$id)
+            return $this->fun_fail('删除失败');
+        $info_= $this->db->from('company_grade')->where('id', $id)->get()->row_array();
+        if(!$info_)
+            return $this->fun_fail('分数线不存在');
+        if($info_['min_score'] == 0)
+            return $this->fun_fail('0分分数线不可删除');
+        $res = $this->db->where('id', $id)->delete('company_grade');
+        if($res)
+            return $this->fun_success('删除成功');
+        return $this->fun_fail('删除失败');
+    }
+
+    /**
+     * 经纪人事件一级列表
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function event4company_type_list($page = 1){
+        $data['limit'] = $this->limit;
+        //搜索条件
+        $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
+        //获取总记录数
+        $this->db->select('count(1) num')->from('event4company_type a');
+        if($data['keyword']){
+            $this->db->like('a.event_type_name', $data['keyword']);
+        }
+        $num = $this->db->get()->row();
+        $data['total_rows'] = $num->num;
+
+        //获取详细列
+        $this->db->select('a.*')->from('event4company_type a');
+        if($data['keyword']){
+            $this->db->like('a.event_type_name', $data['keyword']);
+        }
+        $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
+        $this->db->order_by('a.id','desc');
+        $data['res_list'] = $this->db->get()->result_array();
+        return $data;
+    }
+
+    /**
+     * 执业经纪人保存页面
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function event4company_type_save(){
+        $data = array(
+            'event_type_name'=>trim($this->input->post('event_type_name')),
+            'type'=>trim($this->input->post('type')),
+            'status' => trim($this->input->post('status')) ? trim($this->input->post('status')) : -1,
+            'cdate' => date('Y-m-d H:i:s', time()),
+        );
+        $id = $this->input->post('id');
+        if(!$data['event_type_name'] || !$data['type']){
+            return $this->fun_fail('缺少必要信息!');
+        }
+        if($id){
+            unset($data['cdate']);
+            $this->db->where('id', $id)->update('event4company_type', $data);
+        }else{
+            $this->db->insert('event4company_type', $data);
+        }
+        return $this->fun_success('保存成功!');
+    }
+
+    public function event4company_type_edit($id){
+        $this->db->select('a.*')->from('event4company_type a');
+        $this->db->where('a.id',$id);
+        $detail =  $this->db->get()->row_array();
+        return $detail;
+    }
 }
