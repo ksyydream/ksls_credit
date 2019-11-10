@@ -319,7 +319,7 @@ class Manager_model extends MY_Model
             return $this->fun_fail('该管理员为超级管理员权限不可直接删除');
         $rs = $this->db->where('admin_id', $id)->delete('admin');
         if ($rs)
-            $this->fun_success('保存成功');
+            return $this->fun_success('删除成功');
         return $this->fun_fail('删除失败');
     }
 
