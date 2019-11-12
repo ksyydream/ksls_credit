@@ -15,6 +15,7 @@ class Manager extends MY_Controller {
     {
         parent::__construct();
         $this->load->model('manager_model');
+        $this->load->model('common4manager_model', 'c4m_model');
         $admin_info = $this->session->userdata('admin_info');
         $admin = $this->manager_model->get_admin($admin_info['admin_id']);
         if(!$admin){
@@ -500,7 +501,24 @@ class Manager extends MY_Controller {
         $this->display('manager/event_agent/event4agent_type_detail.html');
     }
 
-
+    /**
+     * 经纪人事件二级列表
+     * @author yangyang
+     * @date 2019-11-12
+     */
+    public function event4agent_detail_list($page = 1){
+        $data = $this->manager_model->event4agent_detail_list($page);
+        $event_type_all = $this->c4m_model->get_event4agent_type_all();
+        $event4agent_type = $this->config->item('event4agent_type');
+        $base_url = "/manager/event4agent_detail_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->assign('event4agent_type', $event4agent_type);
+        $this->assign('event_type_all', $event_type_all);
+        $this->display('manager/event_agent/event4agent_detail_list.html');
+    }
     /**
      *********************************************************************************************
      * 企业事件

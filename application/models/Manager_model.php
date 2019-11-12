@@ -694,6 +694,49 @@ class Manager_model extends MY_Model
     }
 
     /**
+     * 经纪人事件二级列表
+     * @author yangyang
+     * @date 2019-11-12
+     */
+    public function event4agent_detail_list($page = 1){
+        $data['limit'] = $this->limit;
+        //搜索条件
+        $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
+        $data['type_id'] = $this->input->get('type_id')?trim($this->input->get('type_id')):null;
+        $data['status'] = $this->input->get('status')?trim($this->input->get('status')):null;
+        //获取总记录数
+        $this->db->select('count(1) num')->from('event4agent_detail a');
+        $this->db->join('event4agent_type b', 'a.type_id = b.id', 'left');
+        if($data['keyword']){
+            $this->db->like('a.event_name', $data['keyword']);
+        }
+        if($data['type_id']){
+            $this->db->like('a.type_id', $data['type_id']);
+        }
+        if($data['status']){
+            $this->db->like('a.status', $data['status']);
+        }
+        $num = $this->db->get()->row();
+        $data['total_rows'] = $num->num;
+
+        //获取详细列
+        $this->db->select('a.*, b.event_type_name, b.type b_type_')->from('event4agent_detail a');
+        $this->db->join('event4agent_type b', 'a.type_id = b.id', 'left');
+        if($data['keyword']){
+            $this->db->like('a.event_name', $data['keyword']);
+        }
+        if($data['type_id']){
+            $this->db->like('a.type_id', $data['type_id']);
+        }
+        if($data['status']){
+            $this->db->like('a.status', $data['status']);
+        }
+        $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
+        $this->db->order_by('a.id','desc');
+        $data['res_list'] = $this->db->get()->result_array();
+        return $data;
+    }
+    /**
      *********************************************************************************************
      * 经纪人事件
      *********************************************************************************************
