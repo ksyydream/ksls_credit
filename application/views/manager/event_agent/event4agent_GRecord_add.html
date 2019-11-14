@@ -1,0 +1,150 @@
+{{include file='manager/public/head.html'}}
+<body class="no-skin">
+{{include file='manager/public/header.html'}}
+<div class="main-container" id="main-container">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('main-container', 'fixed')
+        } catch (e) {
+        }
+    </script>
+    <style>
+        pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+        .string { color: green; }
+        .number { color: darkorange; }
+        .boolean { color: blue; }
+        .null { color: magenta; }
+        .key { color: red; }
+    </style>
+    {{include file='manager/public/sidebar.html'}}
+    <div class="main-content">
+        <div class="main-content-inner">
+            <!-- #section:basics/content.breadcrumbs -->
+            {{include file='manager/public/breadcrumbs.html'}}
+
+            <!-- /section:basics/content.breadcrumbs -->
+            <div class="page-content">
+                {{include file='manager/public/set.html'}}
+
+                <!-- /section:settings.box -->
+                <div class="row">
+                    <div class="col-xs-12">
+                        <!-- PAGE CONTENT BEGINS -->
+                        <form id="save_form" class="form-horizontal" role="form" action="/manager/event4agent_GRecord_save" method="post">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="agent_id"> 执业经纪人 </label>
+                                <div class="col-sm-5">
+                                   <select id="agent_id" name="agent_id" class="form-control">
+                                    <option value="">--请选择--</option>
+                                    {{foreach from=$agent_all key=k item=v}}
+                                    <option  value="{{$v.id}}">{{$v.name}}-{{$v.job_code}}</option>
+                                    {{/foreach}}
+                                    </select>
+                                    <span class="lbl"></span>
+                                </div>
+                            </div>
+                        
+
+                            <div class="space-4"></div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="flag"> 一级类别 </label>
+                                <div class="col-sm-5 yy_m_7">
+                                    <select id="type_id" name="type_id" class="form-control">
+                                    <option value="">--请选择--</option>
+                                    {{foreach from=$event_type_all key=k item=v}}
+                                    <option {{if $v.id == $data.type_id|default:''}}selected{{/if}} value="{{$v.id}}">{{$v.event_type_name}}</option>
+                                    {{/foreach}}
+                                    </select>
+                                    <span class="lbl"></span>
+
+                                </div>
+
+                            </div>
+                             <div class="space-4"></div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="flag"> 事件列表 </label>
+                                <div class="col-sm-5 yy_m_7">
+                                    <select id="event_id" name="event_id" class="form-control">
+                                    <option value="">--请选择--</option>
+                                    </select>
+                                    <span class="lbl"></span>
+
+                                </div>
+
+                            </div>
+                              <div class="space-4"></div>
+                                 <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="record_fact"> 事实 </label>
+                                <div class="col-sm-9">
+                                    <input type="text" id="record_fact" name="record_fact" required="required" class="rcol-xs-10 col-sm-6" value="">
+                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                </div>
+                            </div>
+                             <div class="space-4"></div>
+                                 <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="event_name"> 备注 </label>
+                                <div class="col-sm-9">
+                                    <input type="text" id="event_name" name="event_name" required="required" class="rcol-xs-10 col-sm-6" value="">
+                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                </div>
+                            </div>
+                             <div class="space-4"></div>
+                            <div class="col-md-offset-2 col-md-9">
+                                <button id="save_btn" class="btn btn-info" type="button">
+
+                                    <i class="icon-ok bigger-110"></i>
+
+                                    保 存
+
+                                </button>
+                                &nbsp; &nbsp; &nbsp;
+                                <a href="/manager/event4agent_GRecord_list" class="btn" type="reset">
+
+                                    <i class="icon-undo bigger-110"></i>
+
+                                    返 回
+
+                                </a>
+                            </div>
+                        </form>
+                        <!-- PAGE CONTENT ENDS -->
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.page-content -->
+        </div>
+    </div><!-- /.main-content -->
+    {{include file='manager/public/footer.html'}}
+
+</div><!-- /.main-container -->
+
+{{include file='manager/public/footerjs.html'}}
+<!-- inline scripts related to this page -->
+<script src="/manager_statics/qwadmin/js/date-time/bootstrap-datepicker.js"></script>
+<script src="/manager_statics/app/ajaxfileupload.js"></script>
+<script type="text/javascript">
+    
+
+
+    $("#save_btn").click(function(){
+        var event_name = $.trim($("#event_name").val());
+        if(event_name == "" ) {
+            layer.msg('事件名称不能为空', {icon: 2});
+            return false;
+        }
+          var type_id = $.trim($("#type_id").val());
+        if(type_id == ""){
+            layer.msg('请选择类别!', {icon: 3});
+            return false;
+        }
+        var score = $.trim($("#score"));
+        if(score == '' || parseFloat(score) <= 0) {
+            layer.msg('请填写分数', {icon: 2});
+            return false;
+        }
+        $("#save_form").submit();
+    })
+
+
+</script>
+</body>
+</html>

@@ -662,7 +662,7 @@ class Manager_model extends MY_Model
     }
 
     /**
-     * 执业经纪人保存页面
+     * 经纪人事件一级保存页面
      * @author yangyang
      * @date 2019-11-09
      */
@@ -736,14 +736,154 @@ class Manager_model extends MY_Model
         $data['res_list'] = $this->db->get()->result_array();
         return $data;
     }
+
+    /**
+     * 经纪人事件二级保存页面
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function event4agent_detail_save(){
+        $data = array(
+            'event_name'=> trim($this->input->post('event_name')),
+            'type_id'=> trim($this->input->post('type_id')),
+            'score' => trim($this->input->post('score')),
+            'status' => trim($this->input->post('status')) ? trim($this->input->post('status')) : -1,
+            'cdate' => date('Y-m-d H:i:s', time()),
+        );
+        $id = $this->input->post('id');
+        if(!$data['event_name'] || !$data['type_id'] || !$data['score']){
+            return $this->fun_fail('缺少必要信息!');
+        }
+        if($id){
+            unset($data['cdate']);
+            $this->db->where('id', $id)->update('event4agent_detail', $data);
+        }else{
+            $this->db->insert('event4agent_detail', $data);
+        }
+        return $this->fun_success('保存成功!');
+    }
+
+    public function event4agent_detail_edit($id){
+        $this->db->select('a.*')->from('event4agent_detail a');
+        $this->db->where('a.id',$id);
+        $detail =  $this->db->get()->row_array();
+        return $detail;
+    }
+
+    /**
+     * 经纪人事件列表
+     * @author yangyang
+     * @date 2019-11-12
+     */
+
+    public function event4agent_record_list($page = 1, $type_type = null){
+        $data['limit'] = $this->limit;
+        //搜索条件
+        $data['agent_keyword'] = $this->input->get('agent_keyword')?trim($this->input->get('agent_keyword')):null;
+        $data['event_keyword'] = $this->input->get('event_keyword')?trim($this->input->get('event_keyword')):null;
+        $data['status'] = $this->input->get('status')?trim($this->input->get('status')):null;
+        //获取总记录数
+        $this->db->select('count(1) num')->from('event4agent_record a');
+        $this->db->join('agent b', 'a.agent_id = b.id', 'left');
+        if($data['agent_keyword']){
+            $this->db->group_start();
+            $this->db->like('b.name', $data['agent_keyword']);
+            $this->db->or_like('b.job_code', $data['agent_keyword']);
+            $this->db->or_like('b.card', $data['agent_keyword']);
+            $this->db->group_end();
+        }
+        if($data['event_keyword']){
+            $this->db->group_start();
+            $this->db->like('a.event_name', $data['event_keyword']);
+            $this->db->or_like('a.event_type_name', $data['event_keyword']);
+            $this->db->group_end();
+        }
+        if($type_type){
+            $this->db->like('a.event_type_type', $type_type);
+        }
+        if($data['status']){
+            $this->db->like('a.status', $data['status']);
+        }
+        $num = $this->db->get()->row();
+        $data['total_rows'] = $num->num;
+
+        //获取详细列
+        $this->db->select('a.*, b.name agent_name_, b.job_code agent_job_code_')->from('event4agent_record a');
+        $this->db->join('agent b', 'a.agent_id = b.id', 'left');
+        if($data['agent_keyword']){
+            $this->db->group_start();
+            $this->db->like('b.name', $data['agent_keyword']);
+            $this->db->or_like('b.job_code', $data['agent_keyword']);
+            $this->db->or_like('b.card', $data['agent_keyword']);
+            $this->db->group_end();
+        }
+        if($data['event_keyword']){
+            $this->db->group_start();
+            $this->db->like('a.event_name', $data['event_keyword']);
+            $this->db->or_like('a.event_type_name', $data['event_keyword']);
+            $this->db->group_end();
+        }
+        if($type_type){
+            $this->db->like('a.event_type_type', $type_type);
+        }
+        if($data['status']){
+            $this->db->like('a.status', $data['status']);
+        }
+        $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
+        $this->db->order_by('a.record_id','desc');
+        $data['res_list'] = $this->db->get()->result_array();
+        return $data;
+    }
+
+    public function event4agent_GRecord_save($admin_id){
+        $event4agent_type = $this->config->item('event4agent_type');
+        $data = array(
+            'agent_id'=> trim($this->input->post('agent_id')),
+            'event_type_id'=> trim($this->input->post('type_id')),
+            'event_id' => trim($this->input->post('event_id')),
+            'record_fact' => trim($this->input->post('record_fact')),
+            'event_date' => trim($this->input->post('event_date')),
+            'remark' => trim($this->input->post('remark')),
+            'create_uid' => $admin_id,
+            'status' => 1,
+            'create_time' => date('Y-m-d H:i:s', time()),
+        );
+        if(!$data['agent_id'] || !$data['event_type_id'] || !$data['event_id'] || !$data['record_fact'] || !$data['remark'] || !$data['event_date']){
+            return $this->fun_fail('缺少必要信息!');
+        }
+        $agent_info_ = $this->readByID('agent', 'id', $data['agent_id']);
+        if(!$agent_info_)
+            return $this->fun_fail('所选经纪人异常!');
+        $event_info_ = $this->readByID('event4agent_detail', 'id', $data['agent_id']);
+        if(!$event_info_ || $event_info_['status'] != 1)
+            return $this->fun_fail('所选事件状态异常!');
+        if( $event_info_['type_id'] != $data['event_type_id'])
+            return $this->fun_fail('所选事件类别与事件不符!');
+        $type_info_ = $this->readByID('event4agent_type', 'id', $data['event_type_id']);
+        if(!$type_info_ || $type_info_['status'] != 1)
+            return $this->fun_fail('所选事件类别状态异常!');
+        if ($type_info_['type'] != 1) {
+           return $this->fun_fail("所选事件不属于 " . $event4agent_type[1] . " 事件!");
+        }
+        $data['event_name'] = $event_info_['event_name'];
+        $data['event_type_name'] = $type_info_['event_type_name'];
+        $data['score'] = $event_info_['score'];
+        $data['event_type_type'] = $type_info_['type'];
+        $res = $this->db->insert('event4agent_record', $data);
+        if ($res) {
+            return $this->fun_success('保存成功!');
+        }
+        return $this->fun_fail('保存失败!');
+    }
+
     /**
      *********************************************************************************************
-     * 经纪人事件
+     * 企业事件
      *********************************************************************************************
      */
 
     /**
-     * 经纪人事件一级列表
+     * 企业事件一级列表
      * @author yangyang
      * @date 2019-11-09
      */
@@ -831,7 +971,7 @@ class Manager_model extends MY_Model
     }
 
     /**
-     * 经纪人事件一级列表
+     * 企业事件一级列表
      * @author yangyang
      * @date 2019-11-09
      */
@@ -859,7 +999,7 @@ class Manager_model extends MY_Model
     }
 
     /**
-     * 执业经纪人保存页面
+     * 企业事件保存页面
      * @author yangyang
      * @date 2019-11-09
      */

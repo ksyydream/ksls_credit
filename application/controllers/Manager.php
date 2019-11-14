@@ -519,6 +519,76 @@ class Manager extends MY_Controller {
         $this->assign('event_type_all', $event_type_all);
         $this->display('manager/event_agent/event4agent_detail_list.html');
     }
+
+    /**
+     * 经纪人事件二级新增页面
+     * @author yangyang
+     * @date 2019-11-14
+     */
+    public function event4agent_detail_add(){
+        $event_type_all = $this->c4m_model->get_event4agent_type_all(1);
+        $this->assign('event_type_all', $event_type_all);
+        $this->display('manager/event_agent/event4agent_detail_detail.html');
+    }
+
+     /**
+     * 经纪人事件二级保存页面
+     * @author yangyang
+     * @date 2019-11-14
+     */
+    public function event4agent_detail_save(){
+        $res = $this->manager_model->event4agent_detail_save();
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/manager/event4agent_detail_list'));
+        }else{
+            $this->show_message($res['msg']);
+        }
+    }
+
+     public function event4agent_detail_edit($m_id){
+        $data = $this->manager_model->event4agent_detail_edit($m_id);
+        if(!$data){
+            $this->show_message('未找到信息!');
+        }
+         $event_type_all = $this->c4m_model->get_event4agent_type_all(1);
+        $this->assign('event_type_all', $event_type_all);
+        $this->assign('data', $data);
+        $this->display('manager/event_agent/event4agent_detail_detail.html');
+    }
+
+    /**
+     * 经纪人事件(良好信用)列表
+     * @author yangyang
+     * @date 2019-11-14
+     */
+
+    public function event4agent_GRecord_list($page = 1){
+        $data = $this->manager_model->event4agent_record_list($page, 1);
+        $base_url = "/manager/event4agent_GRecord_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('manager/event_agent/event4agent_GRecord_list.html');
+    }
+
+    public function event4agent_GRecord_add(){
+        $event_type_all = $this->c4m_model->get_event4agent_type_all(1);
+        $this->assign('event_type_all', $event_type_all);
+        $get_agent_all = $this->c4m_model->get_agent_all(2);
+        $this->assign('agent_all', $get_agent_all);
+        $this->display('manager/event_agent/event4agent_GRecord_add.html');
+    }
+
+    public function event4agent_GRecord_save(){
+         $res = $this->manager_model->event4agent_GRecord_save($this->admin_id);
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/manager/event4agent_GRecord_list'));
+        }else{
+            $this->show_message($res['msg']);
+        }
+    }
+
     /**
      *********************************************************************************************
      * 企业事件

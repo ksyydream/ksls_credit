@@ -1,19 +1,13 @@
 $(function(){
     $(".js4phone").keyup(function () {
-        $("#nickname").val('');
-        $("#account_warning").hide();
         $(this).val($(this).val().replace(/[^0-9]/g, ''));
         $(this).val($(this).val().toUpperCase());
 
     }).blur(function(){
-        $("#nickname").val('');
-        $("#account_warning").hide();
         $(this).val($(this).val().replace(/[^0-9]/g, ''));
         $(this).val($(this).val().toUpperCase());
 
     }).bind("paste", function () {  //CTR+V事件处理
-        $("#nickname").val('');
-        $("#account_warning").hide();
         $(this).val($(this).val().replace(/[^0-9]/g, ''));
         $(this).val($(this).val().toUpperCase());
 
