@@ -47,7 +47,7 @@
 
                             <div class="space-4"></div>
                             <div class="form-group">
-                                <label class="col-sm-2 control-label no-padding-right" for="flag"> 一级类别 </label>
+                                <label class="col-sm-2 control-label no-padding-right" for="type_id"> 一级类别 </label>
                                 <div class="col-sm-5 yy_m_7">
                                     <select id="type_id" name="type_id" class="form-control">
                                     <option value="">--请选择--</option>
@@ -62,7 +62,7 @@
                             </div>
                              <div class="space-4"></div>
                             <div class="form-group">
-                                <label class="col-sm-2 control-label no-padding-right" for="flag"> 事件列表 </label>
+                                <label class="col-sm-2 control-label no-padding-right" for="event_id"> 事件列表 </label>
                                 <div class="col-sm-5 yy_m_7">
                                     <select id="event_id" name="event_id" class="form-control">
                                     <option value="">--请选择--</option>
@@ -72,11 +72,19 @@
                                 </div>
 
                             </div>
+                            <div class="space-4"></div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="event_date"> 事件时间 </label>
+                                <div class="col-sm-9">
+                                    <input type="text" onfocus="WdatePicker({isShowClear:false,readOnly:true,dateFmt:'yyyy-MM-dd'})" id="event_date" name="event_date" required="required" class="rcol-xs-10 col-sm-6" value="">
+                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                </div>
+                            </div>
                               <div class="space-4"></div>
                                  <div class="form-group">
                                 <label class="col-sm-2 control-label no-padding-right" for="record_fact"> 事实 </label>
                                 <div class="col-sm-9">
-                                    <input type="text" id="record_fact" name="record_fact" required="required" class="rcol-xs-10 col-sm-6" value="">
+                                    <textarea name="record_fact" id="record_fact" maxlength="150" style="width:60%;height:100px;"></textarea>
                                     <span class="help-inline col-xs-12 col-sm-7"></span>
                                 </div>
                             </div>
@@ -84,7 +92,7 @@
                                  <div class="form-group">
                                 <label class="col-sm-2 control-label no-padding-right" for="event_name"> 备注 </label>
                                 <div class="col-sm-9">
-                                    <input type="text" id="event_name" name="event_name" required="required" class="rcol-xs-10 col-sm-6" value="">
+                                    <textarea name="event_name" id="event_name" maxlength="150" style="width:60%;height:100px;"></textarea>
                                     <span class="help-inline col-xs-12 col-sm-7"></span>
                                 </div>
                             </div>
@@ -120,9 +128,30 @@
 {{include file='manager/public/footerjs.html'}}
 <!-- inline scripts related to this page -->
 <script src="/manager_statics/qwadmin/js/date-time/bootstrap-datepicker.js"></script>
-<script src="/manager_statics/app/ajaxfileupload.js"></script>
+<script src="/manager_statics/app/select2.full.min.js"></script>
+<link rel="stylesheet" href="/manager_statics/app/select2.min.css">
+
 <script type="text/javascript">
-    
+    $("#agent_id").select2();
+    $("#type_id").select2();
+    $("#event_id").select2();
+    $("#type_id").change(function(){
+        var type_id = $(this).val();
+
+        $.post('/ajax_api/get_eventByType', {type_id:type_id}, function(data) {
+            var data = JSON.parse(data);
+            var card_list = data.card_list;
+            $("#event_id").select2('destroy').empty();
+            var html = '<option value="">--请选择--</option>';
+            for(var i=0 ;i< card_list.length; i++){
+                html += "<option value='" + card_list[i]['id'] + "'>" + card_list[i]['event_name'] + "</option>"
+            }
+            $("#event_id").html(html);
+            $("#event_id").select2();
+            $("#event_id").val(['']).trigger('change');
+
+        });
+    });
 
 
     $("#save_btn").click(function(){

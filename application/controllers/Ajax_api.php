@@ -16,6 +16,7 @@ class Ajax_api extends CI_Controller {
         $this->load->library('image_lib');
         $this->load->helper('directory');
         $this->load->model('manager_model');
+        $this->load->model('common4manager_model', 'c4m_model');
     }
 
     /**
@@ -44,6 +45,12 @@ class Ajax_api extends CI_Controller {
             $pic_arr = $this->upload->data();
             echo $pic_arr['file_name'];
         }
+    }
+
+    public function get_eventByType(){
+        $region = $this->c4m_model->get_eventByType();
+        echo json_encode($region);
+        exit();
     }
 
 }

@@ -37,4 +37,14 @@ class Common4manager_model extends MY_Model
         return $res;
     }
 
+    public function get_eventByType(){
+        $this->db->select();
+        $this->db->from('event4agent_detail');
+        $this->db->where('status', 1);
+        if($type_id = $this->input->post('type_id'))
+            $this->db->where('type_id', $type_id);
+        $res =  $this->db->get()->result_array();
+        return $res;
+    }
+
 }
