@@ -130,45 +130,6 @@
 <script src="/manager_statics/qwadmin/js/date-time/bootstrap-datepicker.js"></script>
 <script src="/manager_statics/app/ajaxfileupload.js"></script>
 <script type="text/javascript">
-    window.onload = function() {
-        init();  //初始化
-
-    }
-    function init() {
-        //初始化图片上传
-        var btnImg = document.getElementById("btnUploadImg");
-        var img = document.getElementById("imgShow");
-        var hidImgName = document.getElementById("hidImgName");
-        g_AjxUploadImg(btnImg, img, hidImgName);
-    }
-
-
-    //图片上传
-    function g_AjxUploadImg(btn, img, hidPut) {
-        var button = btn, interval;
-        new AjaxUpload(button, {
-            action: "/ajax_api/upload_exam_head",
-            data: {},
-            name: 'userfile',
-            onSubmit: function(file, ext) {
-                if (!(ext && /^(jpg|JPG|png|PNG|gif|GIF)$/.test(ext))) {
-                    alert("您上传的图片格式不对，请重新选择！");
-                    return false;
-                }
-            },
-            onComplete: function(file, response) {
-                flagValue = response;
-                if (flagValue == "1") {
-                    alert("您上传的图片存在错误");
-                }
-                else {
-                    hidPut.value = response;
-                    img.src = response;
-
-                }
-            }
-        });
-    }
 
 
 
