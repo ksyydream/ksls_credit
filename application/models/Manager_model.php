@@ -835,7 +835,8 @@ class Manager_model extends MY_Model
         return $data;
     }
 
-    public function event4agent_GRecord_save($admin_id){
+    //通过$event4agent_type判断是 良好信用操作 还是失信信用操作，1代表良好信用，-1代表失信信用
+    public function event4agent_Record_save($admin_id, $event4agent_type_index){
         $event4agent_type = $this->config->item('event4agent_type');
         $data = array(
             'agent_id'=> trim($this->input->post('agent_id')),
@@ -854,7 +855,9 @@ class Manager_model extends MY_Model
         $agent_info_ = $this->readByID('agent', 'id', $data['agent_id']);
         if(!$agent_info_)
             return $this->fun_fail('所选经纪人异常!');
-        $event_info_ = $this->readByID('event4agent_detail', 'id', $data['agent_id']);
+        if($agent_info_['score'] < 0)
+            return $this->fun_fail('所选经纪人分数异常!');
+        $event_info_ = $this->readByID('event4agent_detail', 'id', $data['event_id']);
         if(!$event_info_ || $event_info_['status'] != 1)
             return $this->fun_fail('所选事件状态异常!');
         if( $event_info_['type_id'] != $data['event_type_id'])
@@ -862,18 +865,88 @@ class Manager_model extends MY_Model
         $type_info_ = $this->readByID('event4agent_type', 'id', $data['event_type_id']);
         if(!$type_info_ || $type_info_['status'] != 1)
             return $this->fun_fail('所选事件类别状态异常!');
-        if ($type_info_['type'] != 1) {
-           return $this->fun_fail("所选事件不属于 " . $event4agent_type[1] . " 事件!");
+        if ($type_info_['type'] != $event4agent_type_index) {
+           return $this->fun_fail("所选事件不属于 " . $event4agent_type[$event4agent_type_index] . " 事件!");
         }
         $data['event_name'] = $event_info_['event_name'];
         $data['event_type_name'] = $type_info_['event_type_name'];
-        $data['score'] = $event_info_['score'];
+        $data['score'] =  ($event4agent_type_index * $event_info_['score']);
         $data['event_type_type'] = $type_info_['type'];
+        $new_score_ = $agent_info_['score'] + $data['score'];
+        if($new_score_ < 0)
+            return $this->fun_fail('所选经纪人分数不足!');
+
         $res = $this->db->insert('event4agent_record', $data);
         if ($res) {
+            $this->db->where(array('id' => $data['agent_id'], 'score' => $agent_info_['score']));
+            $res_agent_ = $this->db->set('score', 'score + ' . $data['score'], FALSE)->update('agent');
+            //DBY重要
+            //这里需要加入 经纪人状态变更，企业分数更新和状态检查 可能还需要做相应的记录
             return $this->fun_success('保存成功!');
         }
         return $this->fun_fail('保存失败!');
+    }
+
+     public function event4agent_Record_update($admin_id){
+        if(!$record_id = $this->input->post('record_id'))
+            return $this->fun_fail('事件状态异常');
+        $record_info_ = $this->readByID('event4agent_record', 'record_id', $record_id);
+        if(!$record_info_ || $record_info_['status'] != 1)
+            return $this->fun_fail('事件状态异常!');
+        $data = array(
+            'record_fact' => trim($this->input->post('record_fact')),
+            'event_date' => trim($this->input->post('event_date')),
+            'remark' => trim($this->input->post('remark')),
+            'modify_uid' => $admin_id,
+            'modify_time' => date('Y-m-d H:i:s', time()),
+        );
+        if(!$data['record_fact'] || !$data['remark'] || !$data['event_date']){
+            return $this->fun_fail('缺少必要信息!');
+        }
+        $res = $this->db->where('record_id', $record_id)->update('event4agent_record', $data);
+        return $this->fun_success('保存成功!');
+    }
+
+     public function event4agent_Record_edit($id){
+        $this->db->select('a.*, b.name agent_name_ ,b.job_code agent_job_code_')->from('event4agent_record a');
+        $this->db->join('agent b', 'b.id = a.agent_id', 'left');
+        $this->db->where('a.record_id',$id);
+        $detail =  $this->db->get()->row_array();
+        return $detail;
+    }
+
+    public function event4agent_Record_cancel($admin_id){
+        if(!$record_id = $this->input->post('record_id'))
+            return $this->fun_fail('事件状态异常');
+        $record_info_ = $this->readByID('event4agent_record', 'record_id', $record_id);
+        if(!$record_info_ || $record_info_['status'] != 1)
+            return $this->fun_fail('事件状态异常!');
+        $agent_info_ = $this->readByID('agent', 'id', $record_info_['agent_id']);
+        if(!$agent_info_)
+            return $this->fun_fail('所选经纪人异常!');
+        if($agent_info_['score'] < 0)
+            return $this->fun_fail('所选经纪人分数异常!');
+        $new_score_ = $agent_info_['score'] - $record_info_['score'];
+        if($new_score_ < 0)
+            return $this->fun_fail('所选经纪人分数不足!');
+        $data = array(
+            'del_remark' => trim($this->input->post('del_remark')),
+            'del_uid' => $admin_id,
+            'status' => -1,
+            'del_time' => date('Y-m-d H:i:s', time()),
+        );
+        if(!$data['del_remark']){
+            return $this->fun_fail('缺少必要信息!');
+        }
+        $res = $this->db->where('record_id', $record_id)->update('event4agent_record', $data);
+         if ($res) {
+            $this->db->where(array('id' => $record_info_['agent_id'], 'score' => $agent_info_['score']));
+            $res_agent_ = $this->db->set('score', 'score - ' . $record_info_['score'], FALSE)->update('agent');
+            //DBY重要
+            //这里需要加入 经纪人状态变更，企业分数更新和状态检查 可能还需要做相应的记录
+            return $this->fun_success('作废成功!');
+        }
+        return $this->fun_fail('作废失败!');
     }
 
     /**

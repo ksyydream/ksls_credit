@@ -572,21 +572,110 @@ class Manager extends MY_Controller {
         $this->display('manager/event_agent/event4agent_GRecord_list.html');
     }
 
+    //新增
     public function event4agent_GRecord_add(){
-        $event_type_all = $this->c4m_model->get_event4agent_type_all(1);
+        $event_type_all = $this->c4m_model->get_event4agent_type_all(1,1);
         $this->assign('event_type_all', $event_type_all);
         $get_agent_all = $this->c4m_model->get_agent_all(2);
         $this->assign('agent_all', $get_agent_all);
         $this->display('manager/event_agent/event4agent_GRecord_add.html');
     }
 
+    //保存
     public function event4agent_GRecord_save(){
-         $res = $this->manager_model->event4agent_GRecord_save($this->admin_id);
+         $res = $this->manager_model->event4agent_Record_save($this->admin_id, 1);
         if($res['status'] == 1){
             $this->show_message($res['msg'], site_url('/manager/event4agent_GRecord_list'));
         }else{
             $this->show_message($res['msg']);
         }
+    }
+
+    //修改
+    public function event4agent_GRecord_update(){
+         $res = $this->manager_model->event4agent_Record_update($this->admin_id);
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/manager/event4agent_GRecord_list'));
+        }else{
+            $this->show_message($res['msg']);
+        }
+    }
+
+    //编辑
+    public function event4agent_GRecord_edit($m_id){
+        $data = $this->manager_model->event4agent_Record_edit($m_id);
+        if(!$data){
+            $this->show_message('未找到信息!');
+        }
+        $this->assign('data', $data);
+        $this->display('manager/event_agent/event4agent_GRecord_edit.html');
+    }
+
+    //作废
+    public function event4agent_GRecord_cancel(){
+         $res = $this->manager_model->event4agent_Record_cancel($this->admin_id);
+        $this->ajaxReturn($res);
+    }
+
+     /**
+     * 经纪人事件(不良信用)列表
+     * @author yangyang
+     * @date 2019-11-14
+     */
+
+    public function event4agent_BRecord_list($page = 1){
+        $data = $this->manager_model->event4agent_record_list($page, -1);
+        $base_url = "/manager/event4agent_BRecord_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('manager/event_agent/event4agent_BRecord_list.html');
+    }
+
+    //新增
+    public function event4agent_BRecord_add(){
+        $event_type_all = $this->c4m_model->get_event4agent_type_all(1, -1);
+        $this->assign('event_type_all', $event_type_all);
+        $get_agent_all = $this->c4m_model->get_agent_all(2);
+        $this->assign('agent_all', $get_agent_all);
+        $this->display('manager/event_agent/event4agent_BRecord_add.html');
+    }
+
+    //保存
+    public function event4agent_BRecord_save(){
+         $res = $this->manager_model->event4agent_Record_save($this->admin_id, -1);
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/manager/event4agent_BRecord_list'));
+        }else{
+            $this->show_message($res['msg']);
+        }
+    }
+
+    //修改
+    public function event4agent_BRecord_update(){
+         $res = $this->manager_model->event4agent_Record_update($this->admin_id);
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/manager/event4agent_BRecord_list'));
+        }else{
+            $this->show_message($res['msg']);
+        }
+    }
+
+    //编辑
+    public function event4agent_BRecord_edit($m_id){
+        $data = $this->manager_model->event4agent_Record_edit($m_id);
+        if(!$data){
+            $this->show_message('未找到信息!');
+        }
+        $this->assign('data', $data);
+        $this->display('manager/event_agent/event4agent_BRecord_edit.html');
+    }
+
+    //作废
+    public function event4agent_BRecord_cancel(){
+         $res = $this->manager_model->event4agent_Record_cancel($this->admin_id);
+        $this->ajaxReturn($res);
     }
 
     /**
