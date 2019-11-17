@@ -728,7 +728,7 @@ class Manager extends MY_Controller {
 
 
     /**
-     * 经纪人事件一级列表
+     * 企业事件一级列表
      * @author yangyang
      * @date 2019-11-09
      */
@@ -745,7 +745,7 @@ class Manager extends MY_Controller {
     }
 
     /**
-     * 经纪人事件一级新增页面
+     * 企业事件一级新增页面
      * @author yangyang
      * @date 2019-11-09
      */
@@ -756,7 +756,7 @@ class Manager extends MY_Controller {
     }
 
     /**
-     * 经纪人事件一级保存页面
+     * 企业事件一级保存页面
      * @author yangyang
      * @date 2019-11-09
      */
@@ -781,7 +781,7 @@ class Manager extends MY_Controller {
     }
 
     /**
-     * 经纪人事件二级列表
+     * 企业事件二级列表
      * @author yangyang
      * @date 2019-11-12
      */
@@ -800,7 +800,7 @@ class Manager extends MY_Controller {
     }
 
     /**
-     * 经纪人事件二级新增页面
+     * 企业事件二级新增页面
      * @author yangyang
      * @date 2019-11-14
      */
@@ -811,7 +811,7 @@ class Manager extends MY_Controller {
     }
 
     /**
-     * 经纪人事件二级保存页面
+     * 企业事件二级保存页面
      * @author yangyang
      * @date 2019-11-14
      */
