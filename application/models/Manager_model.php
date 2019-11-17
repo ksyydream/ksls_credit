@@ -711,10 +711,10 @@ class Manager_model extends MY_Model
             $this->db->like('a.event_name', $data['keyword']);
         }
         if($data['type_id']){
-            $this->db->like('a.type_id', $data['type_id']);
+            $this->db->where('a.type_id', $data['type_id']);
         }
         if($data['status']){
-            $this->db->like('a.status', $data['status']);
+            $this->db->where('a.status', $data['status']);
         }
         $num = $this->db->get()->row();
         $data['total_rows'] = $num->num;
@@ -726,10 +726,10 @@ class Manager_model extends MY_Model
             $this->db->like('a.event_name', $data['keyword']);
         }
         if($data['type_id']){
-            $this->db->like('a.type_id', $data['type_id']);
+            $this->db->where('a.type_id', $data['type_id']);
         }
         if($data['status']){
-            $this->db->like('a.status', $data['status']);
+            $this->db->where('a.status', $data['status']);
         }
         $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
         $this->db->order_by('a.id','desc');
@@ -799,10 +799,10 @@ class Manager_model extends MY_Model
             $this->db->group_end();
         }
         if($type_type){
-            $this->db->like('a.event_type_type', $type_type);
+            $this->db->where('a.event_type_type', $type_type);
         }
         if($data['status']){
-            $this->db->like('a.status', $data['status']);
+            $this->db->where('a.status', $data['status']);
         }
         $num = $this->db->get()->row();
         $data['total_rows'] = $num->num;
@@ -824,10 +824,10 @@ class Manager_model extends MY_Model
             $this->db->group_end();
         }
         if($type_type){
-            $this->db->like('a.event_type_type', $type_type);
+            $this->db->where('a.event_type_type', $type_type);
         }
         if($data['status']){
-            $this->db->like('a.status', $data['status']);
+            $this->db->where('a.status', $data['status']);
         }
         $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
         $this->db->order_by('a.record_id','desc');
@@ -1098,6 +1098,83 @@ class Manager_model extends MY_Model
 
     public function event4company_type_edit($id){
         $this->db->select('a.*')->from('event4company_type a');
+        $this->db->where('a.id',$id);
+        $detail =  $this->db->get()->row_array();
+        return $detail;
+    }
+
+    /**
+     * 企业事件二级列表
+     * @author yangyang
+     * @date 2019-11-12
+     */
+    public function event4company_detail_list($page = 1){
+        $data['limit'] = $this->limit;
+        //搜索条件
+        $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
+        $data['type_id'] = $this->input->get('type_id')?trim($this->input->get('type_id')):null;
+        $data['status'] = $this->input->get('status')?trim($this->input->get('status')):null;
+        //获取总记录数
+        $this->db->select('count(1) num')->from('event4company_detail a');
+        $this->db->join('event4company_type b', 'a.type_id = b.id', 'left');
+        if($data['keyword']){
+            $this->db->like('a.event_name', $data['keyword']);
+        }
+        if($data['type_id']){
+            $this->db->where('a.type_id', $data['type_id']);
+        }
+        if($data['status']){
+            $this->db->where('a.status', $data['status']);
+        }
+        $num = $this->db->get()->row();
+        $data['total_rows'] = $num->num;
+
+        //获取详细列
+        $this->db->select('a.*, b.event_type_name, b.type b_type_')->from('event4company_detail a');
+        $this->db->join('event4company_type b', 'a.type_id = b.id', 'left');
+        if($data['keyword']){
+            $this->db->like('a.event_name', $data['keyword']);
+        }
+        if($data['type_id']){
+            $this->db->where('a.type_id', $data['type_id']);
+        }
+        if($data['status']){
+            $this->db->where('a.status', $data['status']);
+        }
+        $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
+        $this->db->order_by('a.id','desc');
+        $data['res_list'] = $this->db->get()->result_array();
+        return $data;
+    }
+
+    /**
+     * 企业事件二级保存页面
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function event4company_detail_save(){
+        $data = array(
+            'event_name'=> trim($this->input->post('event_name')),
+            'type_id'=> trim($this->input->post('type_id')),
+            'score' => trim($this->input->post('score')),
+            'status' => trim($this->input->post('status')) ? trim($this->input->post('status')) : -1,
+            'cdate' => date('Y-m-d H:i:s', time()),
+        );
+        $id = $this->input->post('id');
+        if(!$data['event_name'] || !$data['type_id'] || !$data['score']){
+            return $this->fun_fail('缺少必要信息!');
+        }
+        if($id){
+            unset($data['cdate']);
+            $this->db->where('id', $id)->update('event4company_detail', $data);
+        }else{
+            $this->db->insert('event4company_detail', $data);
+        }
+        return $this->fun_success('保存成功!');
+    }
+
+    public function event4company_detail_edit($id){
+        $this->db->select('a.*')->from('event4company_detail a');
         $this->db->where('a.id',$id);
         $detail =  $this->db->get()->row_array();
         return $detail;

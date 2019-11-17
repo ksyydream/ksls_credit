@@ -780,4 +780,59 @@ class Manager extends MY_Controller {
         $this->display('manager/event_company/event4company_type_detail.html');
     }
 
+    /**
+     * 经纪人事件二级列表
+     * @author yangyang
+     * @date 2019-11-12
+     */
+    public function event4company_detail_list($page = 1){
+        $data = $this->manager_model->event4company_detail_list($page);
+        $event_type_all = $this->c4m_model->get_event4company_type_all();
+        $event4company_type = $this->config->item('event4company_type');
+        $base_url = "/manager/event4company_detail_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->assign('event4company_type', $event4company_type);
+        $this->assign('event_type_all', $event_type_all);
+        $this->display('manager/event_company/event4company_detail_list.html');
+    }
+
+    /**
+     * 经纪人事件二级新增页面
+     * @author yangyang
+     * @date 2019-11-14
+     */
+    public function event4company_detail_add(){
+        $event_type_all = $this->c4m_model->get_event4company_type_all(1);
+        $this->assign('event_type_all', $event_type_all);
+        $this->display('manager/event_company/event4company_detail_detail.html');
+    }
+
+    /**
+     * 经纪人事件二级保存页面
+     * @author yangyang
+     * @date 2019-11-14
+     */
+    public function event4company_detail_save(){
+        $res = $this->manager_model->event4company_detail_save();
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/manager/event4company_detail_list'));
+        }else{
+            $this->show_message($res['msg']);
+        }
+    }
+
+    public function event4company_detail_edit($m_id){
+        $data = $this->manager_model->event4company_detail_edit($m_id);
+        if(!$data){
+            $this->show_message('未找到信息!');
+        }
+        $event_type_all = $this->c4m_model->get_event4company_type_all(1);
+        $this->assign('event_type_all', $event_type_all);
+        $this->assign('data', $data);
+        $this->display('manager/event_company/event4company_detail_detail.html');
+    }
+
 }

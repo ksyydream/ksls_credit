@@ -50,7 +50,17 @@ class Ajax_api extends CI_Controller {
     //暂时只设计给后台 经纪人事件新增选择事件时使用，所以在没有type_id的时候不返回信息
     public function get_eventByType4agent(){
         if($type_id = $this->input->post('type_id'))
-            $region = $this->c4m_model->get_eventByTypeId($type_id);
+            $region = $this->c4m_model->get_eventByType4agent($type_id);
+        else
+            $region = array();
+        echo json_encode($region);
+        exit();
+    }
+
+    //暂时只设计给后台 企业事件新增选择事件时使用，所以在没有type_id的时候不返回信息
+    public function get_eventByType4company(){
+        if($type_id = $this->input->post('type_id'))
+            $region = $this->c4m_model->get_eventByType4company($type_id);
         else
             $region = array();
         echo json_encode($region);
