@@ -835,4 +835,35 @@ class Manager extends MY_Controller {
         $this->display('manager/event_company/event4company_detail_detail.html');
     }
 
+    /**
+     *********************************************************************************************
+     * 以下代码为企业管理
+     *********************************************************************************************
+     */
+
+    /**
+     * 企业报备列表
+     * @author yangyang
+     * @date 2019-11-12
+     */
+    public function company_apply_list($page = 1){
+        $data = $this->manager_model->company_apply_list($page, 1);
+        $base_url = "/manager/company_apply_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('manager/company/company_apply_list.html');
+    }
+
+
+    /**
+     * 企业报备保存页面 用于测试
+     * @author yangyang
+     * @date 2019-11-18
+     */
+    public function company_apply_add(){
+        $this->display('manager/company/company_apply_add.html');
+    }
+
 }

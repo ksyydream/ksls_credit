@@ -1,0 +1,103 @@
+<div class="profile-user-info profile-user-info-striped">
+    <input type="hidden" id="insert_agent_id_" value="{{$data.id|default:''}}">
+    <input type="hidden" id="insert_agent_name_" value="{{$data.name|default:''}}">
+    <input type="hidden" id="insert_agent_job_code_" value="{{$data.job_code|default:''}}">
+    <input type="hidden" id="insert_agent_card_" value="{{$data.card|default:''}}">
+    <input type="hidden" id="insert_agent_phone_" value="{{$data.phone|default:''}}">
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 姓名 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$data.name|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 执业证号 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <i class="fa fa-thumb-tack light-orange bigger-110"></i>
+                                                                                <span>{{$data.job_code|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 身份证号 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$data.card|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 联系电话 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$data.phone|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 所属公司 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$data.company_name|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 状态 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>
+                                            {{if $data.flag == 2}}<span class="label label-success">有效</span>{{/if}}
+                                            {{if $data.flag == 1}}<span class="label label-default">离昆</span>{{/if}}
+                                            {{if $data.flag == -1}}<span class="label label-danger">无效</span>{{/if}}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 信用分数 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$data.score|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name">  </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                {{if $data.company_id == -1}}
+                                                                                <button id="insert_btn_agent_" class="pull-right btn btn-sm btn-primary btn-white btn-round" type="button">
+                                                                                加入
+                                                                                <i class="ace-icon fa fa-arrow-right icon-on-right bigger-110"></i> </button>
+                                                                                {{else}}
+                                                                                <span class="label label-warning label-white middle">不可加入</span>
+                                                                                {{/if}}
+                                                                                
+                                                                           
+                                                                            </div>
+                                                                        </div>
+                                                                       
+</div>
+
+<script type="text/javascript">
+    
+    $("#insert_btn_agent_").click(function(){
+        var insert_agent_phone_ = $("#insert_agent_phone_").val();
+        var insert_agent_job_code_ = $("#insert_agent_job_code_").val();
+        var insert_agent_card_ = $("#insert_agent_card_").val();
+        var insert_agent_name_ = $("#insert_agent_name_").val();
+        var insert_agent_id_ = $("#insert_agent_id_").val();
+        var html_ = ' <tr>';
+        html_ += '<td>' + insert_agent_name_ + '</td>';
+        html_ += '<td>' + insert_agent_job_code_ + '</td>';
+         html_ += '<td>' + insert_agent_card_ + '</td>';
+          html_ += '<td>' + insert_agent_phone_ + '</td><td>';
+          html_ += '<input type="hidden" name="new_job_code[]" value="' + insert_agent_job_code_ + '">';
+           html_ += ' <input type="hidden" name="new_agent_id[]" value="' + insert_agent_id_ + '"><a href="javascript:void(0);" dataid="" class="delete_yy_"><i class="ace-icon fa fa-print bigger-100 red"></i>删除</a></td>';
+       $("#tbody_id").append(html_);
+        layer.closeAll();
+    })
+</script>

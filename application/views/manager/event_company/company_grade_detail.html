@@ -43,7 +43,7 @@
                             <div class="form-group">
                                 <label class="col-sm-2 control-label no-padding-right" for="min_score"> 分数线 </label>
                                 <div class="col-sm-9">
-                                    <input type="text" id="min_score" name="min_score" required="required"  {{if $data.min_score|default:'-1' == 0}}readonly="readonly" {{/if}} class="rcol-xs-10 col-sm-5 js4phone" value="{{$data.min_score|default:''}}">
+                                    <input type="text" id="min_score" name="min_score" required="required"  {{if $data.flag|default:'1' == -1}}readonly="readonly" {{/if}} class="rcol-xs-10 col-sm-5 js4phone" value="{{$data.min_score|default:''}}">
                                     <span class="help-inline col-xs-12 col-sm-7"></span>
                                 </div>
                             </div>

@@ -71,4 +71,16 @@ class Common4manager_model extends MY_Model
         return $res;
     }
 
+    public function get_agent4company(){
+        if(!$job_code = trim($this->input->post('keyword')))
+            return array();
+        $this->db->select('a.*, b.company_name');
+        $this->db->from('agent a');
+        $this->db->join('company_pending b', 'a.company_id = b.id', 'left');
+        $this->db->where('a.job_code', $job_code);
+        //这里暂时不排除其他无效状态的人员
+        //DBY重要
+        return $this->db->get()->row_array();
+    }
+
 }

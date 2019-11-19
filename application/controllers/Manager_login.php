@@ -14,7 +14,7 @@ class Manager_login extends MY_Controller {
     {
         parent::__construct();
         $this->load->model('manager_model');
-
+        $this->load->model('common4manager_model', 'c4m_model');
     }
 
     /**
@@ -129,5 +129,25 @@ class Manager_login extends MY_Controller {
         }
         $data['time'] = $time;
         echo json_encode($data);
+    }
+
+    /**
+     * 企业保存页面 用于测试
+     * @author yangyang
+     * @date 2019-11-14
+     */
+    public function show_agent4company_add(){
+         $admin_info = $this->session->userdata('admin_info');
+        if(!$admin_info){
+            echo -1;//如果没有登陆 不可调用
+            exit();
+        }
+        $data = $this->c4m_model->get_agent4company();
+        if (!$data) {
+            echo -2;//没有数据
+            exit();
+        }
+        $this->assign('data',$data);
+        $this->display('manager/company/show_agent.html');
     }
 }

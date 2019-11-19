@@ -466,8 +466,8 @@ class Manager_model extends MY_Model
         $data['total_rows'] = $num->num;
 
         //获取详细列
-        $this->db->select('a.*')->from('agent a');
-        //$this->db->join('company_pending b','a.company_id = b.id','left');
+        $this->db->select('a.*, b.company_name')->from('agent a');
+        $this->db->join('company_pending b','a.company_id = b.id','left');
         //$this->db->join('company_pass c','b.id = c.company_id','left');
         if($data['keyword']){
             $this->db->group_start();
@@ -485,8 +485,8 @@ class Manager_model extends MY_Model
     }
 
     public function agent_edit($id){
-        $this->db->select('a.*')->from('agent a');
-        //$this->db->join('company_pending b','a.company_id = b.id','left');
+        $this->db->select('a.*, b.company_name')->from('agent a');
+        $this->db->join('company_pending b','a.company_id = b.id','left');
         //$this->db->join('company_pass c','c.company_id = b.id','left');
         $this->db->where('a.id',$id);
         $detail =  $this->db->get()->row_array();
@@ -593,8 +593,8 @@ class Manager_model extends MY_Model
             $info_ = $this->readByID($table_, 'id', $grade_id);
             if(!$info_)
                 return $this->fun_fail('等级不存在');
-            if($info_['min_score'] == 0)
-                $data['min_score'] = 0;
+            if($info_['flag'] == -1)
+                $data['min_score'] = $info_['min_score'];
             $res = $this->db->select('')->from($table_)->where(array('grade_name'=>$data['grade_name'],'id <>' => $grade_id))->get()->row_array();
             if($res)
                 return $this->fun_fail('存在相同等级名称');
@@ -625,8 +625,8 @@ class Manager_model extends MY_Model
         $info_= $this->db->from('agent_grade')->where('id', $id)->get()->row_array();
         if(!$info_)
             return $this->fun_fail('分数线不存在');
-        if($info_['min_score'] == 0)
-            return $this->fun_fail('0分分数线不可删除');
+        if($info_['flag'] == -1)
+            return $this->fun_fail('失信分数线不可删除');
         $res = $this->db->where('id', $id)->delete('agent_grade');
         if($res)
             return $this->fun_success('删除成功');
@@ -1003,8 +1003,8 @@ class Manager_model extends MY_Model
             $info_ = $this->readByID($table_, 'id', $grade_id);
             if(!$info_)
                 return $this->fun_fail('等级不存在');
-            if($info_['min_score'] == 0)
-                $data['min_score'] = 0;
+            if($info_['flag'] == -1)
+                $data['min_score'] = $info_['min_score'];
             $res = $this->db->select('')->from($table_)->where(array('grade_name'=>$data['grade_name'],'id <>' => $grade_id))->get()->row_array();
             if($res)
                 return $this->fun_fail('存在相同等级名称');
@@ -1035,8 +1035,8 @@ class Manager_model extends MY_Model
         $info_= $this->db->from('company_grade')->where('id', $id)->get()->row_array();
         if(!$info_)
             return $this->fun_fail('分数线不存在');
-        if($info_['min_score'] == 0)
-            return $this->fun_fail('0分分数线不可删除');
+        if($info_['flag'] == -1)
+            return $this->fun_fail('失信分数线不可删除');
         $res = $this->db->where('id', $id)->delete('company_grade');
         if($res)
             return $this->fun_success('删除成功');
@@ -1178,5 +1178,46 @@ class Manager_model extends MY_Model
         $this->db->where('a.id',$id);
         $detail =  $this->db->get()->row_array();
         return $detail;
+    }
+
+    /**
+     *********************************************************************************************
+     * 以下代码为企业管理
+     *********************************************************************************************
+     */
+
+     /**
+     * 企业报备列表
+     * @author yangyang
+     * @date 2019-11-12
+     */
+    public function company_apply_list($page = 1, $flag){
+        $data['limit'] = $this->limit;
+        //搜索条件
+        $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
+       
+        $this->db->select('count(1) num')->from('company_pending a');
+        if($data['keyword']){
+            $this->db->like('a.company_name', $data['keyword']);
+        }
+        if($flag){
+            $this->db->where('a.flag',$flag);
+        }
+        $num = $this->db->get()->row();
+        $data['total_rows'] = $num->num;
+
+        //获取详细列
+        $this->db->select('a.*')->from('company_pending a');
+        if($data['keyword']){
+            $this->db->like('a.company_name', $data['keyword']);
+        }
+        if($flag){
+            $this->db->where('a.flag',$flag);
+        }
+        $this->db->order_by('a.mdate','asc');
+      
+        $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
+        $data['res_list'] = $this->db->get()->result_array();
+        return $data;
     }
 }
