@@ -83,4 +83,9 @@ class Common4manager_model extends MY_Model
         return $this->db->get()->row_array();
     }
 
+    public function get_niu_pics($f_name, $time){
+        $res = $this->db->select()->from('upload_img')->where(array('folder' => $f_name, 'flag_time' => $time))->get()->result_array();
+        return $res;
+    }
+
 }

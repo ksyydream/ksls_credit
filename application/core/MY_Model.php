@@ -729,6 +729,48 @@ class MY_Model extends CI_Model{
 
         return $groups;
     }
+
+    //从服务器端上传图片
+    function save_qiniu($bucket, $file_name , $file, $time){
+        $this->load->library('Qiniu');
+        $accessKey = $this->config->item('qiniu_AccessKey');
+        $secretKey = $this->config->item('qiniu_SecretKey');
+        $auth = new Qiniu\Auth($accessKey, $secretKey);
+        $ossSupportPath = array('ksls2credit');
+        if(!in_array($bucket, $ossSupportPath)){
+            return '';
+        }
+        $token = $auth->uploadToken($bucket);
+        $bucketMgr = new Qiniu\Storage\UploadManager();
+        $object = 'public/upload/' .md5(time().mt_rand(100000,999999)).'.'.pathinfo($file_name, PATHINFO_EXTENSION);
+        $filePath = './upload_files/'.$file.'/'.$file_name;
+        if(file_exists($filePath)){
+            list($ret, $err) = $bucketMgr->putFile($token, $object, $filePath);
+            if ($err !== null) {
+                $insert_arr = array(
+                    'type' => 1,
+                    'add_time' => time(),
+                    'err_msg' => "oss上传文件失败，".$err
+                );
+                $this->db->insert('log', $insert_arr);
+                return '';
+            } else {
+                @unlink($filePath);
+                $url = "http://"  . $this->config->item('qiniu_url') . '/' . $ret['key'];
+                $insert_arr = array(
+                    'img_url' => $url,
+                    'folder' => $file,
+                    'flag_time' => $time,
+                    'add_time' => time()
+                );
+                $this->db->insert('upload_img', $insert_arr);
+                return $url;
+            }
+        }else{
+            return '';
+        }
+
+    }
 }
 
 /* End of file MY_Model.php */

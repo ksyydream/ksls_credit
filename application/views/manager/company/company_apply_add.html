@@ -1,6 +1,15 @@
 {{include file='manager/public/head.html'}}
 <body class="no-skin">
 {{include file='manager/public/header.html'}}
+<style>
+    #uploadImgcontainer li{
+        list-style: none;
+        float: left;
+        position: relative;
+        margin-bottom: 10px;
+        margin-right: 10px;
+    }
+</style>
 <div class="main-container" id="main-container">
     <script type="text/javascript">
         try {
@@ -31,6 +40,7 @@
                     <div class="col-xs-12">
                         <!-- PAGE CONTENT BEGINS -->
                         <form id="save_form" class="form-horizontal" role="form" action="/manager/company_save" method="post">
+                            <input type="hidden" name="folder" value="{{$time}}" id="folder">
                            <div class="tabbable">
                                     <ul class="nav nav-tabs padding-18 tab-size-bigger" id="myTab">
                                         <li class="active">
@@ -144,7 +154,27 @@
                                             </h4>
 
                                             <div class="space-8"></div>
+                                            <div class="form-group">
 
+                                                <div class="col-sm-9">
+                                                    <a href="javascript:" class="btn btn-white btn-xs btn-primary" onclick="triggerFileUpload(1)">上 传</a>
+
+
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group">
+
+
+                                                <div class="col-sm-10">
+
+                                                    <ul id="uploadImgcontainer" style="width: 95%">
+
+                                                    </ul>
+
+                                                </div>
+
+                                            </div>
 
                                         </div>
 
@@ -237,10 +267,95 @@
 
 {{include file='manager/public/footerjs.html'}}
 <!-- inline scripts related to this page -->
+
+<!--plupload start--------------------------------------------------------------------------->
+<!-- Load plupload and all it's runtimes and finally the UI widget -->
+<link rel="stylesheet" href="/manager_statics/plupload/js/jquery.ui.plupload/css/jquery.ui.plupload.css" type="text/css" />
+<!-- production -->
+<script type="text/javascript" src="/manager_statics/plupload/js/plupload.full.min.js"></script>
+<script type="text/javascript" src="/manager_statics/plupload/js/zh_CN.js"></script>
+<script type="text/javascript" src="/manager_statics/plupload/js/jquery.ui.plupload/jquery.ui.plupload.js"></script>
+<!--plupload END--------------------------------------------------------------------------->
+
 <script src="/manager_statics/qwadmin/js/date-time/bootstrap-datepicker.js"></script>
 <script src="/manager_statics/app/ajaxfileupload.js"></script>
 <script type="text/javascript">
+    function triggerFileUpload(flag) {
+        var data_ = "{{$f_user_id}}_{{$time}}_" + flag.toString() + "_" +  Math.floor(Math.random()*(9000)+1000);
+        $("#folder").val(data_);
+        var html = '<div id="uploader" style="width:550px;"><p>Your browser doesn\'t have Flash, Silverlight or HTML5 support.</p></div>';
 
+        var layerIndex = layer.confirm(html, {
+            offset: ['100px', (document.body.offsetWidth - 800) / 2],
+            maxWidth: 800,
+            btn: ['确定','取消'],
+            shade: false
+        }, function(){
+            uploadFile(flag);
+            layer.close(layerIndex);
+        }, function(){
+        });
+
+        $("#uploader").plupload({
+            runtimes : 'html5,flash,silverlight',
+            url : "/manager_login/save_pics/company_pic/" + $("#folder").val(),
+            max_file_size : '50mb',
+            resize : { crop: true },
+            file_data_name: 'userfile',
+            filters : [],
+            filters: {
+                mime_types : [{
+                    title : "Image files",
+                    extensions : "jpg,gif,png,jpeg"
+                }],
+                max_file_size : '8024kb',
+                prevent_duplicates : true
+            },
+            rename: true,
+            sortable: true,
+            dragdrop: true,
+            views: {
+                list: true,
+                thumbs: true,
+                active: 'thumbs'
+            },
+            flash_swf_url : '/manager_statics/plupload/js/Moxie.swf',
+            silverlight_xap_url : '/manager_statics/plupload/js/Moxie.xap'
+        });
+    }
+
+    function uploadFile(flag) {
+        if ($('#uploader').plupload('getFiles').length < 1) {
+            alert("图片未上传,请重新选择.");
+            return false;
+        } else {
+            $.getJSON("/manager_login/get_pics/company_pic/" + $("#folder").val() +  "/?_=" + Math.random(), function(data){
+                var html = '';
+                var now_pic = [];
+                $('input[name="pic_short[]"]').each(function(index){
+                    now_pic[index] = $(this).val();
+                });
+
+                $.each(data.img,function(index,item){
+                    var path = item;
+                    if($.inArray(item, now_pic) < 0){
+                        html += '<li><img src="' + path + '" alert="" style="height: 100px" />';
+                        html += '<span class="delete-this" onclick="del_pic(this);"><i></i></span>';
+                        html += '<input type="hidden" name="server_id[]" class="pic_short" value="' + item + '">';
+                        html += '<input type="hidden" name="folder[]" value="'+ $("#folder").val() +'">';
+                        html += '</li>';
+                    }
+                });
+                $("#uploadImgcontainer").append(html);
+
+            });
+            return true;
+        }
+    }
+
+    function del_pic(obj) {
+        $(obj).parent().remove();
+    }
 
 
     $("#save_btn").click(function(){

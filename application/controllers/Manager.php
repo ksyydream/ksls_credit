@@ -863,6 +863,8 @@ class Manager extends MY_Controller {
      * @date 2019-11-18
      */
     public function company_apply_add(){
+        $this->assign('f_user_id', $this->admin_id);
+        $this->assign('time', time());
         $this->display('manager/company/company_apply_add.html');
     }
 

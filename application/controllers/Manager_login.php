@@ -74,8 +74,51 @@ class Manager_login extends MY_Controller {
         $this->session->set_flashdata('cap', $rs['word']);
     }
 
+    public function save_pics($f_name, $time){
+        $admin_info = $this->session->userdata('admin_info');
+        if(!$admin_info){
+            echo -1;//如果没有登陆 不可上传,以免有人恶意上传图片占用服务器资源
+        }
+        //$this->load->library('image_lib');
+        if (is_readable('./././upload_files/' . $f_name) == false) {
+            mkdir('./././upload_files/' . $f_name);
+        }
+        $path = './././upload_files/' . $f_name;
+
+        //设置原图限制
+        $config['upload_path'] = $path;
+        $config['allowed_types'] = 'gif|jpg|png|jpeg';
+        $config['max_size'] = '10000';
+        $config['encrypt_name'] = true;
+        $this->load->library('upload', $config);
+
+        if($this->upload->do_upload()){
+            $data = $this->upload->data();//返回上传文件的所有相关信息的数组
+            $full_path_ = $data['full_path'];
+            $file_name_ = $data['file_name'];
+            $this->c4m_model->save_qiniu('ksls2credit', $file_name_, $f_name, $time);
+
+            echo 1;
+        }else{
+            echo -1;
+        }
+        exit;
+    }
+
+    //ajax获取图片信息
+    public function get_pics($f_name, $time){
+        $res = $this->c4m_model->get_niu_pics($f_name, $time);
+        $data = array();
+        //整理图片名字，取缩略图片
+        foreach($res as $v){
+            $data['img'][] = $v['img_url'] . '?imageView2/0/w/200/h/200/q/75|imageslim';
+        }
+        $data['time'] = $time;
+        echo json_encode($data);
+    }
 
     public function save_pics4con($time){
+        die(-1);
         $this->load->library('image_lib');
 
         if (is_readable('./././upload/consignment') == false) {
@@ -117,6 +160,7 @@ class Manager_login extends MY_Controller {
 
     //ajax获取图片信息
     public function get_pics4con($time){
+        die(-1);
         $this->load->helper('directory');
         $path = './././upload/consignment/'.$time;
         $map = directory_map($path);
