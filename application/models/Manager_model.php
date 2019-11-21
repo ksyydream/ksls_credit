@@ -1187,11 +1187,13 @@ class Manager_model extends MY_Model
      */
 
      /**
-     * 企业报备列表
+     * 历史原因 status 1代表等待初审，2代表审核通过，3代表审核失败，4代表等待终审，-1代表作废
+     * flag  1代表报备，2代表报备成功
+     * 企业列表 设计为通用
      * @author yangyang
      * @date 2019-11-12
      */
-    public function company_apply_list($page = 1, $flag){
+    public function company_common_list($page = 1, $flag, $status = array()){
         $data['limit'] = $this->limit;
         //搜索条件
         $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
@@ -1202,6 +1204,9 @@ class Manager_model extends MY_Model
         }
         if($flag){
             $this->db->where('a.flag',$flag);
+        }
+        if($status){
+            $this->db->where_in('a.status',$status);
         }
         $num = $this->db->get()->row();
         $data['total_rows'] = $num->num;
@@ -1214,10 +1219,141 @@ class Manager_model extends MY_Model
         if($flag){
             $this->db->where('a.flag',$flag);
         }
+        if($status){
+            $this->db->where_in('a.status',$status);
+        }
         $this->db->order_by('a.mdate','asc');
       
         $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
         $data['res_list'] = $this->db->get()->result_array();
         return $data;
+    }
+
+    public function company_apply_edit($id){
+        $this->db->select('a.*')->from('company_pending a');
+        $this->db->where('a.id', $id);
+        $detail =  $this->db->get()->row_array();
+        if (!$detail) {
+            return array();
+        }
+        $this->db->select()->from('company_pending_img');
+        $this->db->where('company_id', $id);
+        $detail['img'] = $this->db->get()->result_array();
+        $this->db->select()->from('agent');
+        $this->db->where('company_id', $id);
+        $detail['agent'] = $this->db->get()->result_array();
+        return $detail;
+    }
+
+    public function company_apply_save(){
+        $data = array(
+            'company_name'=>trim($this->input->post('company_name')),
+            'register_path'=>trim($this->input->post('register_path')),
+            'business_path'=>trim($this->input->post('business_path')),
+            'issuing_date'=>trim($this->input->post('issuing_date')),
+            'company_phone'=>trim($this->input->post('company_phone')),
+            'director_name'=>trim($this->input->post('director_name')),
+            'director_phone'=>trim($this->input->post('director_phone')),
+            'legal_name'=>trim($this->input->post('legal_name')),
+            'legal_phone'=>trim($this->input->post('legal_phone')),
+            'cdate'=>date('Y-m-d H:i:s',time()),
+            'mdate'=>date('Y-m-d H:i:s',time()),
+            'score' => $this->config->item('company_score'),
+            'username'=>$this->get_username(),
+            'password'=>sha1('123456'),
+            'status' => 1,
+        );
+        $company_id = $this->input->post('company_id');
+        if(!$data['company_name'] || !$data['register_path'] || !$data['business_path'] || 
+            !$data['issuing_date'] || !$data['company_phone'] || !$data['director_name'] || 
+            !$data['director_phone'] || !$data['legal_name'] || !$data['legal_phone']){
+            die();
+            return $this->fun_fail('缺少必要信息!');
+        }
+        $this->load->model('common4manager_model', 'c4m_model');
+        $check_company_name_ = $this->c4m_model->check_company_name($data['company_name'], $company_id);
+        if($check_company_name_['status'] != 1)
+            return $this->fun_fail($check_company_name_['msg']);
+        $code_ = $this->input->post('agent_job_code');
+        if ($code_ && is_array($code_)) {
+            foreach($code_ as $idx => $card_) {
+            $check_card = $this->c4m_model->check_code4get(trim($card_), $company_id);
+            if($check_card['status'] != 1){
+                 return $this->fun_fail($check_card['msg']);;exit();
+            }else{
+                foreach($code_ as $idx2 => $card_2) {
+                    //$card_2 = trim($card_2);
+                    if($idx != $idx2 && trim($card_) == trim($card_2)) {
+                        return $this->fun_fail('存在重复录入执业经纪人!');
+                    }
+                }
+            }
+            }
+        }
+        
+        $save4track_old = array();
+        $where_arr_ = array('id' => $company_id, 'status' => 1, 'flag' => 1);
+        if($company_id){
+             $company_info_ = $this->db->where($where_arr_)->from('company_pending')->get()->row_array();
+             if (!$company_info_) {
+                 return $this->fun_fail('企业状态变更不可修改!');
+             }
+        }
+       
+        $this->db->trans_start();//--------开始事务
+        if($company_id){
+            unset($data['cdate']);
+            unset($data['username']);
+            unset($data['password']);
+            unset($data['status']);
+            unset($data['flag']);
+            $this->db->where('id', $company_id)->update('company_pending', $data);
+            $this->db->select('a.*')->from('agent a');
+            $this->db->where('a.company_id',$company_id);
+            $save4track_old = $this->db->get()->result_array();
+            $this->db->where($where_arr_)->update('company_pending', $data);
+        }else{
+            $this->db->insert('company_pending', $data);
+            $company_id = $this->db->insert_id();
+        }
+        //处理经纪人
+        $this->db->where('company_id',$company_id)->update('agent',array('company_id'=>-1));
+        $arr_agent_job_code = $this->input->post('agent_job_code');
+        $arr_agent_wq = $this->input->post('setwq');
+        $arr_agent_company_id = array(
+            'company_id' => $company_id,
+        );
+        if ($arr_agent_job_code && is_array($arr_agent_job_code)) {
+             foreach($arr_agent_job_code as $idx => $pic) {
+            $update_data4agent_ = $arr_agent_company_id;
+            $update_data4agent_['wq'] = $arr_agent_wq[$idx];
+            $this->db->where('job_code',$pic)->where('flag',2)->update('agent', $update_data4agent_);
+            }
+        }
+       
+        //处理图片
+        $this->db->delete('company_pending_img', array('company_id' => $company_id));
+        $pic_short = $this->input->post('pic_short');
+        if($pic_short){
+            foreach($pic_short as $idx => $pic) {
+                $company_pic = array(
+                    'company_id' => $company_id,
+                    'img_path' => $pic,
+                    'm_img_path' => $pic . '?imageView2/0/w/200/h/200/q/75|imageslim'
+                );
+                $this->db->insert('company_pending_img', $company_pic);
+            }
+        }
+        $this->db->trans_complete();//------结束事务
+        if ($this->db->trans_status() === FALSE) {
+           return $this->fun_fail('保存失败!');
+        } else {
+            $this->db->select('a.*')->from('agent a');
+            $this->db->where('a.company_id',$company_id);
+            $save4track_new = $this->db->get()->result_array();
+            $this->save_agent_track($company_id,$data,array(),$save4track_new);
+            return $this->fun_success('保存成功!');
+        }
+        
     }
 }

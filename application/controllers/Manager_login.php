@@ -111,7 +111,7 @@ class Manager_login extends MY_Controller {
         $data = array();
         //整理图片名字，取缩略图片
         foreach($res as $v){
-            $data['img'][] = $v['img_url'] . '?imageView2/0/w/200/h/200/q/75|imageslim';
+            $data['img'][] = $v['img_url'];
         }
         $data['time'] = $time;
         echo json_encode($data);

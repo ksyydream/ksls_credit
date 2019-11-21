@@ -39,8 +39,9 @@
                 <div class="row">
                     <div class="col-xs-12">
                         <!-- PAGE CONTENT BEGINS -->
-                        <form id="save_form" class="form-horizontal" role="form" action="/manager/company_save" method="post">
+                        <form id="save_form" class="form-horizontal" role="form" action="/manager/company_apply_save" method="post">
                             <input type="hidden" name="folder" value="{{$time}}" id="folder">
+                            <input type="hidden" name="company_id" value="{{$data.id|default:''}}" id="folder">
                            <div class="tabbable">
                                     <ul class="nav nav-tabs padding-18 tab-size-bigger" id="myTab">
                                         <li class="active">
@@ -69,7 +70,7 @@
                                         <div class="form-group">
                                              <label class="col-sm-1 control-label no-padding-right" for="company_name"> 企业名称 </label>
                                         <div class="col-sm-9">
-                                        <input type="text" id="company_name" name="company_name" class="rcol-xs-10 col-sm-5" value="">
+                                        <input type="text" id="company_name" name="company_name" class="rcol-xs-10 col-sm-5" value="{{$data.company_name|default:''}}">
                                             <span class="help-inline col-xs-12 col-sm-7"></span>
                                             </div>
                                         </div>
@@ -77,7 +78,7 @@
                                      <div class="form-group">
                                              <label class="col-sm-1 control-label no-padding-right" for="register_path"> 注册地址 </label>
                                         <div class="col-sm-9">
-                                        <input type="text" id="register_path" name="register_path" class="rcol-xs-10 col-sm-5" value="">
+                                        <input type="text" id="register_path" name="register_path" class="rcol-xs-10 col-sm-5" value="{{$data.register_path|default:''}}">
                                             <span class="help-inline col-xs-12 col-sm-7"></span>
                                             </div>
                                         </div>
@@ -85,7 +86,7 @@
                                          <div class="form-group">
                                              <label class="col-sm-1 control-label no-padding-right" for="business_path"> 经营地址 </label>
                                         <div class="col-sm-9">
-                                        <input type="text" id="business_path" name="business_path" class="rcol-xs-10 col-sm-5" value="">
+                                        <input type="text" id="business_path" name="business_path" class="rcol-xs-10 col-sm-5" value="{{$data.business_path|default:''}}">
                                             <span class="help-inline col-xs-12 col-sm-7"></span>
                                             </div>
                                         </div>
@@ -94,7 +95,7 @@
                                          <div class="form-group">
                                              <label class="col-sm-1 control-label no-padding-right" for="issuing_date"> 发证日期 </label>
                                         <div class="col-sm-9">
-                                        <input type="text" onfocus="WdatePicker({isShowClear:true,readOnly:true,dateFmt:'yyyy-MM-dd'})"  id="issuing_date" name="issuing_date" class="rcol-xs-10 col-sm-5" value="">
+                                        <input type="text" onfocus="WdatePicker({isShowClear:true,readOnly:true,dateFmt:'yyyy-MM-dd'})"  id="issuing_date" name="issuing_date" class="rcol-xs-10 col-sm-5" value="{{$data.issuing_date|default:''}}">
                                             <span class="help-inline col-xs-12 col-sm-7"></span>
                                             </div>
                                         </div>
@@ -103,7 +104,7 @@
                                          <div class="form-group">
                                              <label class="col-sm-1 control-label no-padding-right" for="company_phone"> 企业电话 </label>
                                         <div class="col-sm-9">
-                                        <input type="text" id="company_phone" name="company_phone"  class="rcol-xs-10 col-sm-5" value="">
+                                        <input type="text" id="company_phone" name="company_phone"  class="rcol-xs-10 col-sm-5" value="{{$data.company_phone|default:''}}">
                                             <span class="help-inline col-xs-12 col-sm-7"></span>
                                             </div>
                                         </div>
@@ -112,7 +113,7 @@
                                          <div class="form-group">
                                              <label class="col-sm-1 control-label no-padding-right" for="director_name"> 负责人姓名 </label>
                                         <div class="col-sm-9">
-                                        <input type="text" id="director_name" name="director_name"  class="rcol-xs-10 col-sm-5" value="">
+                                        <input type="text" id="director_name" name="director_name"  class="rcol-xs-10 col-sm-5" value="{{$data.director_name|default:''}}">
                                             <span class="help-inline col-xs-12 col-sm-7"></span>
                                             </div>
                                         </div>
@@ -121,7 +122,7 @@
                                          <div class="form-group">
                                              <label class="col-sm-1 control-label no-padding-right" for="director_phone"> 负责人电话 </label>
                                         <div class="col-sm-9">
-                                        <input type="text" id="director_phone" name="director_phone"  class="rcol-xs-10 col-sm-5" value="">
+                                        <input type="text" id="director_phone" name="director_phone"  class="rcol-xs-10 col-sm-5" value="{{$data.director_phone|default:''}}">
                                             <span class="help-inline col-xs-12 col-sm-7"></span>
                                             </div>
                                         </div>
@@ -135,7 +136,7 @@
                                          <div class="form-group">
                                              <label class="col-sm-1 control-label no-padding-right" for="legal_name"> 法人姓名 </label>
                                         <div class="col-sm-9">
-                                        <input type="text" id="legal_name" name="legal_name"  class="rcol-xs-10 col-sm-5" value="">
+                                        <input type="text" id="legal_name" name="legal_name"  class="rcol-xs-10 col-sm-5" value="{{$data.legal_name|default:''}}">
                                             <span class="help-inline col-xs-12 col-sm-7"></span>
                                             </div>
                                         </div>
@@ -143,7 +144,7 @@
                                         <div class="form-group">
                                              <label class="col-sm-1 control-label no-padding-right" for="legal_phone"> 法人电话 </label>
                                         <div class="col-sm-9">
-                                        <input type="text" id="legal_phone" name="legal_phone"  class="rcol-xs-10 col-sm-5" value="">
+                                        <input type="text" id="legal_phone" name="legal_phone"  class="rcol-xs-10 col-sm-5" value="{{$data.legal_phone|default:''}}">
                                             <span class="help-inline col-xs-12 col-sm-7"></span>
                                             </div>
                                         </div>
@@ -169,7 +170,16 @@
                                                 <div class="col-sm-10">
 
                                                     <ul id="uploadImgcontainer" style="width: 95%">
-
+                            {{if !empty($data.img) }}
+                            {{foreach from=$data.img item=item}}
+                            <li>
+                                <img src="{{$item.img_path}}?imageView2/0/w/200/h/200/q/75|imageslim" alt="" style="height: 120px">
+                                <span class="delete-this" onclick="del_pic(this);"><i></i></span>
+                               <input type="hidden" name="pic_short[]" class="pic_short" value="{{$item.img_path}}">
+                             
+                            </li>
+                            {{/foreach}}
+                            {{/if}}
                                                     </ul>
 
                                                 </div>
@@ -206,24 +216,33 @@
 
                                     <th style="width:25%;">身份证号</th>
                                     <th style="width:15%;">联系电话</th>
+                                    <th style="width:10%;">网签</th>
                                      <th style="width:10%;">操作</th>
                                 </tr>
 
                                 </thead>
 
                                 <tbody id="tbody_id">
-                                    
-                                    <!--<tr>
-                                        <td>张三</td>
-                                        <td>001234</td>
-                                          <td>320583199000000000</td>
-                                            <td>18918970707</td>
+                                    {{if !empty($data.agent) }}
+                            {{foreach from=$data.agent item=item}}
+                            <tr>
+                                        <td>{{$item.name}}</td>
+                                        <td>{{$item.job_code}}</td>
+                                          <td>{{$item.card}}</td>
+                                            <td>{{$item.phone}}</td>
+                                            <td>
+                                                <input type="hidden" name="setwq[]" value="{{if $item.wq == 2}}2{{else}}1{{/if}}">
+                                                <input name="ckwq[]" {{if $item.wq == 2}} checked{{/if}} type="checkbox" />
+                                            </td>
                                         <td>
-                                            <input type="hidden" name="new_job_code[]" value="">
-                                            <input type="hidden" name="new_agent_id[]" value="">
+                                            <input type="hidden" name="agent_job_code[]" value="{{$item.job_code}}">
+                                            <input type="hidden" name="new_agent_id[]" value="{{$item.id}}">
                                             <a href="javascript:void(0);" dataid="" class="delete_yy_"><i class="ace-icon fa fa-print bigger-100 red"></i>删除</a>
                                         </td>
-                                    </tr>-->
+                                    </tr>
+                            {{/foreach}}
+                            {{/if}}
+                                  
                                 </tbody>
                             </table>
                                             </div>
@@ -337,12 +356,12 @@
                 });
 
                 $.each(data.img,function(index,item){
-                    var path = item;
+                    var path = item + '?imageView2/0/w/200/h/200/q/75|imageslim';
                     if($.inArray(item, now_pic) < 0){
-                        html += '<li><img src="' + path + '" alert="" style="height: 100px" />';
+                        html += '<li><img src="' + path + '" alert="" style="height: 120px" />';
                         html += '<span class="delete-this" onclick="del_pic(this);"><i></i></span>';
-                        html += '<input type="hidden" name="server_id[]" class="pic_short" value="' + item + '">';
-                        html += '<input type="hidden" name="folder[]" value="'+ $("#folder").val() +'">';
+                        html += '<input type="hidden" name="pic_short[]" class="pic_short" value="' + item + '">';
+                        //html += '<input type="hidden" name="folder[]" value="'+ $("#folder").val() +'">';
                         html += '</li>';
                     }
                 });
@@ -405,7 +424,12 @@
             layer.msg('法人电话不能为空', {icon: 2});
             return false;
         }
-       
+        //报备时可以随意修改 审核时再做判断，以免在审核中有人员变动
+        var length = $("#tbody_id").find(".delete_yy_").length;
+        if(length < 3){
+            //layer.msg('持证经纪人不能小于三个!', {icon: 2});
+            //flag=1;return false;
+        }
         $("#save_form").submit();
     })
 
@@ -416,7 +440,7 @@
             return false;
         }
         var flag_ = 1;
-        $("[name='new_job_code[]']").each(function(index2){
+        $("[name='agent_job_code[]']").each(function(index2){
                         var code_2 = $.trim($(this).val());
                         if(code_2 != "" && code_2 == search_){
                                 layer.alert('输入的执业证号已在列表中!', {skin: 'layui-layer-lan',closeBtn: 0,shift: 4 });
@@ -456,6 +480,14 @@
 $("#tbody_id").on("click",".delete_yy_",function(){
      $(this).parent().parent().remove();
   });
+
+ $("#tbody_id").on('click',"[name='ckwq[]']",function(){
+           if($(this).is(':checked')){
+               $(this).prev().val(2);
+           }else{
+               $(this).prev().val(1);
+           }
+       })
    
 </script>
 </body>

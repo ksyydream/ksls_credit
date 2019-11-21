@@ -847,7 +847,7 @@ class Manager extends MY_Controller {
      * @date 2019-11-12
      */
     public function company_apply_list($page = 1){
-        $data = $this->manager_model->company_apply_list($page, 1);
+        $data = $this->manager_model->company_common_list($page, 1, array(1));
         $base_url = "/manager/company_apply_list/";
         $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
         $this->assign('pager', $pager);
@@ -866,6 +866,86 @@ class Manager extends MY_Controller {
         $this->assign('f_user_id', $this->admin_id);
         $this->assign('time', time());
         $this->display('manager/company/company_apply_add.html');
+    }
+
+    public function company_apply_edit($m_id){
+        $this->assign('f_user_id', $this->admin_id);
+        $this->assign('time', time());
+         $data = $this->manager_model->company_apply_edit($m_id);
+        if(!$data){
+            $this->show_message('未找到信息!');
+        }
+        $this->assign('data', $data);
+        $this->display('manager/company/company_apply_add.html');
+    }
+
+    public function company_apply_save(){
+         $res = $this->manager_model->company_apply_save();
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/manager/company_apply_list'));
+        }else{
+            $this->show_message($res['msg']);
+        }
+    }
+
+    /**
+     * 企业初审列表
+     * @author yangyang
+     * @date 2019-11-12
+     */
+    public function company_pending_1_list($page = 1){
+        $data = $this->manager_model->company_common_list($page, 2, array(1));
+        $base_url = "/manager/company_pending_1_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('manager/company/company_pending_1_list.html');
+    }
+
+    /**
+     * 企业完成列表
+     * @author yangyang
+     * @date 2019-11-12
+     */
+    public function company_pending_2_list($page = 1){
+        $data = $this->manager_model->company_common_list($page, 2, array(2));
+        $base_url = "/manager/company_pending_2_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('manager/company/company_pending_2_list.html');
+    }
+
+    /**
+     * 企业终审列表
+     * @author yangyang
+     * @date 2019-11-12
+     */
+    public function company_pending_4_list($page = 1){
+        $data = $this->manager_model->company_common_list($page, 2, array(4));
+        $base_url = "/manager/company_pending_4_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('manager/company/company_pending_4_list.html');
+    }
+
+    /**
+     * 企业审核失败列表
+     * @author yangyang
+     * @date 2019-11-12
+     */
+    public function company_pending_3_list($page = 1){
+        $data = $this->manager_model->company_common_list($page, 2, array(3));
+        $base_url = "/manager/company_pending_3_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('manager/company/company_pending_3_list.html');
     }
 
 }
