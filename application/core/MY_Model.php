@@ -771,6 +771,65 @@ class MY_Model extends CI_Model{
         }
 
     }
+
+    //获取随机登陆账号
+    public function get_username(){
+        $title_ = 'KS' . date('Ymd', time());
+        $username = $title_ . sprintf('%03s', $this->get_sys_num_auto($title_));
+        $check = $this->db->select('id')->from('company_pending')->where('username',$username)->order_by('id','desc')->get()->row_array();
+        if($check)
+            $username = $this->get_username();
+        return $username;
+    }
+
+    public function save_agent_track($company_id,$company_data,$agent_old,$agent_new){
+        $data_insert= array();
+        $agent_arr_ = array();
+        if($agent_old && is_array($agent_old)){
+            foreach($agent_old as $item){
+                $agent_arr_[$item['id']] = 2;
+            }
+        }
+        if($agent_new && is_array($agent_new)){
+            foreach($agent_new as $item){
+                if(!isset($agent_arr_[$item['id']])){
+                    $agent_arr_[$item['id']] = 1;
+                }else{
+                    $agent_arr_[$item['id']] = 3;
+                }
+            }
+        }
+        foreach($agent_arr_ as $k=>$v){
+            if($v==1){
+                $data_insert[] = array(
+                    'to_company_id'=>$company_id,
+                    'to_company_name'=>$company_data['company_name'],
+                    'from_company_id'=>null,
+                    'from_company_name'=>null,
+                    'agent_id'=>$k,
+                    'status'=>1,
+                    'create_date'=>date('Y-m-d H:i:s',time()),
+                );
+            }
+            if($v==2){
+                $data_insert[] = array(
+                    'to_company_id'=>null,
+                    'to_company_name'=>null,
+                    'from_company_id'=>$company_id,
+                    'from_company_name'=>$company_data['company_name'],
+                    'agent_id'=>$k,
+                    'status'=>2,
+                    'create_date'=>date('Y-m-d H:i:s',time()),
+                );
+            }
+
+        }
+
+        if($data_insert){
+            $this->db->insert_batch('agent_track',$data_insert);
+        }
+
+    }
 }
 
 /* End of file MY_Model.php */
