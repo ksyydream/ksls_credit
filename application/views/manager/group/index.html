@@ -42,7 +42,7 @@
                                     <td>{{$v.title}}</td>
                                     <td>{{if $v.id == 1}}启用{{else}}{{if $v.status == 1}}启用{{else}}禁用{{/if}}{{/if}}</td>
                                     <td class="center">
-                                        <a href="/manager/group_edit/{{$v.id}}"><i class="ace-icon fa fa-book bigger-100 blue"></i>修改</a>
+                                        <a href="/manager/group_edit/{{$v.id}}"><i class="ace-icon fa fa-pencil green bigger-100 blue"></i>编辑</a>
                                         {{if $v.id != 1}} <a href="javascript:;" val="{{$v.id}}" class="del"><i class="ace-icon fa fa-trash-o bigger-100 red"></i>删除</a>{{/if}}
                                     </td>
                                     </td>
