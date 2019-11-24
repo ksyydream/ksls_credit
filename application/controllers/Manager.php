@@ -456,12 +456,14 @@ class Manager extends MY_Controller {
     public function event4agent_type_list($page = 1){
         $data = $this->manager_model->event4agent_type_list($page);
         $event4agent_type = $this->config->item('event4agent_type');
+        $event4agent_type4label = $this->config->item('event4agent_type4label');
         $base_url = "/manager/event4agent_type_list/";
         $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
         $this->assign('pager', $pager);
         $this->assign('page', $page);
         $this->assign('data', $data);
         $this->assign('event4agent_type', $event4agent_type);
+        $this->assign('event4agent_type4label', $event4agent_type4label);
         $this->display('manager/event_agent/event4agent_type_list.html');
     }
 
@@ -472,6 +474,8 @@ class Manager extends MY_Controller {
      */
     public function event4agent_type_add(){
         $event4agent_type = $this->config->item('event4agent_type');
+        $event4agent_type4label = $this->config->item('event4agent_type4label');
+        $this->assign('event4agent_type4label', $event4agent_type4label);
         $this->assign('event4agent_type', $event4agent_type);
         $this->display('manager/event_agent/event4agent_type_detail.html');
     }
@@ -497,6 +501,8 @@ class Manager extends MY_Controller {
         }
         $event4agent_type = $this->config->item('event4agent_type');
         $this->assign('event4agent_type', $event4agent_type);
+        $event4agent_type4label = $this->config->item('event4agent_type4label');
+        $this->assign('event4agent_type4label', $event4agent_type4label);
         $this->assign('data', $data);
         $this->display('manager/event_agent/event4agent_type_detail.html');
     }
@@ -516,6 +522,8 @@ class Manager extends MY_Controller {
         $this->assign('page', $page);
         $this->assign('data', $data);
         $this->assign('event4agent_type', $event4agent_type);
+        $event4agent_type4label = $this->config->item('event4agent_type4label');
+        $this->assign('event4agent_type4label', $event4agent_type4label);
         $this->assign('event_type_all', $event_type_all);
         $this->display('manager/event_agent/event4agent_detail_list.html');
     }
@@ -741,6 +749,8 @@ class Manager extends MY_Controller {
         $this->assign('page', $page);
         $this->assign('data', $data);
         $this->assign('event4company_type', $event4company_type);
+        $event4company_type4label = $this->config->item('event4company_type4label');
+        $this->assign('event4company_type4label', $event4company_type4label);
         $this->display('manager/event_company/event4company_type_list.html');
     }
 
@@ -752,6 +762,8 @@ class Manager extends MY_Controller {
     public function event4company_type_add(){
         $event4company_type = $this->config->item('event4company_type');
         $this->assign('event4company_type', $event4company_type);
+        $event4company_type4label = $this->config->item('event4company_type4label');
+        $this->assign('event4company_type4label', $event4company_type4label);
         $this->display('manager/event_company/event4company_type_detail.html');
     }
 
@@ -776,6 +788,8 @@ class Manager extends MY_Controller {
         }
         $event4company_type = $this->config->item('event4company_type');
         $this->assign('event4company_type', $event4company_type);
+        $event4company_type4label = $this->config->item('event4company_type4label');
+        $this->assign('event4company_type4label', $event4company_type4label);
         $this->assign('data', $data);
         $this->display('manager/event_company/event4company_type_detail.html');
     }
@@ -795,6 +809,8 @@ class Manager extends MY_Controller {
         $this->assign('page', $page);
         $this->assign('data', $data);
         $this->assign('event4company_type', $event4company_type);
+        $event4company_type4label = $this->config->item('event4company_type4label');
+        $this->assign('event4company_type4label', $event4company_type4label);
         $this->assign('event_type_all', $event_type_all);
         $this->display('manager/event_company/event4company_detail_list.html');
     }
