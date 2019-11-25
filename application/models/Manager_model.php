@@ -58,8 +58,10 @@ class Manager_model extends MY_Model
     }
 
     public function get_action_menu($controller = null, $action = null) {
-        $action_new = str_replace('edit', 'list', $action);
-        $action_new = str_replace('add', 'list', $action_new);
+        $action_new = str_replace('_edit', '_list', $action);
+        $action_new = str_replace('_add', '_list', $action_new);
+        $action_new = str_replace('_view', '_list', $action_new);
+        $action_new = str_replace('_audit', '_list', $action_new);
         $this->db->select('s.id,s.title,s.name,s.tips,s.pid,p.pid as ppid,p.title as ptitle');
         $this->db->from('auth_rule s');
         $this->db->join('auth_rule p', 'p.id = s.pid', 'left');
@@ -492,10 +494,6 @@ class Manager_model extends MY_Model
         $detail =  $this->db->get()->row_array();
         if(!$detail)
             return $detail;
-        //$this->db->select('a.*')->from('agent_ns_list a');
-        //$this->db->where('a.agent_id',$id);
-        //$this->db->order_by('a.year','desc');
-        //$detail['ns_list'] = $this->db->get()->result_array();
         return $detail;
     }
 
@@ -747,11 +745,15 @@ class Manager_model extends MY_Model
             'event_name'=> trim($this->input->post('event_name')),
             'type_id'=> trim($this->input->post('type_id')),
             'score' => trim($this->input->post('score')),
+            'allow_times' => trim($this->input->post('allow_times')) ? trim($this->input->post('allow_times')) : 0,
             'status' => trim($this->input->post('status')) ? trim($this->input->post('status')) : -1,
             'cdate' => date('Y-m-d H:i:s', time()),
         );
         $id = $this->input->post('id');
         if(!$data['event_name'] || !$data['type_id'] || !$data['score']){
+            return $this->fun_fail('缺少必要信息!');
+        }
+        if($data['allow_times'] < 0){
             return $this->fun_fail('缺少必要信息!');
         }
         if($id){
@@ -779,12 +781,16 @@ class Manager_model extends MY_Model
     public function event4agent_record_list($page = 1, $type_type = null){
         $data['limit'] = $this->limit;
         //搜索条件
+        $data['agent_job_code'] = $this->input->get('agent_job_code')?trim($this->input->get('agent_job_code')):null;
         $data['agent_keyword'] = $this->input->get('agent_keyword')?trim($this->input->get('agent_keyword')):null;
         $data['event_keyword'] = $this->input->get('event_keyword')?trim($this->input->get('event_keyword')):null;
         $data['status'] = $this->input->get('status')?trim($this->input->get('status')):null;
         //获取总记录数
         $this->db->select('count(1) num')->from('event4agent_record a');
         $this->db->join('agent b', 'a.agent_id = b.id', 'left');
+        if ($data['agent_job_code']) {
+            $this->db->where('b.job_code', $data['agent_job_code']);
+        }
         if($data['agent_keyword']){
             $this->db->group_start();
             $this->db->like('b.name', $data['agent_keyword']);
@@ -810,6 +816,9 @@ class Manager_model extends MY_Model
         //获取详细列
         $this->db->select('a.*, b.name agent_name_, b.job_code agent_job_code_')->from('event4agent_record a');
         $this->db->join('agent b', 'a.agent_id = b.id', 'left');
+        if ($data['agent_job_code']) {
+            $this->db->where('b.job_code', $data['agent_job_code']);
+        }
         if($data['agent_keyword']){
             $this->db->group_start();
             $this->db->like('b.name', $data['agent_keyword']);
@@ -862,6 +871,15 @@ class Manager_model extends MY_Model
             return $this->fun_fail('所选事件状态异常!');
         if( $event_info_['type_id'] != $data['event_type_id'])
             return $this->fun_fail('所选事件类别与事件不符!');
+        //检查事件是否存在 次数限制，并查看是否可以新建
+        if ($event_info_['allow_times'] > 0) {
+            $check_times_ = $this->db->select('count(1) num')->from('event4agent_record')->where(array('agent_id' => $data['agent_id'], 'event_id' => $data['event_id'], 'status' => 1))->get()->row_array();
+            if ($check_times_['num'] >= $event_info_['allow_times']) {
+                return $this->fun_fail('事件已设置到次数上限!');
+            }
+
+        }
+
         $type_info_ = $this->readByID('event4agent_type', 'id', $data['event_type_id']);
         if(!$type_info_ || $type_info_['status'] != 1)
             return $this->fun_fail('所选事件类别状态异常!');
@@ -873,8 +891,7 @@ class Manager_model extends MY_Model
         $data['score'] =  ($event4agent_type_index * $event_info_['score']);
         $data['event_type_type'] = $type_info_['type'];
         $new_score_ = $agent_info_['score'] + $data['score'];
-        if($new_score_ < 0)
-            return $this->fun_fail('所选经纪人分数不足!');
+       
 
         $res = $this->db->insert('event4agent_record', $data);
         if ($res) {
@@ -1157,11 +1174,15 @@ class Manager_model extends MY_Model
             'event_name'=> trim($this->input->post('event_name')),
             'type_id'=> trim($this->input->post('type_id')),
             'score' => trim($this->input->post('score')),
+            'allow_times' => trim($this->input->post('allow_times')) ? trim($this->input->post('allow_times')) : 0,
             'status' => trim($this->input->post('status')) ? trim($this->input->post('status')) : -1,
             'cdate' => date('Y-m-d H:i:s', time()),
         );
         $id = $this->input->post('id');
         if(!$data['event_name'] || !$data['type_id'] || !$data['score']){
+            return $this->fun_fail('缺少必要信息!');
+        }
+        if($data['allow_times'] < 0){
             return $this->fun_fail('缺少必要信息!');
         }
         if($id){
@@ -1355,5 +1376,41 @@ class Manager_model extends MY_Model
             return $this->fun_success('保存成功!');
         }
         
+    }
+
+    //报备通过
+    public function company_apply_pass(){
+        $company_id = $this->input->post('company_id');
+        $record_num = trim($this->input->post('record_num'));
+        if(!$company_id)
+            return $this->fun_fail('信息缺失!');
+        $company_data = $this->db->select('*')->from('company_pending')->where('id',$company_id)->get()->row_array();
+        if(!$company_data)
+            return $this->fun_fail('企业信息丢失!');
+        if($company_data['flag']!=1)
+            return $this->fun_fail('企业状态变更不可通过!');
+        $this->load->model('common4manager_model', 'c4m_model');
+        $check_num_ = $this->c4m_model->check_record_num($record_num, $company_id);
+        if($check_num_['status'] != 1)
+            return $this->fun_fail('备案号已占用!');
+        $check_name = $this->c4m_model->check_company_name($company_data['company_name'], $company_id);
+        if($check_name['status'] != 1)
+           return $this->fun_fail('企业名称已被申请!');
+        //暂时不做判断
+        $agents = $this->db->select()->from('agent')->where('flag',2)->where('company_id',$company_id)->get()->result_array();
+        $data = array('zz_status'=>1,'record_num'=>$record_num,'flag'=>2,'status'=>2,'sdate'=>date('Y-m-d H:i:s',time()));
+        if(count($agents) < 3)
+            $data['zz_status'] = -1;
+        //$this->log_company($company_id);
+
+        //$data['username'] = $this->get_username($company_data['id']);
+        $data['password'] = sha1('123456');
+        $res = $this->db->where('id',$company_id)->update('company_pending',$data);
+        //$this->company_ns_save($company_id,$data['status']);
+        if($res){
+            return $this->fun_success('通过成功!');
+        }else{
+            return $this->fun_fail('审核失败!');
+        }
     }
 }

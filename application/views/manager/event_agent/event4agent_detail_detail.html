@@ -57,10 +57,18 @@
                             </div>
                             <div class="space-4"></div>
                                 <div class="form-group">
-                                <label class="col-sm-2 control-label no-padding-right" for="event_name"> 分数 </label>
+                                <label class="col-sm-2 control-label no-padding-right" for="score"> 分数 </label>
                                 <div class="col-sm-9">
                                     <input type="text" id="score" name="score" required="required" class="rcol-xs-10 col-sm-5 js4phone" value="{{$data.score|default:''}}">
                                     <span class="help-inline col-xs-12 col-sm-7"></span>
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+                                <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="allow_times"> 使用次数 </label>
+                                <div class="col-sm-9">
+                                    <input type="text" id="allow_times" maxlength="3" name="allow_times" required="required" class="rcol-xs-10 col-sm-5 js4phone" value="{{$data.allow_times|default:'0'}}">
+                                    <span class="help-inline col-xs-12 col-sm-7 yy_m_7">同一对象所限制的使用次数，0代表无限次</span>
                                 </div>
                             </div>
                              <div class="space-4"></div>
@@ -127,6 +135,11 @@
         var score = $.trim($("#score"));
         if(score == '' || parseFloat(score) <= 0) {
             layer.msg('请填写分数', {icon: 2});
+            return false;
+        }
+        var allow_times = $.trim($("#allow_times"));
+        if(score == '') {
+            layer.msg('请填写使用次数', {icon: 2});
             return false;
         }
         $("#save_form").submit();

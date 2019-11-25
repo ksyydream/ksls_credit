@@ -1,0 +1,301 @@
+{{include file='manager/public/head.html'}}
+<body class="no-skin">
+{{include file='manager/public/header.html'}}
+<link rel="stylesheet" href="/manager_statics/app/lightbox.min.css?v2"/>
+<style>
+    #uploadImgcontainer li{
+        list-style: none;
+        float: left;
+        position: relative;
+        margin-bottom: 10px;
+        margin-right: 10px;
+    }
+</style>
+<div class="main-container" id="main-container">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('main-container', 'fixed')
+        } catch (e) {
+        }
+    </script>
+    <style>
+        pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+        .string { color: green; }
+        .number { color: darkorange; }
+        .boolean { color: blue; }
+        .null { color: magenta; }
+        .key { color: red; }
+    </style>
+    {{include file='manager/public/sidebar.html'}}
+    <div class="main-content">
+        <div class="main-content-inner">
+            <!-- #section:basics/content.breadcrumbs -->
+            {{include file='manager/public/breadcrumbs.html'}}
+
+            <!-- /section:basics/content.breadcrumbs -->
+            <div class="page-content">
+                {{include file='manager/public/set.html'}}
+
+                <!-- /section:settings.box -->
+                <div class="row">
+                    <div class="col-xs-12">
+                        <form id="delete_form" method="post" action="/manager/company_apply_cancel">
+                 <input type="hidden" name="company_id" value="{{$data.id|default:''}}" id="folder">
+            </form>
+                        <!-- PAGE CONTENT BEGINS -->
+                        <form id="save_form" class="form-horizontal" role="form" action="/manager/company_apply_pass" method="post">
+                            <input type="hidden" name="folder" value="{{$time}}" id="folder">
+                            <input type="hidden" name="company_id" value="{{$data.id|default:''}}" id="folder">
+                           <div class="tabbable">
+                                    <ul class="nav nav-tabs padding-18 tab-size-bigger" id="myTab">
+                                        <li class="active">
+                                            <a data-toggle="tab" href="#faq-tab-1">
+                                                <i class="blue ace-icon fa fa-question-circle bigger-120"></i>
+                                                企业基本信息
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a data-toggle="tab" href="#faq-tab-2">
+                                                <i class="green ace-icon fa fa-user bigger-120"></i>
+                                                执业经纪人
+                                            </a>
+                                        </li>
+                                    </ul>
+
+                                    <div class="tab-content no-border padding-24">
+                                        <div id="faq-tab-1" class="tab-pane fade in active">
+                                            <h4 class="blue">
+                                                <i class="green ace-icon fa fa-list bigger-110"></i>
+                                               企业信息
+                                            </h4>
+
+                                            <div class="space-8"></div>
+                                        <div class="form-group">
+                                             <label class="col-sm-1 control-label no-padding-right"> 企业名称 </label>
+                                        <div class="col-sm-9 yy_m_7">
+                                       {{$data.company_name|default:''}}
+                                            </div>
+                                        </div>
+                                        <div class="space-4"></div>
+                                     <div class="form-group">
+                                             <label class="col-sm-1 control-label no-padding-right"> 注册地址 </label>
+                                        <div class="col-sm-9 yy_m_7">
+                                       {{$data.register_path|default:''}}
+                                            </div>
+                                        </div>
+                                        <div class="space-4"></div>
+                                         <div class="form-group">
+                                             <label class="col-sm-1 control-label no-padding-right"> 经营地址 </label>
+                                        <div class="col-sm-9 yy_m_7">
+                                       {{$data.business_path|default:''}}
+                                            </div>
+                                        </div>
+                                        <div class="space-4"></div>
+
+                                         <div class="form-group">
+                                             <label class="col-sm-1 control-label no-padding-right" for="record_num"> 备案号 </label>
+                                       <div class="col-sm-9">
+                                        <input type="text" id="record_num" name="record_num" class="rcol-xs-10 col-sm-5" value="{{$data.record_num|default:''}}">
+                                            <span class="help-inline col-xs-12 col-sm-7"></span>
+                                            </div>
+                                        </div>
+                                    
+                                        <div class="space-4"></div>
+
+                                         <div class="form-group">
+                                             <label class="col-sm-1 control-label no-padding-right"> 发证日期 </label>
+                                        <div class="col-sm-9 yy_m_7">
+                                      {{$data.issuing_date|default:''}}
+                                            </div>
+                                        </div>
+                                        <div class="space-4"></div>
+
+                                         <div class="form-group">
+                                             <label class="col-sm-1 control-label no-padding-right"> 企业电话 </label>
+                                        <div class="col-sm-9 yy_m_7">
+                                       {{$data.company_phone|default:''}}
+                                            </div>
+                                        </div>
+                                        <div class="space-4"></div>
+
+                                         <div class="form-group">
+                                             <label class="col-sm-1 control-label no-padding-right"> 负责人姓名 </label>
+                                        <div class="col-sm-9 yy_m_7">
+                                      {{$data.director_name|default:''}}
+                                            </div>
+                                        </div>
+                                        <div class="space-4"></div>
+
+                                         <div class="form-group">
+                                             <label class="col-sm-1 control-label no-padding-right"> 负责人电话 </label>
+                                        <div class="col-sm-9 yy_m_7">
+                                       {{$data.director_phone|default:''}}
+                                            </div>
+                                        </div>
+                                        <div class="space-4"></div>
+                                             <h4 class="blue">
+                                                <i class="green ace-icon fa fa-list bigger-110"></i>
+                                               法人信息
+                                            </h4>
+
+                                            <div class="space-8"></div>
+                                         <div class="form-group">
+                                             <label class="col-sm-1 control-label no-padding-right"> 法人姓名 </label>
+                                        <div class="col-sm-9 yy_m_7">
+                                        {{$data.legal_name|default:''}}
+                                            </div>
+                                        </div>
+                                        <div class="space-4"></div>
+                                        <div class="form-group">
+                                             <label class="col-sm-1 control-label no-padding-right"> 法人电话 </label>
+                                        <div class="col-sm-9 yy_m_7">
+                                      {{$data.legal_phone|default:''}}
+                                            </div>
+                                        </div>
+                                        <div class="space-4"></div>
+                                            <h4 class="blue">
+                                                <i class="green ace-icon fa fa-list bigger-110"></i>
+                                               图片
+                                            </h4>
+
+                                            <div class="space-8"></div>
+                                         
+                                            <div class="form-group">
+
+
+                                                <div class="col-sm-10">
+
+                                                    <ul id="uploadImgcontainer" style="width: 95%">
+                                                       
+                            {{if !empty($data.img) }}
+                            {{foreach from=$data.img key=k item=item}}
+                            <li>
+                                 <a class="example-image-link" href="{{$item.img_path}}" data-lightbox="example-set example_num-{{$k}}" data-title="企业资料">
+                                <img src="{{$item.img_path}}?imageView2/0/w/200/h/200/q/75|imageslim" alt="" style="height: 120px">
+                               </a>
+                             
+                            </li>
+                            {{/foreach}}
+                            {{/if}}
+                                                    </ul>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                        <div id="faq-tab-2" class="tab-pane fade">
+                                            <h4 class="blue">
+                                                <i class="green ace-icon fa fa-user bigger-110"></i>
+                                                执业经纪人
+                                            </h4>
+
+                                            <div class="space-8"></div>
+                                             <div class="form-group">
+                                           
+                                        <div class="col-sm-9">
+                                             <table class="table table-striped table-bordered">
+
+                                <thead>
+
+                                <tr>
+
+                                    <th style="width:15%;">姓名</th>
+                                    <th style="width:25%;">执业证号</th>
+
+                                    <th style="width:25%;">身份证号</th>
+                                    <th style="width:15%;">联系电话</th>
+                                    <th style="width:10%;">网签</th>
+                                </tr>
+
+                                </thead>
+
+                                <tbody id="tbody_id">
+                                    {{if !empty($data.agent) }}
+                            {{foreach from=$data.agent item=item}}
+                            <tr>
+                                        <td>{{$item.name}}</td>
+                                        <td>{{$item.job_code}}</td>
+                                          <td>{{$item.card}}</td>
+                                            <td>{{$item.phone}}</td>
+                                            <td>
+                                                <input type="hidden" name="setwq[]" value="{{if $item.wq == 2}}2{{else}}1{{/if}}">
+                                                <input readonly="readonly" disabled="disabled" name="ckwq[]" {{if $item.wq == 2}} checked{{/if}} type="checkbox" />
+                                            </td>
+                                    </tr>
+                            {{/foreach}}
+                            {{/if}}
+                                  
+                                </tbody>
+                            </table>
+                                            </div>
+                                        </div>
+                          
+                                         
+                                        </div>
+                        
+                                    </div>
+                                </div>
+
+                      
+
+                            <div class="col-md-offset-2 col-md-9">
+                                <button id="save_btn" class="btn btn-info" type="button">
+
+                                    <i class="icon-ok bigger-110"></i>
+
+                                    通 过
+
+                                </button>
+                                &nbsp; &nbsp; &nbsp;
+                                <a href="/manager/company_apply_list" class="btn" type="reset">
+
+                                    <i class="icon-undo bigger-110"></i>
+
+                                    返 回
+
+                                </a>
+                                &nbsp; &nbsp; &nbsp;
+                                <button id="delete_btn" class="btn btn-info red" type="button">
+
+                                    <i class="icon-ok bigger-110"></i>
+
+                                    作 废
+
+                                </button>
+                            </div>
+                        </form>
+                        <!-- PAGE CONTENT ENDS -->
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.page-content -->
+        </div>
+    </div><!-- /.main-content -->
+    {{include file='manager/public/footer.html'}}
+
+</div><!-- /.main-container -->
+
+{{include file='manager/public/footerjs.html'}}
+<!-- inline scripts related to this page -->
+
+
+<script src="/manager_statics/qwadmin/js/date-time/bootstrap-datepicker.js"></script>
+<script src="/manager_statics/app/ajaxfileupload.js"></script>
+<script type="text/javascript" src="/manager_statics/app/lightbox-plus-jquery.min.js"></script>
+<script type="text/javascript">
+ $("#save_btn").click(function(){
+        var record_num = $.trim($("#record_num").val());
+        if(record_num == "" ) {
+            layer.msg('备案号不能为空', {icon: 2});
+            return false;
+        }
+       
+        
+        $("#save_form").submit();
+    })
+   
+</script>
+</body>
+</html>

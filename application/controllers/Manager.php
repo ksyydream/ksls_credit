@@ -399,6 +399,15 @@ class Manager extends MY_Controller {
         }
     }
 
+    public function agent_view($m_id){
+        $data = $this->manager_model->agent_edit($m_id);
+        if(!$data){
+            $this->show_message('未找到执业经纪人信息!');
+        }
+        $this->assign('data', $data);
+        $this->display('manager/agent/agent_view.html');
+    }
+
     /**
      *********************************************************************************************
      * 经纪人事件
@@ -574,6 +583,8 @@ class Manager extends MY_Controller {
         $data = $this->manager_model->event4agent_record_list($page, 1);
         $base_url = "/manager/event4agent_GRecord_list/";
         $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $event_type_all = $this->c4m_model->get_event4agent_type_all(null, 1);
+        $this->assign('event_type_all', $event_type_all);
         $this->assign('pager', $pager);
         $this->assign('page', $page);
         $this->assign('data', $data);
@@ -635,6 +646,8 @@ class Manager extends MY_Controller {
         $data = $this->manager_model->event4agent_record_list($page, -1);
         $base_url = "/manager/event4agent_BRecord_list/";
         $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $event_type_all = $this->c4m_model->get_event4agent_type_all(null, -1);
+        $this->assign('event_type_all', $event_type_all);
         $this->assign('pager', $pager);
         $this->assign('page', $page);
         $this->assign('data', $data);
@@ -893,6 +906,29 @@ class Manager extends MY_Controller {
         }
         $this->assign('data', $data);
         $this->display('manager/company/company_apply_add.html');
+    }
+
+
+    //报备审核页面
+    public function company_apply_audit($m_id){
+        $this->assign('f_user_id', $this->admin_id);
+        $this->assign('time', time());
+         $data = $this->manager_model->company_apply_edit($m_id);
+        if(!$data){
+            $this->show_message('未找到信息!');
+        }
+        $this->assign('data', $data);
+        $this->display('manager/company/company_apply_audit.html');
+    }
+
+    //报备通过
+    public function company_apply_pass(){
+        $res = $this->manager_model->company_apply_pass();
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/manager/company_apply_list'));
+        }else{
+            $this->show_message($res['msg']);
+        }
     }
 
     public function company_apply_save(){
