@@ -176,7 +176,7 @@ class Manager_login extends MY_Controller {
     }
 
     /**
-     * 企业保存页面 用于测试
+     * 企业保存页面
      * @author yangyang
      * @date 2019-11-14
      */
@@ -194,4 +194,25 @@ class Manager_login extends MY_Controller {
         $this->assign('data',$data);
         $this->display('manager/company/show_agent.html');
     }
+
+    /**
+     * 经纪人就业轨迹
+     * @author yangyang
+     * @date 2019-11-14
+     */
+    public function show_agent_track($page = 1){
+        $admin_info = $this->session->userdata('admin_info');
+        if(!$admin_info){
+            echo '';//如果没有登陆 不可调用
+            exit();
+        }
+        $data = $this->c4m_model->show_agent_track($page);
+        $base_url = "/manager_login/show_agent_track/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('manager/agent/show_agent_track.html');
+    }
+
 }

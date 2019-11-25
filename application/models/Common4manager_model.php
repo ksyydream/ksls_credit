@@ -155,4 +155,40 @@ class Common4manager_model extends MY_Model
         }
     }
 
+    //经纪人就业轨迹
+    public function show_agent_track($page){
+        $id = $this->input->post('agent_id') ? $this->input->post('agent_id') : -1;
+
+        $data['limit'] = $this->limit;
+        //搜索条件
+        $data['keyword'] = $this->input->get('keyword') ? trim($this->input->get('keyword')):null;
+
+        $this->db->select('count(1) num')->from('agent_track a');
+        $this->db->join('company_pass b','a.to_company_id = b.company_id','left');
+        $this->db->join('company_pass c','a.from_company_id = c.company_id','left');
+        $this->db->join('company_pending d','a.to_company_id = d.id','left');
+        $this->db->join('company_pending e','a.from_company_id = e.id','left');
+        $this->db->where('a.agent_id',$id);
+        if($data['keyword']){
+            $this->db->like('a.to_company_name', $data['keyword']);
+        }
+        $num = $this->db->get()->row();
+        $data['total_rows'] = $num->num;
+        $this->db->select('a.*,b.company_name to_name,c.company_name from_name,
+		d.status to_company_status,d.flag to_company_flag,e.status from_company_status,e.flag from_company_flag')->from('agent_track a');
+        $this->db->join('company_pass b','a.to_company_id = b.company_id','left');
+        $this->db->join('company_pass c','a.from_company_id = c.company_id','left');
+        $this->db->join('company_pending d','a.to_company_id = d.id','left');
+        $this->db->join('company_pending e','a.from_company_id = e.id','left');
+        $this->db->where('a.agent_id',$id);
+        if($data['keyword']){
+            $this->db->like('a.to_company_name', $data['keyword']);
+        }
+        $this->db->order_by('a.create_date','desc');
+        $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
+        $data['res_list'] = $this->db->get()->result_array();
+        //die(var_dump($this->db->last_query()));
+        return $data;
+    }
+
 }

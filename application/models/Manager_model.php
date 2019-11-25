@@ -1288,7 +1288,6 @@ class Manager_model extends MY_Model
         if(!$data['company_name'] || !$data['register_path'] || !$data['business_path'] || 
             !$data['issuing_date'] || !$data['company_phone'] || !$data['director_name'] || 
             !$data['director_phone'] || !$data['legal_name'] || !$data['legal_phone']){
-            die();
             return $this->fun_fail('缺少必要信息!');
         }
         $this->load->model('common4manager_model', 'c4m_model');
@@ -1372,7 +1371,7 @@ class Manager_model extends MY_Model
             $this->db->select('a.*')->from('agent a');
             $this->db->where('a.company_id',$company_id);
             $save4track_new = $this->db->get()->result_array();
-            $this->save_agent_track($company_id,$data,array(),$save4track_new);
+            $this->save_agent_track($company_id, $data, $save4track_old, $save4track_new);
             return $this->fun_success('保存成功!');
         }
         
