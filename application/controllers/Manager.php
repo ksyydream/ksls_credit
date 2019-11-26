@@ -864,6 +864,133 @@ class Manager extends MY_Controller {
         $this->display('manager/event_company/event4company_detail_detail.html');
     }
 
+
+    /**
+     * 企业事件(良好信用)列表
+     * @author yangyang
+     * @date 2019-11-26
+     */
+
+    public function event4company_GRecord_list($page = 1){
+        $data = $this->manager_model->event4company_record_list($page, 1);
+        $base_url = "/manager/event4company_GRecord_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $event_type_all = $this->c4m_model->get_event4company_type_all(null, 1);
+        $this->assign('event_type_all', $event_type_all);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('manager/event_company/event4company_GRecord_list.html');
+    }
+
+    //新增
+    public function event4company_GRecord_add(){
+        $event_type_all = $this->c4m_model->get_event4company_type_all(1,1);
+        $this->assign('event_type_all', $event_type_all);
+        $get_company_all = $this->c4m_model->get_company_all(2);
+        $this->assign('company_all', $get_company_all);
+        $this->display('manager/event_company/event4company_GRecord_add.html');
+    }
+
+    //保存
+    public function event4company_GRecord_save(){
+         $res = $this->manager_model->event4company_Record_save($this->admin_id, 1);
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/manager/event4company_GRecord_list'));
+        }else{
+            $this->show_message($res['msg']);
+        }
+    }
+
+    //修改
+    public function event4company_GRecord_update(){
+         $res = $this->manager_model->event4company_Record_update($this->admin_id);
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/manager/event4company_GRecord_list'));
+        }else{
+            $this->show_message($res['msg']);
+        }
+    }
+
+    //编辑
+    public function event4company_GRecord_edit($m_id){
+        $data = $this->manager_model->event4company_Record_edit($m_id);
+        if(!$data){
+            $this->show_message('未找到信息!');
+        }
+        $this->assign('data', $data);
+        $this->display('manager/event_company/event4company_GRecord_edit.html');
+    }
+
+    //作废
+    public function event4company_GRecord_cancel(){
+         $res = $this->manager_model->event4company_Record_cancel($this->admin_id);
+        $this->ajaxReturn($res);
+    }
+
+     /**
+     * 企业事件(不良信用)列表
+     * @author yangyang
+     * @date 2019-11-26
+     */
+
+    public function event4company_BRecord_list($page = 1){
+        $data = $this->manager_model->event4company_record_list($page, -1);
+        $base_url = "/manager/event4company_BRecord_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $event_type_all = $this->c4m_model->get_event4company_type_all(null, -1);
+        $this->assign('event_type_all', $event_type_all);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('manager/event_company/event4company_BRecord_list.html');
+    }
+
+    //新增
+    public function event4company_BRecord_add(){
+        $event_type_all = $this->c4m_model->get_event4company_type_all(1, -1);
+        $this->assign('event_type_all', $event_type_all);
+        $get_company_all = $this->c4m_model->get_company_all(2);
+        $this->assign('company_all', $get_company_all);
+        $this->display('manager/event_company/event4company_BRecord_add.html');
+    }
+
+    //保存
+    public function event4company_BRecord_save(){
+         $res = $this->manager_model->event4company_Record_save($this->admin_id, -1);
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/manager/event4company_BRecord_list'));
+        }else{
+            $this->show_message($res['msg']);
+        }
+    }
+
+    //修改
+    public function event4company_BRecord_update(){
+         $res = $this->manager_model->event4company_Record_update($this->admin_id);
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/manager/event4company_BRecord_list'));
+        }else{
+            $this->show_message($res['msg']);
+        }
+    }
+
+    //编辑
+    public function event4company_BRecord_edit($m_id){
+        $data = $this->manager_model->event4company_Record_edit($m_id);
+        if(!$data){
+            $this->show_message('未找到信息!');
+        }
+        $this->assign('data', $data);
+        $this->display('manager/event_company/event4company_BRecord_edit.html');
+    }
+
+    //作废
+    public function event4company_BRecord_cancel(){
+         $res = $this->manager_model->event4company_Record_cancel($this->admin_id);
+        $this->ajaxReturn($res);
+    }
+
     /**
      *********************************************************************************************
      * 以下代码为企业管理
@@ -904,6 +1031,8 @@ class Manager extends MY_Controller {
         if(!$data){
             $this->show_message('未找到信息!');
         }
+        if ($data['flag'] != 1) 
+            $this->show_message('企业信息已不在报备列表!');
         $this->assign('data', $data);
         $this->display('manager/company/company_apply_add.html');
     }
@@ -917,6 +1046,8 @@ class Manager extends MY_Controller {
         if(!$data){
             $this->show_message('未找到信息!');
         }
+        if ($data['flag'] != 1) 
+            $this->show_message('企业信息已不在报备列表!');
         $this->assign('data', $data);
         $this->display('manager/company/company_apply_audit.html');
     }

@@ -29,6 +29,8 @@ class Common4manager_model extends MY_Model
         return $res;
     }
 
+    //获取经纪人下拉选项
+    //1 经纪人事件新增时使用
     public function get_agent_all($flag = null){
         $this->db->select();
         $this->db->from('agent');
@@ -71,6 +73,19 @@ class Common4manager_model extends MY_Model
         return $res;
     }
 
+    //获取企业下拉选项
+    //1 企业事件新增时使用
+    public function get_company_all($flag = null){
+        $this->db->select();
+        $this->db->from('company_pending');
+        if ($flag) {
+            $this->db->where('flag', $flag);
+        }
+        $res =  $this->db->get()->result_array();
+        return $res;
+    }
+
+    //企业添加经纪人使用
     public function get_agent4company(){
         if(!$job_code = trim($this->input->post('keyword')))
             return array();
@@ -78,8 +93,7 @@ class Common4manager_model extends MY_Model
         $this->db->from('agent a');
         $this->db->join('company_pending b', 'a.company_id = b.id', 'left');
         $this->db->where('a.job_code', $job_code);
-        //这里暂时不排除其他无效状态的人员
-        //DBY重要
+        $this->db->where('a.flag', 2);
         return $this->db->get()->row_array();
     }
 

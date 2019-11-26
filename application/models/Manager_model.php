@@ -1202,14 +1202,206 @@ class Manager_model extends MY_Model
     }
 
     /**
+     * 企业事件列表
+     * @author yangyang
+     * @date 2019-11-12
+     */
+
+    public function event4company_record_list($page = 1, $type_type = null){
+        $data['limit'] = $this->limit;
+        //搜索条件
+        $data['record_num'] = $this->input->get('record_num')?trim($this->input->get('record_num')):null;
+        $data['company_keyword'] = $this->input->get('company_keyword')?trim($this->input->get('company_keyword')):null;
+        $data['event_keyword'] = $this->input->get('event_keyword')?trim($this->input->get('event_keyword')):null;
+        $data['status'] = $this->input->get('status')?trim($this->input->get('status')):null;
+        //获取总记录数
+        $this->db->select('count(1) num')->from('event4company_record a');
+        $this->db->join('company_pending b', 'a.company_id = b.id', 'left');
+        if ($data['record_num']) {
+            $this->db->where('b.record_num', $data['record_num']);
+        }
+        if($data['company_keyword']){
+            $this->db->group_start();
+            $this->db->like('b.company_name', $data['company_keyword']);
+            $this->db->or_like('b.record_num', $data['company_keyword']);
+            $this->db->group_end();
+        }
+        if($data['event_keyword']){
+            $this->db->group_start();
+            $this->db->like('a.event_name', $data['event_keyword']);
+            $this->db->or_like('a.event_type_name', $data['event_keyword']);
+            $this->db->group_end();
+        }
+        if($type_type){
+            $this->db->where('a.event_type_type', $type_type);
+        }
+        if($data['status']){
+            $this->db->where('a.status', $data['status']);
+        }
+        $num = $this->db->get()->row();
+        $data['total_rows'] = $num->num;
+
+        //获取详细列
+        $this->db->select('a.*, b.company_name new_company_name_, b.record_num record_num_')->from('event4company_record a');
+        $this->db->join('company_pending b', 'a.company_id = b.id', 'left');
+        if ($data['record_num']) {
+            $this->db->where('b.record_num', $data['record_num']);
+        }
+        if($data['company_keyword']){
+            $this->db->group_start();
+            $this->db->like('b.company_name', $data['company_keyword']);
+            $this->db->or_like('b.record_num', $data['company_keyword']);
+            $this->db->group_end();
+        }
+        if($data['event_keyword']){
+            $this->db->group_start();
+            $this->db->like('a.event_name', $data['event_keyword']);
+            $this->db->or_like('a.event_type_name', $data['event_keyword']);
+            $this->db->group_end();
+        }
+        if($type_type){
+            $this->db->where('a.event_type_type', $type_type);
+        }
+        if($data['status']){
+            $this->db->where('a.status', $data['status']);
+        }
+        $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
+        $this->db->order_by('a.record_id','desc');
+        $data['res_list'] = $this->db->get()->result_array();
+        return $data;
+    }
+
+    //通过$event4company_type判断是 良好信用操作 还是失信信用操作，1代表良好信用，-1代表失信信用
+    public function event4company_Record_save($admin_id, $event4company_type_index){
+        $event4company_type = $this->config->item('event4company_type');
+        $data = array(
+            'company_id'=> trim($this->input->post('company_id')),
+            'event_type_id'=> trim($this->input->post('type_id')),
+            'event_id' => trim($this->input->post('event_id')),
+            'record_fact' => trim($this->input->post('record_fact')),
+            'event_date' => trim($this->input->post('event_date')),
+            'remark' => trim($this->input->post('remark')),
+            'create_uid' => $admin_id,
+            'status' => 1,
+            'create_time' => date('Y-m-d H:i:s', time()),
+        );
+        if(!$data['company_id'] || !$data['event_type_id'] || !$data['event_id'] || !$data['record_fact'] || !$data['remark'] || !$data['event_date']){
+            return $this->fun_fail('缺少必要信息!');
+        }
+        $company_info_ = $this->readByID('company_pending', 'id', $data['company_id']);
+        if(!$company_info_)
+            return $this->fun_fail('所选企业异常!');
+        if($company_info_['flag'] != 2)
+            return $this->fun_fail('所选企业状态异常!');
+        $data['old_company_name'] = $company_info_['company_name'];
+        $event_info_ = $this->readByID('event4company_detail', 'id', $data['event_id']);
+        if(!$event_info_ || $event_info_['status'] != 1)
+            return $this->fun_fail('所选事件状态异常!');
+        if( $event_info_['type_id'] != $data['event_type_id'])
+            return $this->fun_fail('所选事件类别与事件不符!');
+        //检查事件是否存在 次数限制，并查看是否可以新建
+        if ($event_info_['allow_times'] > 0) {
+            $check_times_ = $this->db->select('count(1) num')->from('event4company_record')->where(array('company_id' => $data['company_id'], 'event_id' => $data['event_id'], 'status' => 1))->get()->row_array();
+            if ($check_times_['num'] >= $event_info_['allow_times']) {
+                return $this->fun_fail('事件已设置到次数上限!');
+            }
+
+        }
+
+        $type_info_ = $this->readByID('event4company_type', 'id', $data['event_type_id']);
+        if(!$type_info_ || $type_info_['status'] != 1)
+            return $this->fun_fail('所选事件类别状态异常!');
+        if ($type_info_['type'] != $event4company_type_index) {
+           return $this->fun_fail("所选事件不属于 " . $event4company_type[$event4company_type_index] . " 事件!");
+        }
+        $data['event_name'] = $event_info_['event_name'];
+        $data['event_type_name'] = $type_info_['event_type_name'];
+        $data['score'] =  ($event4company_type_index * $event_info_['score']);
+        $data['event_type_type'] = $type_info_['type'];
+        $new_score_ = $company_info_['score'] + $data['score'];
+       
+
+        $res = $this->db->insert('event4company_record', $data);
+        if ($res) {
+            $this->db->where(array('id' => $data['company_id'], 'score' => $company_info_['score']));
+            $res_company_ = $this->db->set('score', 'score + ' . $data['score'], FALSE)->update('company_pending');
+            //DBY重要
+            //这里需要加入 企业分数变更时的处理
+            return $this->fun_success('保存成功!');
+        }
+        return $this->fun_fail('保存失败!');
+    }
+
+     public function event4company_Record_update($admin_id){
+        if(!$record_id = $this->input->post('record_id'))
+            return $this->fun_fail('事件状态异常');
+        $record_info_ = $this->readByID('event4company_record', 'record_id', $record_id);
+        if(!$record_info_ || $record_info_['status'] != 1)
+            return $this->fun_fail('事件状态异常!');
+        $data = array(
+            'record_fact' => trim($this->input->post('record_fact')),
+            'event_date' => trim($this->input->post('event_date')),
+            'remark' => trim($this->input->post('remark')),
+            'modify_uid' => $admin_id,
+            'modify_time' => date('Y-m-d H:i:s', time()),
+        );
+        if(!$data['record_fact'] || !$data['remark'] || !$data['event_date']){
+            return $this->fun_fail('缺少必要信息!');
+        }
+        $res = $this->db->where('record_id', $record_id)->update('event4company_record', $data);
+        return $this->fun_success('保存成功!');
+    }
+
+     public function event4company_Record_edit($id){
+        $this->db->select('a.*, b.company_name new_company_name_, b.record_num record_num_')->from('event4company_record a');
+        $this->db->join('company_pending b', 'b.id = a.company_id', 'left');
+        $this->db->where('a.record_id',$id);
+        $detail =  $this->db->get()->row_array();
+        return $detail;
+    }
+
+    public function event4company_Record_cancel($admin_id){
+        if(!$record_id = $this->input->post('record_id'))
+            return $this->fun_fail('事件状态异常');
+        $record_info_ = $this->readByID('event4company_record', 'record_id', $record_id);
+        if(!$record_info_ || $record_info_['status'] != 1)
+            return $this->fun_fail('事件状态异常!');
+        $company_info_ = $this->readByID('company_pending', 'id', $record_info_['company_id']);
+        if(!$company_info_)
+            return $this->fun_fail('所选企业异常!');
+        if($company_info_['flag'] != 2)
+            return $this->fun_fail('所选经企业状态异常!');
+        $new_score_ = $company_info_['score'] - $record_info_['score'];
+
+        $data = array(
+            'del_remark' => trim($this->input->post('del_remark')),
+            'del_uid' => $admin_id,
+            'status' => -1,
+            'del_time' => date('Y-m-d H:i:s', time()),
+        );
+        if(!$data['del_remark']){
+            return $this->fun_fail('缺少必要信息!');
+        }
+        $res = $this->db->where('record_id', $record_id)->update('event4company_record', $data);
+         if ($res) {
+            $this->db->where(array('id' => $record_info_['company_id'], 'score' => $company_info_['score']));
+            $res_company_ = $this->db->set('score', 'score - ' . $record_info_['score'], FALSE)->update('company_pending');
+            //DBY重要
+            //这里需要加入 经纪人状态变更，企业分数更新和状态检查 可能还需要做相应的记录
+            return $this->fun_success('作废成功!');
+        }
+        return $this->fun_fail('作废失败!');
+    }
+
+    /**
      *********************************************************************************************
      * 以下代码为企业管理
      *********************************************************************************************
      */
 
      /**
-     * 历史原因 status 1代表等待初审，2代表审核通过，3代表审核失败，4代表等待终审，-1代表作废
-     * flag  1代表报备，2代表报备成功
+     * 历史原因 status 1代表等待初审，2代表审核通过，3代表审核失败，4代表等待终审
+     * flag  1代表报备，2代表报备成功，-1代表作废
      * 企业列表 设计为通用
      * @author yangyang
      * @date 2019-11-12
@@ -1386,7 +1578,7 @@ class Manager_model extends MY_Model
         $company_data = $this->db->select('*')->from('company_pending')->where('id',$company_id)->get()->row_array();
         if(!$company_data)
             return $this->fun_fail('企业信息丢失!');
-        if($company_data['flag']!=1)
+        if($company_data['flag'] != 1)
             return $this->fun_fail('企业状态变更不可通过!');
         $this->load->model('common4manager_model', 'c4m_model');
         $check_num_ = $this->c4m_model->check_record_num($record_num, $company_id);
