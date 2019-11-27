@@ -169,6 +169,26 @@ class Common4manager_model extends MY_Model
         }
     }
 
+    //检查重复和不规范的经纪人，用于企业信息保存和提交
+    public function check_repeat_agent($company_id = null, $code_ = array()){
+        if ($code_ && is_array($code_)) {
+            foreach($code_ as $idx => $card_) {
+            $check_card = $this->check_code4get(trim($card_), $company_id);
+            if($check_card['status'] != 1){
+                 return $this->fun_fail($check_card['msg'])
+            }else{
+                foreach($code_ as $idx2 => $card_2) {
+                    //$card_2 = trim($card_2);
+                    if($idx != $idx2 && trim($card_) == trim($card_2)) {
+                        return $this->fun_fail('存在重复录入执业经纪人!');
+                    }
+                }
+            }
+            }
+        }
+        return $this->fun_success('可以使用!');
+    }
+
     //经纪人就业轨迹
     public function show_agent_track($page){
         $id = $this->input->post('agent_id') ? $this->input->post('agent_id') : -1;

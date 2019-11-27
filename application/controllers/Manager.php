@@ -1087,6 +1087,22 @@ class Manager extends MY_Controller {
     }
 
     /**
+     * 初审审核页面
+     * @author yangyang
+     * @date 2019-11-27
+     */
+    public function company_pending_1_audit($m_id){
+        $data = $this->manager_model->company_apply_edit($m_id);
+        if(!$data){
+            $this->show_message('未找到信息!');
+        }
+        if ($data['flag'] != 2 || $data['status'] != 1) 
+            $this->show_message('企业信息已不在初审列表!');
+        $this->assign('data', $data);
+        //$this->display('manager/company/company_apply_audit.html');
+    }
+
+    /**
      * 企业完成列表
      * @author yangyang
      * @date 2019-11-12
@@ -1099,6 +1115,36 @@ class Manager extends MY_Controller {
         $this->assign('page', $page);
         $this->assign('data', $data);
         $this->display('manager/company/company_pending_2_list.html');
+    }
+
+    /**
+     * 编辑终审审核
+     * @author yangyang
+     * @date 2019-11-12
+     */
+     public function company_pending_2_edit($m_id){
+         $data = $this->manager_model->company_apply_edit($m_id);
+        if(!$data){
+            $this->show_message('未找到信息!');
+        }
+        if ($data['flag'] != 2 || !in_array($data['status'], array(2))) 
+            $this->show_message('企业信息已不在终审列表!');
+        $this->assign('data', $data);
+        $this->display('manager/company/company_pending_2_edit.html');
+    }
+
+    /**
+     * 提交审核信息
+     * @author yangyang
+     * @date 2019-11-12
+     */
+     public function company_pending_2_save(){
+          $res = $this->manager_model->company_pending_2_save();
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/manager/company_pending_2_list'));
+        }else{
+            $this->show_message($res['msg']);
+        }
     }
 
     /**
@@ -1130,5 +1176,6 @@ class Manager extends MY_Controller {
         $this->assign('data', $data);
         $this->display('manager/company/company_pending_3_list.html');
     }
+
 
 }

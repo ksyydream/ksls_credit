@@ -57,7 +57,7 @@
 
                                 </button>
                                 &nbsp; &nbsp; &nbsp;
-                                <a href="/manager/company_list" class="btn" type="reset">
+                                <a href="/manager/company_grade_list" class="btn" type="reset">
 
                                     <i class="icon-undo bigger-110"></i>
 
@@ -90,11 +90,13 @@
             layer.msg('分数等级名称不能为空', {icon: 2});
             return false;
         }
-        var min_score = $.trim($("#min_score").val());
-        if(min_score == '' || parseFloat(min_score) < 0) {
+        {{if $data.flag|default:'1' == 1}}
+            var min_score = $.trim($("#min_score").val());
+            if(min_score == '' || parseFloat(min_score) < 0) {
             layer.msg('分数线必须大于0', {icon: 2});
             return false;
-        }
+            }
+        {{/if}}
         $("#save_form").submit();
     })
 

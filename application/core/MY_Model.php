@@ -782,6 +782,33 @@ class MY_Model extends CI_Model{
         return $username;
     }
 
+    /**
+     *********************************************************************************************
+     * 通用逻辑类函数
+     *********************************************************************************************
+     */
+
+    /**
+    *重新计算企业总分
+     * @param $company_id 企业ID
+     * @return bool
+     * 因为企业存在多种分值，在计算结束后，无论结果如何都要相加计算，以方便之后排名和查看分数线
+     */
+    public function save_company_total_score($company_id){
+        //第一步基础分，无需操作
+
+        //第二步事件分，无需操作
+
+        //第三步系统分，主要由实际的经纪人数量和状态决定
+        //建议 每次重新计算时 记录计算过程，需要新表
+        //DBY重要
+
+        //最后一步 把各个分值相加
+        $this->db->where('id', $company_id);
+        $this->db->set('total_score', 'event_score + sys_score + base_score', FALSE)->update('company_pending');
+        return true;
+    }
+
     public function save_agent_track($company_id,$company_data,$agent_old,$agent_new){
         $data_insert= array();
         $agent_arr_ = array();

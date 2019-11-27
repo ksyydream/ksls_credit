@@ -75,9 +75,15 @@ class Manager_login extends MY_Controller {
     }
 
     public function save_pics($f_name, $time){
+        if(!$f_name || strlen($$f_name) < 5)
+            exit(-1);
+        if(strpos($f_name,'.') !== false) 
+            exit(-1);
+        if(strpos($f_name,'php') !== false || strpos($f_name,'js') !== false)
+             exit(-1);
         $admin_info = $this->session->userdata('admin_info');
         if(!$admin_info){
-            echo -1;//如果没有登陆 不可上传,以免有人恶意上传图片占用服务器资源
+            exit(-1);//如果没有登陆 不可上传,以免有人恶意上传图片占用服务器资源
         }
         //$this->load->library('image_lib');
         if (is_readable('./././upload_files/' . $f_name) == false) {
