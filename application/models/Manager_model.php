@@ -1467,10 +1467,27 @@ class Manager_model extends MY_Model
 
     /**
     * 企业审核信息保存【重要】
+    * 通过变更的 审核状态自动判断是否保存 company_pass
     * @param $status 需要变更的审核状态 1代表等待初审，2代表审核通过，3代表审核失败，4代表等待终审
     * 
     */
     public function company_audit_save($status){
+
+        $this->load->model('common4manager_model', 'c4m_model');
+        $data = array(
+            'company_name'=>trim($this->input->post('company_name')),
+            'register_path'=>trim($this->input->post('register_path')),
+            'business_path'=>trim($this->input->post('business_path')),
+            'issuing_date'=>trim($this->input->post('issuing_date')),
+            'company_phone'=>trim($this->input->post('company_phone')),
+            'director_name'=>trim($this->input->post('director_name')),
+            'director_phone'=>trim($this->input->post('director_phone')),
+            'legal_name'=>trim($this->input->post('legal_name')),
+            'legal_phone'=>trim($this->input->post('legal_phone')),
+            'mdate'=>date('Y-m-d H:i:s',time()),
+            'tj_date'=>date('Y-m-d H:i:s',time()),
+            'status' => $status,    
+        );
         //先判断变更的状态是否正确
         if (!in_array($status, array(1, 2, 3, 4))) 
             return $this->fun_fail('审核状态不规范!');
@@ -1484,23 +1501,36 @@ class Manager_model extends MY_Model
              if ($company_info_['flag'] != 2) {
                  return $this->fun_fail('企业备案状态异常!');
              }
+             //如果审核状态相同，就只是编辑
+             if ($status != $company_info_['status']) {
+                 switch ($company_info_['status']) {
+                 case 1:
+                     if ($status == 2)
+                        return $this->fun_fail('企业备案状态为待初审，不可直接终审!');
+                     break;
+                case 2:
+                     if ($status == 4)
+                        return $this->fun_fail('企业备案状态为终审完成，不可直接退回终审!');
+                     break;
+                case 3:
+                     if ($status == 2)
+                        return $this->fun_fail('企业备案状态为审核失败，不可直接终审成功!');
+                    if ($status == 4)
+                        return $this->fun_fail('企业备案状态为审核失败，不可直接退回终审!');
+                     break;
+                case 4:
+                     if ($status == 1)
+                        return $this->fun_fail('企业备案状态为等待初审，不可直接退回初审!');
+                     break;
+                }
+             }else{
+                //如果只是编辑 就不修改提交时间
+                unset($data['tj_date']);
+             }
         }else{
             return $this->fun_fail('请求异常!');
         }
-        $this->load->model('common4manager_model', 'c4m_model');
-        $data = array(
-            'company_name'=>trim($this->input->post('company_name')),
-            'register_path'=>trim($this->input->post('register_path')),
-            'business_path'=>trim($this->input->post('business_path')),
-            'issuing_date'=>trim($this->input->post('issuing_date')),
-            'company_phone'=>trim($this->input->post('company_phone')),
-            'director_name'=>trim($this->input->post('director_name')),
-            'director_phone'=>trim($this->input->post('director_phone')),
-            'legal_name'=>trim($this->input->post('legal_name')),
-            'legal_phone'=>trim($this->input->post('legal_phone')),
-            'mdate'=>date('Y-m-d H:i:s',time()),
-            'status' => $status,    
-        );
+        
         
         if(!$data['company_name'] || !$data['register_path'] || !$data['business_path'] || 
             !$data['issuing_date'] || !$data['company_phone'] || !$data['director_name'] || 
@@ -1562,6 +1592,9 @@ class Manager_model extends MY_Model
             $this->db->where('a.company_id',$company_id);
             $save4track_new = $this->db->get()->result_array();
             $this->save_agent_track($company_id, $data, $save4track_old, $save4track_new);
+            if ($status == 2)
+                $this->save_pass_company($company_id);
+            $this->save_log_company($company_id);
             return $this->fun_success('保存成功!');
         }
         
@@ -1664,6 +1697,7 @@ class Manager_model extends MY_Model
             $this->db->where('a.company_id',$company_id);
             $save4track_new = $this->db->get()->result_array();
             $this->save_agent_track($company_id, $data, $save4track_old, $save4track_new);
+            $this->save_log_company($company_id);
             return $this->fun_success('保存成功!');
         }
         
@@ -1692,17 +1726,36 @@ class Manager_model extends MY_Model
         $data = array('zz_status'=>1,'record_num'=>$record_num,'flag'=>2,'status'=>2,'sdate'=>date('Y-m-d H:i:s',time()));
         if(count($agents) < 3)
             $data['zz_status'] = -1;
-        //$this->log_company($company_id);
-
-        //$data['username'] = $this->get_username($company_data['id']);
+      
         $data['password'] = sha1('123456');
         $res = $this->db->where('id', $company_id)->update('company_pending',$data);
         $this->save_company_total_score($company_id);
         //$this->company_ns_save($company_id,$data['status']);
         if($res){
+            $this->save_pass_company($company_id);
+            $this->save_log_company($company_id);
             return $this->fun_success('通过成功!');
         }else{
             return $this->fun_fail('审核失败!');
         }
+    }
+
+    //获取最近一次终审通过的信息
+    public function company_pass_data($company_id){
+        $this->db->select('a.*')->from('company_pass a');
+        $this->db->where('a.company_id', $company_id);
+        $detail =  $this->db->get()->row_array();
+        $this->db->select()->from('company_pass_img');
+        $this->db->where('company_id', $company_id);
+        $detail['img'] = $this->db->get()->result_array();
+        $this->db->select()->from('company_pass_agent');
+        $this->db->where('company_id', $company_id);
+        $detail['agent'] = $this->db->get()->result_array();
+        return $detail;
+    }
+
+    //审核操作
+    public function company_pending_submit($status){
+        
     }
 }

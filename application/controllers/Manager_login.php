@@ -75,7 +75,7 @@ class Manager_login extends MY_Controller {
     }
 
     public function save_pics($f_name, $time){
-        if(!$f_name || strlen($$f_name) < 5)
+        if(!$f_name || strlen($f_name) < 5)
             exit(-1);
         if(strpos($f_name,'.') !== false) 
             exit(-1);

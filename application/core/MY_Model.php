@@ -857,6 +857,68 @@ class MY_Model extends CI_Model{
         }
 
     }
+
+    //保存企业修改记录
+    //第一 指记录保存成功的数据
+    //第二 尽可能的保存多的数据，比如分数，备案号，审核状态，报备状态等信息
+    public function save_log_company($company_id){
+        $company_data = $this->db->select()->from('company_pending')->where('id',$company_id)->order_by('id','desc')->get()->row_array();
+        $company_data['company_id']=$company_data['id'];
+        unset($company_data['id']);
+        unset($company_data['username']);
+        unset($company_data['password']);
+        $admin_info = $this->session->userdata('admin_info');
+        $company_data['handle_user'] = $admin_info ? $admin_info['admin_id'] : -1;
+        $company_data['handle_date'] = date('Y-m-d H:i:s',time());
+        $this->db->insert('company_log',$company_data);
+        $log_id = $this->db->insert_id();
+        $this->db->select("img_path,m_img_path,folder,company_id,{$log_id} log_id")->from('company_pending_img');
+        $this->db->where('company_id',$company_id);
+        $data['img'] = $this->db->get()->result_array();
+        if($data['img'])
+            $this->db->insert_batch('company_log_img',$data['img']);
+        $this->db->select("id agent_id,name,phone,job_code,card,company_id,{$log_id} log_id,wq,old_job_code")->from('agent');
+        $this->db->where('company_id',$company_id);
+        $data['agent'] = $this->db->get()->result_array();
+        if($data['agent'])
+            $this->db->insert_batch('company_log_agent',$data['agent']);
+       
+    }
+
+    //保存企业终审成功信息
+    //第一 指终审通过 和 在终审通过下修改成功的信息
+    //第二 尽可能的保存多的数据，比如分数，备案号，审核状态，报备状态等信息
+    public function save_pass_company($company_id){
+        $company_data = $this->db->select()->from('company_pending')->where('id',$company_id)->order_by('id','desc')->get()->row_array();
+        $company_data['company_id']=$company_data['id'];
+        unset($company_data['id']);
+        unset($company_data['username']);
+        unset($company_data['password']);
+        $admin_info = $this->session->userdata('admin_info');
+        $company_data['handle_user'] = $admin_info ? $admin_info['admin_id'] : -1;
+        $company_data['handle_date'] = date('Y-m-d H:i:s',time());
+
+        $this->db->where('company_id',$company_id)->delete('company_pass');
+        $this->db->insert('company_pass',$company_data);
+        $pass_id = $this->db->insert_id();
+
+
+        $this->db->where('company_id',$company_id)->delete('company_pass_img');
+        $this->db->select("img_path,m_img_path,folder,company_id")->from('company_pending_img');
+        $this->db->where('company_id',$company_id);
+        $pass_img = $this->db->get()->result_array();
+        if($pass_img)
+            $this->db->insert_batch('company_pass_img',$pass_img);
+
+        $this->db->where('company_id',$company_id)->delete('company_pass_agent');
+        $this->db->select("id agent_id,name,phone,job_code,card,company_id,wq,old_job_code")->from('agent');
+        //$this->db->where('flag',2); //如果是离昆的就不要进行保存 //有什么信息就保存什么信息，真正是否显示，还是要看实际的状态
+        $this->db->where('company_id',$company_id);
+        $pass_agent = $this->db->get()->result_array();
+        if($pass_agent)
+            $this->db->insert_batch('company_pass_agent',$pass_agent);
+       
+    }
 }
 
 /* End of file MY_Model.php */

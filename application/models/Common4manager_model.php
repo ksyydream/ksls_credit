@@ -175,7 +175,7 @@ class Common4manager_model extends MY_Model
             foreach($code_ as $idx => $card_) {
             $check_card = $this->check_code4get(trim($card_), $company_id);
             if($check_card['status'] != 1){
-                 return $this->fun_fail($check_card['msg'])
+                 return $this->fun_fail($check_card['msg']);
             }else{
                 foreach($code_ as $idx2 => $card_2) {
                     //$card_2 = trim($card_2);
