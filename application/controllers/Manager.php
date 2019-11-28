@@ -1110,7 +1110,7 @@ class Manager extends MY_Controller {
      * @date 2019-11-27
      */
     public function company_pending_1_submit(){
-        $res = $this->manager_model->company_pending_submit(4);
+        $res = $this->manager_model->company_pending_submit(2);
         if($res['status'] == 1){
             $this->show_message($res['msg'], site_url('/manager/company_pending_1_list'));
         }else{
@@ -1119,7 +1119,7 @@ class Manager extends MY_Controller {
     }
 
     /**
-     * 企业完成列表
+     * 待终审列表
      * @author yangyang
      * @date 2019-11-12
      */
@@ -1134,66 +1134,7 @@ class Manager extends MY_Controller {
     }
 
     /**
-     * 编辑终审审核
-     * @author yangyang
-     * @date 2019-11-12
-     */
-     public function company_pending_2_edit($m_id){
-         $data = $this->manager_model->company_apply_edit($m_id);
-        if(!$data){
-            $this->show_message('未找到信息!');
-        }
-        if ($data['flag'] != 2 || !in_array($data['status'], array(2))) 
-            $this->show_message('企业信息已不在终审列表!');
-        $this->assign('data', $data);
-        $this->display('manager/company/company_pending_2_edit.html');
-    }
-
-    /**
-     * 提交审核信息
-     * @author yangyang
-     * @date 2019-11-12
-     */
-     public function company_pending_2_save(){
-          $res = $this->manager_model->company_audit_save(2);
-        if($res['status'] == 1){
-            $this->show_message($res['msg'], site_url('/manager/company_pending_2_list'));
-        }else{
-            $this->show_message($res['msg']);
-        }
-    }
-
-    /**
-     * 提交审核信息
-     * @author yangyang
-     * @date 2019-11-12
-     */
-     public function company_pending_2_submit(){
-          $res = $this->manager_model->company_audit_save(1);
-        if($res['status'] == 1){
-            $this->show_message($res['msg'], site_url('/manager/company_pending_2_list'));
-        }else{
-            $this->show_message($res['msg']);
-        }
-    }
-
-    /**
-     * 企业终审列表
-     * @author yangyang
-     * @date 2019-11-12
-     */
-    public function company_pending_4_list($page = 1){
-        $data = $this->manager_model->company_common_list($page, 2, array(4));
-        $base_url = "/manager/company_pending_4_list/";
-        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
-        $this->assign('pager', $pager);
-        $this->assign('page', $page);
-        $this->assign('data', $data);
-        $this->display('manager/company/company_pending_4_list.html');
-    }
-
-    /**
-     * 企业审核失败列表
+     * 企业审核成功列表
      * @author yangyang
      * @date 2019-11-12
      */
@@ -1206,6 +1147,69 @@ class Manager extends MY_Controller {
         $this->assign('data', $data);
         $this->display('manager/company/company_pending_3_list.html');
     }
+
+    /**
+     * 编辑终审审核
+     * @author yangyang
+     * @date 2019-11-12
+     */
+     public function company_pending_3_edit($m_id){
+         $data = $this->manager_model->company_apply_edit($m_id);
+        if(!$data){
+            $this->show_message('未找到信息!');
+        }
+        if ($data['flag'] != 2 || !in_array($data['status'], array(3)))
+            $this->show_message('企业信息已不在终审列表!');
+        $this->assign('data', $data);
+        $this->display('manager/company/company_pending_3_edit.html');
+    }
+
+    /**
+     * 提交审核信息
+     * @author yangyang
+     * @date 2019-11-12
+     */
+     public function company_pending_3_save(){
+          $res = $this->manager_model->company_audit_save(3);
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/manager/company_pending_3_list'));
+        }else{
+            $this->show_message($res['msg']);
+        }
+    }
+
+    /**
+     * 提交审核信息
+     * @author yangyang
+     * @date 2019-11-12
+     */
+     public function company_pending_3_submit(){
+          $res = $this->manager_model->company_audit_save(1);
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/manager/company_pending_3_list'));
+        }else{
+            $this->show_message($res['msg']);
+        }
+    }
+
+
+
+    /**
+     * 审核失败列表
+     * @author yangyang
+     * @date 2019-11-12
+     */
+    public function company_pending_f1_list($page = 1){
+        $data = $this->manager_model->company_common_list($page, 2, array(-1));
+        $base_url = "/manager/company_pending_f1_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('manager/company/company_pending_f1_list.html');
+    }
+
+
 
 
 }

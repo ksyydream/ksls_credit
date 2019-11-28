@@ -1407,7 +1407,8 @@ class Manager_model extends MY_Model
      */
 
      /**
-     * 历史原因 status 1代表等待初审，2代表审核通过，3代表审核失败，4代表等待终审
+     * [作废]历史原因 status 1代表等待初审，2代表审核通过，3代表审核失败，4代表等待终审
+      * 以免给自己挖坑,把status 修改为 1代表等待初审，2代表等待终审，3代表审核通过，-1代表审核失败
      * flag  1代表报备，2代表报备成功，-1代表作废
      * 企业列表 设计为通用
      * @author yangyang
@@ -1442,7 +1443,14 @@ class Manager_model extends MY_Model
         if($status){
             $this->db->where_in('a.status',$status);
         }
-        $this->db->order_by('a.mdate','asc');
+        switch($flag){
+            case 2:
+                $this->db->order_by('a.tj_date','desc');
+                break;
+            default:
+                $this->db->order_by('a.mdate','asc');
+        }
+
       
         $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
         $data['res_list'] = $this->db->get()->result_array();
@@ -1468,7 +1476,8 @@ class Manager_model extends MY_Model
     /**
     * 企业审核信息保存【重要】
     * 通过变更的 审核状态自动判断是否保存 company_pass
-    * @param $status 需要变更的审核状态 1代表等待初审，2代表审核通过，3代表审核失败，4代表等待终审
+    * @param $status 需要变更的审核状态
+     * 把status 修改为 1代表等待初审，2代表等待终审，3代表审核通过，-1代表审核失败
     * 
     */
     public function company_audit_save($status){
@@ -1489,7 +1498,7 @@ class Manager_model extends MY_Model
             'status' => $status,    
         );
         //先判断变更的状态是否正确
-        if (!in_array($status, array(1, 2, 3, 4))) 
+        if (!in_array($status, array(1, 2, 3, -1)))
             return $this->fun_fail('审核状态不规范!');
         //判断企业信息是否符合变更条件
         $company_id = $this->input->post('company_id');
@@ -1505,22 +1514,22 @@ class Manager_model extends MY_Model
              if ($status != $company_info_['status']) {
                  switch ($company_info_['status']) {
                  case 1:
-                     if ($status == 2)
-                        return $this->fun_fail('企业备案状态为待初审，不可直接终审!');
+                     if ($status == 3)
+                        return $this->fun_fail('企业审核状态为待初审，不可直接终审成功!');
                      break;
                 case 2:
-                     if ($status == 4)
-                        return $this->fun_fail('企业备案状态为终审完成，不可直接退回终审!');
+                     if ($status == 1)
+                        return $this->fun_fail('企业审核状态为待终审，不可直接退回初审!');
                      break;
                 case 3:
-                     if ($status == 2)
-                        return $this->fun_fail('企业备案状态为审核失败，不可直接终审成功!');
-                    if ($status == 4)
-                        return $this->fun_fail('企业备案状态为审核失败，不可直接退回终审!');
+                    if ($status == 2)
+                        return $this->fun_fail('企业审核状态为终审成功，不可直接退回终审!');
                      break;
-                case 4:
-                     if ($status == 1)
-                        return $this->fun_fail('企业备案状态为等待初审，不可直接退回初审!');
+                case -1:
+                    if ($status == 3)
+                        return $this->fun_fail('企业审核状态为审核失败，不可直接终审成功!');
+                    if ($status == 2)
+                        return $this->fun_fail('企业审核状态为审核失败，不可直接退回终审!');
                      break;
                 }
              }else{
@@ -1546,7 +1555,6 @@ class Manager_model extends MY_Model
         $check_repeat_agent_ = $this->c4m_model->check_repeat_agent($company_id, $code_);
         if($check_repeat_agent_['status'] != 1)
             return $this->fun_fail($check_repeat_agent_['msg']);
-        
 
         $save4track_old = array();
         $this->db->trans_start();//--------开始事务
@@ -1592,7 +1600,7 @@ class Manager_model extends MY_Model
             $this->db->where('a.company_id',$company_id);
             $save4track_new = $this->db->get()->result_array();
             $this->save_agent_track($company_id, $data, $save4track_old, $save4track_new);
-            if ($status == 2)
+            if ($status == 3)
                 $this->save_pass_company($company_id);
             $this->save_log_company($company_id);
             return $this->fun_success('保存成功!');
@@ -1723,7 +1731,7 @@ class Manager_model extends MY_Model
            return $this->fun_fail('企业名称已被申请!');
         //暂时不做判断
         $agents = $this->db->select()->from('agent')->where('flag',2)->where('company_id',$company_id)->get()->result_array();
-        $data = array('zz_status'=>1,'record_num'=>$record_num,'flag'=>2,'status'=>2,'sdate'=>date('Y-m-d H:i:s',time()));
+        $data = array('zz_status'=>1,'record_num'=>$record_num,'flag'=>2,'status'=>3,'sdate'=>date('Y-m-d H:i:s',time()));
         if(count($agents) < 3)
             $data['zz_status'] = -1;
       

@@ -39,7 +39,7 @@
                 <div class="row">
                     <div class="col-xs-12">
                         <!-- PAGE CONTENT BEGINS -->
-                        <form id="save_form" class="form-horizontal" role="form" action="/manager/company_apply_save" method="post">
+                        <form id="save_form" class="form-horizontal" role="form" action="/manager/company_pending_3_save" method="post">
                             <input type="hidden" name="folder" value="{{$time}}" id="folder">
                             <input type="hidden" name="company_id" value="{{$data.id|default:''}}">
                            <div class="tabbable">
@@ -88,6 +88,13 @@
                                         <div class="col-sm-9">
                                         <input type="text" id="business_path" name="business_path" class="rcol-xs-10 col-sm-5" value="{{$data.business_path|default:''}}">
                                             <span class="help-inline col-xs-12 col-sm-7"></span>
+                                            </div>
+                                        </div>
+                                         <div class="space-4"></div>
+                                         <div class="form-group">
+                                             <label class="col-sm-1 control-label no-padding-right"> 备案号 </label>
+                                        <div class="col-sm-9 yy_m_7">
+                                       {{$data.record_num|default:''}}
                                             </div>
                                         </div>
                                         <div class="space-4"></div>
@@ -257,6 +264,22 @@
                       
 
                             <div class="col-md-offset-2 col-md-9">
+                                <button id="audit_btn" class="btn btn-info" type="button">
+
+                                    <i class="icon-ok bigger-110"></i>
+
+                                    提 审
+
+                                </button>
+                                &nbsp; &nbsp; &nbsp;
+                                <a href="/manager/company_pending_3_list" class="btn" type="reset">
+
+                                    <i class="icon-undo bigger-110"></i>
+
+                                    返 回
+
+                                </a>
+                                &nbsp; &nbsp; &nbsp;
                                 <button id="save_btn" class="btn btn-info" type="button">
 
                                     <i class="icon-ok bigger-110"></i>
@@ -264,14 +287,6 @@
                                     保 存
 
                                 </button>
-                                &nbsp; &nbsp; &nbsp;
-                                <a href="/manager/company_apply_list" class="btn" type="reset">
-
-                                    <i class="icon-undo bigger-110"></i>
-
-                                    返 回
-
-                                </a>
                             </div>
                         </form>
                         <!-- PAGE CONTENT ENDS -->
@@ -376,9 +391,29 @@
         $(obj).parent().remove();
     }
 
+    $("#audit_btn").click(function(){
+        layer.confirm('是否确定提审!确定后将进入审核环节。', {
+            btn: ['确定','取消'], //按钮
+            area: ['400px', 'auto']
+        }, function(){
+            submit_fun('/manager/company_pending_3_submit');
+        },function(){
+
+        });
+    })
 
     $("#save_btn").click(function(){
-        var company_name = $.trim($("#company_name").val());
+       layer.confirm('是否确定保存!终审完成状态进行保存将更新前台企业信息，将直接展示与游客。', {
+            btn: ['确定','取消'], //按钮
+            area: ['400px', 'auto']
+        }, function(){
+            submit_fun('/manager/company_pending_3_save');
+        },function(){
+
+        });
+    })
+    function submit_fun(url_submit){
+         var company_name = $.trim($("#company_name").val());
         if(company_name == "" ) {
             layer.msg('企业名称不能为空', {icon: 2});
             return false;
@@ -430,8 +465,10 @@
             //layer.msg('持证经纪人不能小于三个!', {icon: 2});
             //flag=1;return false;
         }
+        $("#save_form").attr('action',url_submit);    //通过jquery为action属性赋值
         $("#save_form").submit();
-    })
+    }
+    
 
     $("#btn_add_agent").click(function(){
         var search_ = $.trim($("#search_").val());
