@@ -1512,26 +1512,10 @@ class Manager_model extends MY_Model
              }
              //如果审核状态相同，就只是编辑
              if ($status != $company_info_['status']) {
-                 switch ($company_info_['status']) {
-                 case 1:
-                     if ($status == 3)
-                        return $this->fun_fail('企业审核状态为待初审，不可直接终审成功!');
-                     break;
-                case 2:
-                     if ($status == 1)
-                        return $this->fun_fail('企业审核状态为待终审，不可直接退回初审!');
-                     break;
-                case 3:
-                    if ($status == 2)
-                        return $this->fun_fail('企业审核状态为终审成功，不可直接退回终审!');
-                     break;
-                case -1:
-                    if ($status == 3)
-                        return $this->fun_fail('企业审核状态为审核失败，不可直接终审成功!');
-                    if ($status == 2)
-                        return $this->fun_fail('企业审核状态为审核失败，不可直接退回终审!');
-                     break;
-                }
+                 $check_status_change4company_ = $this->c4m_model->check_status_change4company($company_info_['status'], $status);
+                 if ($check_status_change4company_['status'] != 1) {
+                     return $this->fun_fail($check_status_change4company_['msg']);
+                 }
              }else{
                 //如果只是编辑 就不修改提交时间
                 unset($data['tj_date']);
@@ -1756,14 +1740,50 @@ class Manager_model extends MY_Model
         $this->db->select()->from('company_pass_img');
         $this->db->where('company_id', $company_id);
         $detail['img'] = $this->db->get()->result_array();
-        $this->db->select()->from('company_pass_agent');
-        $this->db->where('company_id', $company_id);
+        $this->db->select('b.*,a.wq pass_wq_')->from('company_pass_agent a');
+        $this->db->join('agent b', 'a.agent_id = b.id','inner');
+        $this->db->where('a.company_id', $company_id);
         $detail['agent'] = $this->db->get()->result_array();
         return $detail;
     }
 
     //审核操作
     public function company_pending_submit($status){
-        
+        $company_id = $this->input->post('company_id');
+        if($company_id){
+             $company_info_ = $this->db->where('id', $company_id)->from('company_pending')->get()->row_array();
+             if (!$company_info_) {
+                 return $this->fun_fail('企业信息丢失!');
+             }
+             if ($company_info_['flag'] != 2) {
+                 return $this->fun_fail('企业备案状态异常!');
+             }
+             //如果审核状态相同，就只是编辑
+             if ($status != $company_info_['status']) {
+                 $check_status_change4company_ = $this->c4m_model->check_status_change4company($company_info_['status'], $status);
+                 if ($check_status_change4company_['status'] != 1) {
+                     return $this->fun_fail($check_status_change4company_['msg']);
+                 }
+             }else{
+                 return $this->fun_fail('请求异常!审核状态不变');
+             }
+        }else{
+            return $this->fun_fail('请求异常!');
+        }
+
+        $update_data = array(
+            'status' => $status,
+            'mdate' => date('Y-m-d H:i:s',time()),
+        );
+
+        if ($status == 2) 
+           $update_data['csdate'] = date('Y-m-d H:i:s',time());
+        if ($status == 3)
+           $update_data['sdate'] = date('Y-m-d H:i:s',time());
+       $this->db->where('id', $company_id)->update('company_pending', $update_data);
+       $this->save_log_company($company_id);
+        if ($status == 3)
+           $this->save_pass_company($company_id);
+       return $this->fun_success('通过成功!');
     }
 }

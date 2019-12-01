@@ -189,6 +189,33 @@ class Common4manager_model extends MY_Model
         return $this->fun_success('可以使用!');
     }
 
+    //检查审核状态是否按照规则执行
+    public function check_status_change4company($old_status, $new_status){
+        if (!in_array($new_status, array(1, 2, 3, -1)))
+            return $this->fun_fail('审核状态不规范!');
+        switch ($old_status) {
+                 case 1:
+                     if ($new_status == 3)
+                        return $this->fun_fail('企业审核状态为待初审，不可直接终审成功!');
+                     break;
+                case 2:
+                     if ($new_status == 1)
+                        return $this->fun_fail('企业审核状态为待终审，不可直接退回初审!');
+                     break;
+                case 3:
+                    if ($new_status == 2)
+                        return $this->fun_fail('企业审核状态为终审成功，不可直接退回终审!');
+                     break;
+                case -1:
+                    if ($new_status == 3)
+                        return $this->fun_fail('企业审核状态为审核失败，不可直接终审成功!');
+                    if ($new_status == 2)
+                        return $this->fun_fail('企业审核状态为审核失败，不可直接退回终审!');
+                     break;
+        }
+        return $this->fun_success('可以使用!');;
+    }
+
     //经纪人就业轨迹
     public function show_agent_track($page){
         $id = $this->input->post('agent_id') ? $this->input->post('agent_id') : -1;

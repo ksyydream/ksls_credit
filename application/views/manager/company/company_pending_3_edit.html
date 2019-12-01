@@ -311,8 +311,6 @@
 <script type="text/javascript" src="/manager_statics/plupload/js/jquery.ui.plupload/jquery.ui.plupload.js"></script>
 <!--plupload END--------------------------------------------------------------------------->
 
-<script src="/manager_statics/qwadmin/js/date-time/bootstrap-datepicker.js"></script>
-<script src="/manager_statics/app/ajaxfileupload.js"></script>
 <script type="text/javascript">
     function triggerFileUpload(flag) {
         var data_ = "{{$f_user_id}}_{{$time}}_" + flag.toString() + "_" +  Math.floor(Math.random()*(9000)+1000);
@@ -340,7 +338,7 @@
             filters: {
                 mime_types : [{
                     title : "Image files",
-                    extensions : "jpg,gif,png,jpeg"
+                    extensions : "jpg,png,jpeg"
                 }],
                 max_file_size : '8024kb',
                 prevent_duplicates : true
