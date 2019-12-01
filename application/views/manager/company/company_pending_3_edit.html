@@ -463,8 +463,39 @@
             //layer.msg('持证经纪人不能小于三个!', {icon: 2});
             //flag=1;return false;
         }
-        $("#save_form").attr('action',url_submit);    //通过jquery为action属性赋值
-        $("#save_form").submit();
+        var form = document.getElementById('save_form');
+
+        var formdata = new FormData(form);
+        $.ajax({
+            type : "POST",
+            url : url_submit,
+            data : formdata,
+            async: true,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success : function(data) {
+                var return_ = JSON.parse(data)
+                if(return_.status == 1){
+                    var url = '{{$reload_url}}';
+                    layer.alert('操作成功!', {
+                        skin: 'layui-layer-molv' //样式类名
+                        ,closeBtn: 0
+                    }, function(){
+                        window.location.replace(url);
+                    });
+                    //window.location.replace(url);
+                }else{
+                    //layer.close(index);
+                    layer.msg(return_.msg);
+                }
+                //layer.close(index);
+            },
+            error:function(){
+                //layer.close(index);
+                layer.msg('网络异常!');
+            }
+        });
     }
     
 

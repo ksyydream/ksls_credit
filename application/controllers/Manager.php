@@ -1034,11 +1034,12 @@ class Manager extends MY_Controller {
         if ($data['flag'] != 1) 
             $this->show_message('企业信息已不在报备列表!');
         $this->assign('data', $data);
+        $this->assign('reload_url', '/manager/company_apply_list');
         $this->display('manager/company/company_apply_add.html');
     }
 
 
-    //报备审核页面
+    //报备审核页面 [停用,因为报备审核功能与 报备编辑页面合并]
     public function company_apply_audit($m_id){
         $this->assign('f_user_id', $this->admin_id);
         $this->assign('time', time());
@@ -1049,26 +1050,20 @@ class Manager extends MY_Controller {
         if ($data['flag'] != 1) 
             $this->show_message('企业信息已不在报备列表!');
         $this->assign('data', $data);
+        $this->assign('reload_url', '/manager/company_apply_list');
         $this->display('manager/company/company_apply_audit.html');
     }
 
     //报备通过
     public function company_apply_pass(){
-        $res = $this->manager_model->company_apply_pass();
-        if($res['status'] == 1){
-            $this->show_message($res['msg'], site_url('/manager/company_apply_list'));
-        }else{
-            $this->show_message($res['msg']);
-        }
+        //$res = $this->manager_model->company_apply_pass();
+        $res = $this->manager_model->company_apply_save(2);
+        $this->ajaxReturn($res);
     }
 
     public function company_apply_save(){
-         $res = $this->manager_model->company_apply_save();
-        if($res['status'] == 1){
-            $this->show_message($res['msg'], site_url('/manager/company_apply_list'));
-        }else{
-            $this->show_message($res['msg']);
-        }
+        $res = $this->manager_model->company_apply_save(1);
+        $this->ajaxReturn($res);
     }
 
     /**
@@ -1196,22 +1191,19 @@ class Manager extends MY_Controller {
         }
         if ($data['flag'] != 2 || !in_array($data['status'], array(3)))
             $this->show_message('企业信息已不在终审列表!');
+         $this->assign('reload_url', '/manager/company_pending_3_list');
         $this->assign('data', $data);
         $this->display('manager/company/company_pending_3_edit.html');
     }
 
     /**
-     * 提交审核信息
+     * 保存终审信息
      * @author yangyang
      * @date 2019-11-12
      */
      public function company_pending_3_save(){
-          $res = $this->manager_model->company_audit_save(3);
-        if($res['status'] == 1){
-            $this->show_message($res['msg'], site_url('/manager/company_pending_3_list'));
-        }else{
-            $this->show_message($res['msg']);
-        }
+         $res = $this->manager_model->company_audit_save(3);
+         $this->ajaxReturn($res);
     }
 
     /**
@@ -1220,12 +1212,8 @@ class Manager extends MY_Controller {
      * @date 2019-11-12
      */
      public function company_pending_3_submit(){
-          $res = $this->manager_model->company_audit_save(1);
-        if($res['status'] == 1){
-            $this->show_message($res['msg'], site_url('/manager/company_pending_3_list'));
-        }else{
-            $this->show_message($res['msg']);
-        }
+         $res = $this->manager_model->company_audit_save(1);
+         $this->ajaxReturn($res);
     }
 
 

@@ -1576,6 +1576,9 @@ class Manager_model extends MY_Model
                 $this->db->insert('company_pending_img', $company_pic);
             }
         }
+        $this->save_company_total_score($company_id);
+        if ($status == 3)
+            $this->save_pass_company($company_id);
         $this->db->trans_complete();//------结束事务
         if ($this->db->trans_status() === FALSE) {
            return $this->fun_fail('保存失败!');
@@ -1584,8 +1587,6 @@ class Manager_model extends MY_Model
             $this->db->where('a.company_id',$company_id);
             $save4track_new = $this->db->get()->result_array();
             $this->save_agent_track($company_id, $data, $save4track_old, $save4track_new);
-            if ($status == 3)
-                $this->save_pass_company($company_id);
             $this->save_log_company($company_id);
             return $this->fun_success('保存成功!');
         }
@@ -1593,7 +1594,9 @@ class Manager_model extends MY_Model
     }
 
     //企业备案信息保存【重要】
-    public function company_apply_save(){
+    public function company_apply_save($flag){
+        if (!in_array($flag, array(1, 2)))
+            return $this->fun_fail('报备状态不规范!');
         $data = array(
             'company_name'=>trim($this->input->post('company_name')),
             'register_path'=>trim($this->input->post('register_path')),
@@ -1602,19 +1605,25 @@ class Manager_model extends MY_Model
             'company_phone'=>trim($this->input->post('company_phone')),
             'director_name'=>trim($this->input->post('director_name')),
             'director_phone'=>trim($this->input->post('director_phone')),
+            'record_num' => trim($this->input->post('record_num')),
             'legal_name'=>trim($this->input->post('legal_name')),
             'legal_phone'=>trim($this->input->post('legal_phone')),
             'cdate'=>date('Y-m-d H:i:s',time()),
             'mdate'=>date('Y-m-d H:i:s',time()),
             'base_score' => $this->config->item('company_score'),
-            'username'=>$this->get_username(),
+            //'username'=>$this->get_username(),
             'password'=>sha1('123456'),
             'status' => 1,
+            'flag' => $flag,
         );
+        if($flag == 2){
+            $data['tj_date'] = date('Y-m-d H:i:s',time());
+            $data['status'] = 3;
+        }
         $company_id = $this->input->post('company_id');
         if(!$data['company_name'] || !$data['register_path'] || !$data['business_path'] || 
             !$data['issuing_date'] || !$data['company_phone'] || !$data['director_name'] || 
-            !$data['director_phone'] || !$data['legal_name'] || !$data['legal_phone']){
+            !$data['director_phone'] || !$data['legal_name'] || !$data['legal_phone'] || !$data['record_num']){
             return $this->fun_fail('缺少必要信息!');
         }
         $this->load->model('common4manager_model', 'c4m_model');
@@ -1622,6 +1631,9 @@ class Manager_model extends MY_Model
         $check_company_name_ = $this->c4m_model->check_company_name($data['company_name'], $company_id);
         if($check_company_name_['status'] != 1)
             return $this->fun_fail($check_company_name_['msg']);
+        $check_num_ = $this->c4m_model->check_record_num($data['record_num'], $company_id);
+        if($check_num_['status'] != 1)
+            return $this->fun_fail('备案号已占用!');
         //检查执业证号是否可用或者重复
         $code_ = $this->input->post('agent_job_code');
         $check_repeat_agent_ = $this->c4m_model->check_repeat_agent($company_id, $code_);
@@ -1642,14 +1654,13 @@ class Manager_model extends MY_Model
             unset($data['cdate']);
             unset($data['username']);
             unset($data['password']);
-            unset($data['status']);
-            unset($data['flag']);
             $this->db->where('id', $company_id)->update('company_pending', $data);
             $this->db->select('a.*')->from('agent a');
             $this->db->where('a.company_id',$company_id);
             $save4track_old = $this->db->get()->result_array();
             $this->db->where($where_arr_)->update('company_pending', $data);
         }else{
+            $data['username'] = $this->get_username();
             $this->db->insert('company_pending', $data);
             $company_id = $this->db->insert_id();
         }
@@ -1681,10 +1692,14 @@ class Manager_model extends MY_Model
                 $this->db->insert('company_pending_img', $company_pic);
             }
         }
+        if($flag == 2)
+            $this->save_pass_company($company_id);
+        $this->save_company_total_score($company_id);
         $this->db->trans_complete();//------结束事务
         if ($this->db->trans_status() === FALSE) {
            return $this->fun_fail('保存失败!');
         } else {
+
             $this->db->select('a.*')->from('agent a');
             $this->db->where('a.company_id',$company_id);
             $save4track_new = $this->db->get()->result_array();
@@ -1695,7 +1710,7 @@ class Manager_model extends MY_Model
         
     }
 
-    //报备通过
+    //报备通过[停用,因保存和报备成功 合并代码]
     public function company_apply_pass(){
         $company_id = $this->input->post('company_id');
         $record_num = trim($this->input->post('record_num'));
