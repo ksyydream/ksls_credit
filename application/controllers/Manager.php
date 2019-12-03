@@ -991,6 +991,54 @@ class Manager extends MY_Controller {
         $this->ajaxReturn($res);
     }
 
+     /**
+     *********************************************************************************************
+     * 以下代码为年审设置
+     *********************************************************************************************
+     */
+
+      /**
+     * 年审时间列表
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function term_list($page = 1){
+        $data = $this->manager_model->term_list($page);
+        $base_url = "/manager/term_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('manager/term/term_list.html');
+    }
+
+    public function term_add(){
+        $this->display('manager/term/term_detail.html');
+    }
+
+    public function term_edit($id){
+        $data = $this->manager_model->term_edit($id);
+        if(!$data){
+            $this->show_message('未找到信息!');
+        }
+        $this->assign('data', $data);
+        $this->display('manager/term/term_detail.html');
+    }
+
+    public function term_save(){
+        $res = $this->manager_model->term_save($this->admin_id);
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/manager/term_list'));
+        }else{
+            $this->show_message($res['msg']);
+        }
+    }
+
+    public function term_delete($id){
+        $res = $this->manager_model->term_delete($id);
+        $this->ajaxReturn($res);
+    }
+
     /**
      *********************************************************************************************
      * 以下代码为企业管理

@@ -1400,6 +1400,109 @@ class Manager_model extends MY_Model
         return $this->fun_fail('作废失败!');
     }
 
+     /**
+     *********************************************************************************************
+     * 以下代码为年审设置
+     *********************************************************************************************
+     */
+
+     /**
+     * 企业事件一级列表
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function term_list($page = 1){
+        $data['limit'] = $this->limit;
+
+        //获取总记录数
+        $this->db->select('count(1) num')->from('term a');
+
+        $num = $this->db->get()->row();
+        $data['total_rows'] = $num->num;
+
+        //获取详细列
+        $this->db->select('a.*')->from('term a');
+
+        $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
+        $this->db->order_by('a.annual_year','desc');
+        $data['res_list'] = $this->db->get()->result_array();
+        return $data;
+    }
+
+    public function term_edit($id){
+        $detail =  $this->readByID('term', 'id', $id);
+        return $detail;
+    }
+
+    public function term_save($admin_id = -1){
+        $data =array(
+            'annual_year'=>trim($this->input->post('annual_year')),
+            'begin_date'=>trim($this->input->post('begin_date')),
+            'end_date'=>trim($this->input->post('end_date')),
+            'create_user' => $admin_id,
+            'create_date'=>date('Y-m-d H:i:s',time()),
+            'modify_user' => $admin_id,
+            'modify_date'=>date('Y-m-d H:i:s',time())
+        );
+        if($term_id = $this->input->post('id')){
+            $res = $this->db->select('')->from('term')->where(array('annual_year'=>$data['annual_year'],'id <>'=>$term_id))->get()->row_array();
+            if($res)
+                return $this->fun_fail('此审核年份已经设置,不可保存');
+            $this->db->select();
+            $this->db->from('term');
+            $this->db->group_start();
+                $this->db->group_start();
+                $this->db->where(array('begin_date <='=>$data['begin_date'],'end_date >='=>$data['begin_date']));
+                $this->db->group_end();
+                $this->db->or_group_start();
+                $this->db->where(array('begin_date <='=>$data['end_date'],'end_date >='=>$data['end_date']));
+                $this->db->group_end();
+                $this->db->or_group_start();
+                $this->db->where(array('begin_date >='=>$data['begin_date'],'end_date <='=>$data['end_date']));
+                $this->db->group_end();
+            $this->db->group_end();
+            $this->db->where('id <>', $term_id);
+            $res_check_ = $this->db->get()->row_array();
+            if($res_check_)
+                return $this->fun_fail('期限范围与其他期限有重叠!');
+            unset($data['create_user']);
+            unset($data['create_date']);
+            $res2 = $this->db->where('id', $term_id)->update('term',$data);
+        }else{
+            $res = $this->db->select('')->from('term')->where('annual_year',$data['annual_year'])->get()->row_array();
+            if($res)
+                return $this->fun_fail('此审核年份已经设置,不可新增');
+            $this->db->select();
+            $this->db->from('term');
+            $this->db->group_start();
+            $this->db->where(array('begin_date <='=>$data['begin_date'],'end_date >='=>$data['begin_date']));
+            $this->db->group_end();
+            $this->db->or_group_start();
+            $this->db->where(array('begin_date <='=>$data['end_date'],'end_date >='=>$data['end_date']));
+            $this->db->group_end();
+            $this->db->or_group_start();
+            $this->db->where(array('begin_date >='=>$data['begin_date'],'end_date <='=>$data['end_date']));
+            $this->db->group_end();
+            $res_check_ = $this->db->get()->row_array();
+            if($res_check_)
+                return $this->fun_fail('期限范围与其他期限有重叠!');
+            $res2 = $this->db->insert('term',$data);
+        }
+
+         if($res2)
+            return $this->fun_success('保存成功');
+        return $this->fun_fail('保存失败');
+    }
+
+    public function term_delete($id){
+        if(!$id)
+            return $this->fun_fail('删除失败');
+        $res = $this->db->where('id', $id)->delete('term');
+        if($res)
+            return $this->fun_success('删除成功');
+        return $this->fun_fail('删除失败');
+    }
+
     /**
      *********************************************************************************************
      * 以下代码为企业管理
