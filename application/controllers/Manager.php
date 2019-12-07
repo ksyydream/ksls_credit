@@ -1055,7 +1055,7 @@ class Manager extends MY_Controller {
      * @date 2019-11-12
      */
     public function company_apply_list($page = 1){
-        $data = $this->manager_model->company_common_list($page, array(1,2));
+        $data = $this->manager_model->company_pending_list($page, array(1,2));
         $base_url = "/manager/company_apply_list/";
         $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
         $is_ns_ = $this->c4m_model->check_is_ns_time();
@@ -1077,6 +1077,7 @@ class Manager extends MY_Controller {
     public function company_apply_add(){
         $this->assign('f_user_id', $this->admin_id);
         $this->assign('time', time());
+        $this->assign('m_id', -1);
         $this->display('manager/company/company_apply_add.html');
     }
 
@@ -1087,15 +1088,16 @@ class Manager extends MY_Controller {
         if(!$data){
             $this->show_message('未找到信息!');
         }
-        if ($data['flag'] != 1) 
+        if (!in_array($data['flag'], array(1,2)))
             $this->show_message('企业信息已不在报备列表!');
         $this->assign('data', $data);
+        $this->assign('m_id', $m_id);
         $this->assign('reload_url', '/manager/company_apply_list');
         $this->display('manager/company/company_apply_add.html');
     }
 
 
-    //年审提报
+    //年审提报 编辑页面
     public function company_apply_audit($m_id){
         $this->assign('f_user_id', $this->admin_id);
         $this->assign('time', time());
@@ -1107,21 +1109,21 @@ class Manager extends MY_Controller {
             $this->show_message('企业信息已不在报备列表!');
         $is_ns_ = $this->c4m_model->check_is_ns_time();
         if($is_ns_['status'] != 1)
-            $this->show_message('不在年审窗口期,不可提报年审!');
+            $this->show_message('不在年审窗口期,不可提交年审!');
         $this->assign('data', $data);
         $this->assign('reload_url', '/manager/company_apply_list');
         $this->display('manager/company/company_apply_audit.html');
     }
 
-    //报备通过
+    //年审 提交页面
     public function company_apply_pass(){
-        //$res = $this->manager_model->company_apply_pass();
-        $res = $this->manager_model->company_apply_save(2);
+        $res = $this->manager_model->company_apply_pass($this->admin_id);
         $this->ajaxReturn($res);
     }
 
+    //企业信息保存
     public function company_apply_save(){
-        $res = $this->manager_model->company_apply_save(1);
+        $res = $this->manager_model->company_apply_save();
         $this->ajaxReturn($res);
     }
 
@@ -1131,13 +1133,13 @@ class Manager extends MY_Controller {
      * @date 2019-11-12
      */
     public function company_pass_1_list($page = 1){
-        $data = $this->manager_model->company_common_list($page, 2, array(1));
+        $data = $this->manager_model->company_pass_list($page, array(1));
         $base_url = "/manager/company_pass_1_list/";
         $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
         $this->assign('pager', $pager);
         $this->assign('page', $page);
         $this->assign('data', $data);
-        $this->display('manager/company/company_pending_1_list.html');
+        $this->display('manager/company/company_pass_1_list.html');
     }
 
     /**
@@ -1145,7 +1147,7 @@ class Manager extends MY_Controller {
      * @author yangyang
      * @date 2019-11-27
      */
-    public function company_pending_1_audit($m_id){
+    public function company_pass_1_audit($m_id){
         $data = $this->manager_model->company_apply_edit($m_id);
         if(!$data){
             $this->show_message('未找到信息!');
@@ -1220,7 +1222,7 @@ class Manager extends MY_Controller {
         $this->assign('pager', $pager);
         $this->assign('page', $page);
         $this->assign('data', $data);
-        $this->display('manager/company/company_pending_2_list.html');
+        $this->display('manager/company/company_pass_2_list.html');
     }
 
     /**
@@ -1235,7 +1237,7 @@ class Manager extends MY_Controller {
         $this->assign('pager', $pager);
         $this->assign('page', $page);
         $this->assign('data', $data);
-        $this->display('manager/company/company_pending_3_list.html');
+        $this->display('manager/company/company_pass_3_list.html');
     }
 
     /**
@@ -1289,7 +1291,7 @@ class Manager extends MY_Controller {
         $this->assign('pager', $pager);
         $this->assign('page', $page);
         $this->assign('data', $data);
-        $this->display('manager/company/company_pending_f1_list.html');
+        $this->display('manager/company/company_pass_f1_list.html');
     }
 
 

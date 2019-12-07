@@ -71,68 +71,74 @@
                                             </h4>
 
                                             <div class="space-8"></div>
-                                        <div class="form-group">
-                                             <label class="col-sm-1 control-label no-padding-right"> 企业名称 </label>
-                                        <div class="col-sm-9 yy_m_7">
-                                       {{$data.company_name|default:''}}
+                                            <div class="form-group">
+                                                <label class="col-sm-1 control-label no-padding-right" for="company_name"> 企业名称 </label>
+                                                <div class="col-sm-9">
+                                                    <input type="text" id="company_name" name="company_name" class="rcol-xs-10 col-sm-5" value="{{$data.company_name|default:''}}">
+                                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="space-4"></div>
-                                     <div class="form-group">
-                                             <label class="col-sm-1 control-label no-padding-right"> 注册地址 </label>
-                                        <div class="col-sm-9 yy_m_7">
-                                       {{$data.register_path|default:''}}
+                                            <div class="space-4"></div>
+                                            <div class="form-group">
+                                                <label class="col-sm-1 control-label no-padding-right" for="register_path"> 注册地址 </label>
+                                                <div class="col-sm-9">
+                                                    <input type="text" id="register_path" name="register_path" class="rcol-xs-10 col-sm-5" value="{{$data.register_path|default:''}}">
+                                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="space-4"></div>
-                                         <div class="form-group">
-                                             <label class="col-sm-1 control-label no-padding-right"> 经营地址 </label>
-                                        <div class="col-sm-9 yy_m_7">
-                                       {{$data.business_path|default:''}}
+                                            <div class="space-4"></div>
+                                            <div class="form-group">
+                                                <label class="col-sm-1 control-label no-padding-right" for="business_path"> 经营地址 </label>
+                                                <div class="col-sm-9">
+                                                    <input type="text" id="business_path" name="business_path" class="rcol-xs-10 col-sm-5" value="{{$data.business_path|default:''}}">
+                                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                                </div>
                                             </div>
-                                        </div>
                                         <div class="space-4"></div>
 
                                          <div class="form-group">
                                              <label class="col-sm-1 control-label no-padding-right" for="record_num"> 备案号 </label>
-                                       <div class="col-sm-9">
-                                        <input type="text" id="record_num" name="record_num" class="rcol-xs-10 col-sm-5" value="{{$data.record_num|default:''}}">
-                                            <span class="help-inline col-xs-12 col-sm-7"></span>
+                                       <div class="col-sm-9 yy_m_7">
+                                           {{$data.record_num|default:''}}
                                             </div>
                                         </div>
                                     
                                         <div class="space-4"></div>
 
-                                         <div class="form-group">
-                                             <label class="col-sm-1 control-label no-padding-right"> 发证日期 </label>
-                                        <div class="col-sm-9 yy_m_7">
-                                      {{$data.issuing_date|default:''}}
+                                            <div class="form-group">
+                                                <label class="col-sm-1 control-label no-padding-right" for="issuing_date"> 发证日期 </label>
+                                                <div class="col-sm-9">
+                                                    <input type="text" onfocus="WdatePicker({isShowClear:true,readOnly:true,dateFmt:'yyyy-MM-dd'})"  id="issuing_date" name="issuing_date" class="rcol-xs-10 col-sm-5" value="{{$data.issuing_date|default:''}}">
+                                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="space-4"></div>
+                                            <div class="space-4"></div>
 
-                                         <div class="form-group">
-                                             <label class="col-sm-1 control-label no-padding-right"> 企业电话 </label>
-                                        <div class="col-sm-9 yy_m_7">
-                                       {{$data.company_phone|default:''}}
+                                            <div class="form-group">
+                                                <label class="col-sm-1 control-label no-padding-right" for="company_phone"> 企业电话 </label>
+                                                <div class="col-sm-9">
+                                                    <input type="text" id="company_phone" name="company_phone"  class="rcol-xs-10 col-sm-5" value="{{$data.company_phone|default:''}}">
+                                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="space-4"></div>
+                                            <div class="space-4"></div>
 
-                                         <div class="form-group">
-                                             <label class="col-sm-1 control-label no-padding-right"> 负责人姓名 </label>
-                                        <div class="col-sm-9 yy_m_7">
-                                      {{$data.director_name|default:''}}
+                                            <div class="form-group">
+                                                <label class="col-sm-1 control-label no-padding-right" for="director_name"> 负责人姓名 </label>
+                                                <div class="col-sm-9">
+                                                    <input type="text" id="director_name" name="director_name"  class="rcol-xs-10 col-sm-5" value="{{$data.director_name|default:''}}">
+                                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="space-4"></div>
+                                            <div class="space-4"></div>
 
-                                         <div class="form-group">
-                                             <label class="col-sm-1 control-label no-padding-right"> 负责人电话 </label>
-                                        <div class="col-sm-9 yy_m_7">
-                                       {{$data.director_phone|default:''}}
+                                            <div class="form-group">
+                                                <label class="col-sm-1 control-label no-padding-right" for="director_phone"> 负责人电话 </label>
+                                                <div class="col-sm-9">
+                                                    <input type="text" id="director_phone" name="director_phone"  class="rcol-xs-10 col-sm-5" value="{{$data.director_phone|default:''}}">
+                                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                                </div>
                                             </div>
-                                        </div>
                                         <div class="space-4"></div>
                                              <h4 class="blue">
                                                 <i class="green ace-icon fa fa-list bigger-110"></i>
@@ -140,44 +146,54 @@
                                             </h4>
 
                                             <div class="space-8"></div>
-                                         <div class="form-group">
-                                             <label class="col-sm-1 control-label no-padding-right"> 法人姓名 </label>
-                                        <div class="col-sm-9 yy_m_7">
-                                        {{$data.legal_name|default:''}}
+                                            <div class="form-group">
+                                                <label class="col-sm-1 control-label no-padding-right" for="legal_name"> 法人姓名 </label>
+                                                <div class="col-sm-9">
+                                                    <input type="text" id="legal_name" name="legal_name"  class="rcol-xs-10 col-sm-5" value="{{$data.legal_name|default:''}}">
+                                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="space-4"></div>
-                                        <div class="form-group">
-                                             <label class="col-sm-1 control-label no-padding-right"> 法人电话 </label>
-                                        <div class="col-sm-9 yy_m_7">
-                                      {{$data.legal_phone|default:''}}
+                                            <div class="space-4"></div>
+                                            <div class="form-group">
+                                                <label class="col-sm-1 control-label no-padding-right" for="legal_phone"> 法人电话 </label>
+                                                <div class="col-sm-9">
+                                                    <input type="text" id="legal_phone" name="legal_phone"  class="rcol-xs-10 col-sm-5" value="{{$data.legal_phone|default:''}}">
+                                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="space-4"></div>
+                                            <div class="space-4"></div>
                                             <h4 class="blue">
                                                 <i class="green ace-icon fa fa-list bigger-110"></i>
-                                               图片
+                                                上传图片
                                             </h4>
 
                                             <div class="space-8"></div>
-                                         
+
+                                            <div class="form-group">
+
+                                                <div class="col-sm-9">
+                                                    <a href="javascript:" class="btn btn-white btn-xs btn-primary" onclick="triggerFileUpload(1)">上 传</a>
+
+
+                                                </div>
+
+                                            </div>
                                             <div class="form-group">
 
 
                                                 <div class="col-sm-10">
 
                                                     <ul id="uploadImgcontainer" style="width: 95%">
-                                                       
-                            {{if !empty($data.img) }}
-                            {{foreach from=$data.img key=k item=item}}
-                            <li>
-                                 <a class="example-image-link" href="{{$item.img_path}}" data-lightbox="example-set example_num2" data-title="企业资料">
-                                <img src="{{$item.img_path}}?imageView2/0/w/200/h/200/q/75|imageslim" alt="" style="height: 120px">
-                               </a>
-                             
-                            </li>
-                            {{/foreach}}
-                            {{/if}}
+                                                        {{if !empty($data.img) }}
+                                                        {{foreach from=$data.img item=item}}
+                                                        <li>
+                                                            <img src="{{$item.img_path}}?imageView2/0/w/200/h/200/q/75|imageslim" alt="" style="height: 120px">
+                                                            <span class="delete-this" onclick="del_pic(this);"><i></i></span>
+                                                            <input type="hidden" name="pic_short[]" class="pic_short" value="{{$item.img_path}}">
+
+                                                        </li>
+                                                        {{/foreach}}
+                                                        {{/if}}
                                                     </ul>
 
                                                 </div>
@@ -222,7 +238,7 @@
                                             <td>{{$item.phone}}</td>
                                             <td>
                                                 <input type="hidden" name="setwq[]" value="{{if $item.wq == 2}}2{{else}}1{{/if}}">
-                                                <input readonly="readonly" disabled="disabled" name="ckwq[]" {{if $item.wq == 2}} checked{{/if}} type="checkbox" />
+                                                <input class="agent_flag_" readonly="readonly" disabled="disabled" name="ckwq[]" {{if $item.wq == 2}} checked{{/if}} type="checkbox" />
                                             </td>
                                     </tr>
                             {{/foreach}}
@@ -271,23 +287,194 @@
 
 {{include file='manager/public/footerjs.html'}}
 <!-- inline scripts related to this page -->
+<!--plupload start--------------------------------------------------------------------------->
+<!-- Load plupload and all it's runtimes and finally the UI widget -->
+<link rel="stylesheet" href="/manager_statics/plupload/js/jquery.ui.plupload/css/jquery.ui.plupload.css" type="text/css" />
+<!-- production -->
+<script type="text/javascript" src="/manager_statics/plupload/js/plupload.full.min.js"></script>
+<script type="text/javascript" src="/manager_statics/plupload/js/zh_CN.js"></script>
+<script type="text/javascript" src="/manager_statics/plupload/js/jquery.ui.plupload/jquery.ui.plupload.js"></script>
+<!--plupload END--------------------------------------------------------------------------->
 
 
-<script src="/manager_statics/qwadmin/js/date-time/bootstrap-datepicker.js"></script>
 <script src="/manager_statics/app/ajaxfileupload.js"></script>
-<script type="text/javascript" src="/manager_statics/app/lightbox-plus-jquery.min.js"></script>
+
 <script type="text/javascript">
- $("#save_btn").click(function(){
-        var record_num = $.trim($("#record_num").val());
-        if(record_num == "" ) {
-            layer.msg('备案号不能为空', {icon: 2});
+
+
+    function triggerFileUpload(flag) {
+        var data_ = "{{$f_user_id}}_{{$time}}_" + flag.toString() + "_" +  Math.floor(Math.random()*(9000)+1000);
+        $("#folder").val(data_);
+        var html = '<div id="uploader" style="width:550px;"><p>Your browser doesn\'t have Flash, Silverlight or HTML5 support.</p></div>';
+
+        var layerIndex = layer.confirm(html, {
+            offset: ['100px', (document.body.offsetWidth - 800) / 2],
+            maxWidth: 800,
+            btn: ['确定','取消'],
+            shade: false
+        }, function(){
+            uploadFile(flag);
+            layer.close(layerIndex);
+        }, function(){
+        });
+
+        $("#uploader").plupload({
+            runtimes : 'html5,flash,silverlight',
+            url : "/manager_login/save_pics/company_pic/" + $("#folder").val(),
+            max_file_size : '50mb',
+            resize : { crop: true },
+            file_data_name: 'userfile',
+            filters : [],
+            filters: {
+                mime_types : [{
+                    title : "Image files",
+                    extensions : "jpg,gif,png,jpeg"
+                }],
+                max_file_size : '8024kb',
+                prevent_duplicates : true
+            },
+            rename: true,
+            sortable: true,
+            dragdrop: true,
+            views: {
+                list: true,
+                thumbs: true,
+                active: 'thumbs'
+            },
+            flash_swf_url : '/manager_statics/plupload/js/Moxie.swf',
+            silverlight_xap_url : '/manager_statics/plupload/js/Moxie.xap'
+        });
+    }
+
+    function uploadFile(flag) {
+        if ($('#uploader').plupload('getFiles').length < 1) {
+            alert("图片未上传,请重新选择.");
+            return false;
+        } else {
+            $.getJSON("/manager_login/get_pics/company_pic/" + $("#folder").val() +  "/?_=" + Math.random(), function(data){
+                var html = '';
+                var now_pic = [];
+                $('input[name="pic_short[]"]').each(function(index){
+                    now_pic[index] = $(this).val();
+                });
+
+                $.each(data.img,function(index,item){
+                    var path = item + '?imageView2/0/w/200/h/200/q/75|imageslim';
+                    if($.inArray(item, now_pic) < 0){
+                        html += '<li><img src="' + path + '" alert="" style="height: 120px" />';
+                        html += '<span class="delete-this" onclick="del_pic(this);"><i></i></span>';
+                        html += '<input type="hidden" name="pic_short[]" class="pic_short" value="' + item + '">';
+                        //html += '<input type="hidden" name="folder[]" value="'+ $("#folder").val() +'">';
+                        html += '</li>';
+                    }
+                });
+                $("#uploadImgcontainer").append(html);
+
+            });
+            return true;
+        }
+    }
+
+    function del_pic(obj) {
+        $(obj).parent().remove();
+    }
+
+
+
+    $("#save_btn").click(function(){
+        submit_fun('/manager/company_apply_pass');
+    })
+    function submit_fun(url_submit){
+        var flag = -1;
+        var company_name = $.trim($("#company_name").val());
+        if(company_name == "" ) {
+            layer.msg('企业名称不能为空', {icon: 2});
             return false;
         }
-       
-        
-        $("#save_form").submit();
-    })
-   
+        var register_path = $.trim($("#register_path").val());
+        if(register_path == "" ) {
+            layer.msg('注册地址不能为空', {icon: 2});
+            return false;
+        }
+        var business_path = $.trim($("#business_path").val());
+        if(business_path == "" ) {
+            layer.msg('经营地址不能为空', {icon: 2});
+            return false;
+        }
+        var issuing_date = $.trim($("#issuing_date").val());
+        if(issuing_date == "" ) {
+            layer.msg('发证日期不能为空', {icon: 2});
+            return false;
+        }
+
+        var company_phone = $.trim($("#company_phone").val());
+        if(company_phone == "" ) {
+            layer.msg('企业电话不能为空', {icon: 2});
+            return false;
+        }
+        var director_name = $.trim($("#director_name").val());
+        if(director_name == "" ) {
+            layer.msg('负责人姓名不能为空', {icon: 2});
+            return false;
+        }
+        var director_phone = $.trim($("#director_phone").val());
+        if(director_phone == "" ) {
+            layer.msg('负责人电话不能为空', {icon: 2});
+            return false;
+        }
+        var legal_name = $.trim($("#legal_name").val());
+        if(legal_name == "" ) {
+            layer.msg('法人姓名不能为空', {icon: 2});
+            return false;
+        }
+        var legal_phone = $.trim($("#legal_phone").val());
+        if(legal_phone == "" ) {
+            layer.msg('法人电话不能为空', {icon: 2});
+            return false;
+        }
+        //报备时可以随意修改 审核时再做判断，以免在审核中有人员变动
+        var length = $("#tbody_id").find(".agent_flag_").length;
+        if(length < 3){
+            layer.msg('年审提审时,持证经纪人不能小于三个!', {icon: 2});
+            flag=1;return false;
+        }
+        if(flag != 1){
+            var form = document.getElementById('save_form');
+
+            var formdata = new FormData(form);
+            $.ajax({
+                type : "POST",
+                url : url_submit,
+                data : formdata,
+                async: true,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success : function(data) {
+                    var return_ = JSON.parse(data)
+                    if(return_.status == 1){
+                        var url = '/manager/company_apply_list/';
+                        layer.alert('操作成功!', {
+                            skin: 'layui-layer-molv' //样式类名
+                            ,closeBtn: 0
+                        }, function(){
+                            window.location.replace(url);
+                        });
+                        //window.location.replace(url);
+                    }else{
+                        //layer.close(index);
+                        layer.msg(return_.msg);
+                    }
+                    //layer.close(index);
+                },
+                error:function(){
+                    //layer.close(index);
+                    layer.msg('网络异常!');
+                }
+            });
+        }
+
+    }
 </script>
 </body>
 </html>

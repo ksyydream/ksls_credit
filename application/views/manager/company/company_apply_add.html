@@ -403,6 +403,7 @@
     })
 
     function submit_fun(url_submit){
+        var flag = -1;
         var company_name = $.trim($("#company_name").val());
         if(company_name == "" ) {
             layer.msg('企业名称不能为空', {icon: 2});
@@ -455,44 +456,48 @@
             return false;
         }
         //报备时可以随意修改 审核时再做判断，以免在审核中有人员变动
+        {{if $m_id < 1}}
         var length = $("#tbody_id").find(".delete_yy_").length;
         if(length < 3){
-            //layer.msg('持证经纪人不能小于三个!', {icon: 2});
-            //flag=1;return false;
+            layer.msg('新增报备,需持证经纪人不能小于三个!', {icon: 2});
+            flag=1;return false;
         }
-        var form = document.getElementById('save_form');
+        {{/if}}
+        if(flag != 1) {
+            var form = document.getElementById('save_form');
 
-        var formdata = new FormData(form);
-        $.ajax({
-            type : "POST",
-            url : url_submit,
-            data : formdata,
-            async: true,
-            cache: false,
-            contentType: false,
-            processData: false,
-            success : function(data) {
-                var return_ = JSON.parse(data)
-                if(return_.status == 1){
-                    var url = '/manager/company_apply_list/';
-                    layer.alert('操作成功!', {
-                        skin: 'layui-layer-molv' //样式类名
-                        ,closeBtn: 0
-                    }, function(){
-                        window.location.replace(url);
-                    });
-                    //window.location.replace(url);
-                }else{
+            var formdata = new FormData(form);
+            $.ajax({
+                type: "POST",
+                url: url_submit,
+                data: formdata,
+                async: true,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    var return_ = JSON.parse(data)
+                    if (return_.status == 1) {
+                        var url = '/manager/company_apply_list/';
+                        layer.alert('操作成功!', {
+                            skin: 'layui-layer-molv' //样式类名
+                            , closeBtn: 0
+                        }, function () {
+                            window.location.replace(url);
+                        });
+                        //window.location.replace(url);
+                    } else {
+                        //layer.close(index);
+                        layer.msg(return_.msg);
+                    }
                     //layer.close(index);
-                    layer.msg(return_.msg);
+                },
+                error: function () {
+                    //layer.close(index);
+                    layer.msg('网络异常!');
                 }
-                //layer.close(index);
-            },
-            error:function(){
-                //layer.close(index);
-                layer.msg('网络异常!');
-            }
-        });
+            });
+        }
     }
 
     $("#btn_add_agent").click(function(){

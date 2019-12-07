@@ -789,23 +789,44 @@ class MY_Model extends CI_Model{
      */
 
     /**
-    *重新计算企业总分
+    *重新计算企业总分/企业异常标记
      * @param $company_id 企业ID
+     * @param $is_ns 是否年审计算,当年审时,会增加一些新的规则
      * @return bool
      * 因为企业存在多种分值，在计算结束后，无论结果如何都要相加计算，以方便之后排名和查看分数线
      */
-    public function save_company_total_score($company_id){
+    public function save_company_total_score($company_id, $is_ns = -1){
+
+        $zz_status_ = 1;        //异常状态
+        $sys_score = 0;         //系统分 (经纪人分数 + 标签分)
         //第一步基础分，无需操作
 
         //第二步事件分，无需操作
 
         //第三步系统分，主要由实际的经纪人数量和状态决定
-        //建议 每次重新计算时 记录计算过程，需要新表
+        // 1 先加入人员分数
+        // 2 再计算标签分数 计划所有标签如果存在修改,均需要在此通用方法前进行
         //DBY重要
-
+        $this->db->select('count(1) num')->from('agent a');
+        $this->db->where('flag', 2);
+        $this->db->where('grade_no >', 1);
+        $this->db->where('company_id', $company_id);
+        $num = $this->db->get()->row();
+        $agent_num = $num->num;
+        $company_agent_score_ = $this->config->item('company_agent_score') ? $this->config->item('company_agent_score') : 0;
+        $company_agent_score_max_ = $this->config->item('company_agent_score_max') ? $this->config->item('company_agent_score_max') : 0;
+        $agent_score_total = $agent_num * $company_agent_score_;
+        if($agent_score_total > $company_agent_score_max_)
+            $sys_score += $company_agent_score_max_;
+        else
+            $sys_score += $agent_score_total;
+        $this->db->where('id', $company_id)->set('sys_score', $sys_score)->update('company_pending');
         //最后一步 把各个分值相加
-        $this->db->where('id', $company_id);
-        $this->db->set('total_score', 'event_score + sys_score + base_score', FALSE)->update('company_pending');
+        $this->db->where('id', $company_id)->set('total_score', 'event_score + sys_score + base_score', FALSE)->update('company_pending');
+        if($agent_num < 3)
+            $zz_status_ = -1;
+        $this->db->where('id', $company_id)->set('zz_status', $zz_status_)->update('company_pending');
+        $this->db->where('id', $company_id)->where('qx_num >', 1)->set('zz_status', -1)->update('company_pending');
         return true;
     }
 
@@ -867,6 +888,7 @@ class MY_Model extends CI_Model{
         unset($company_data['id']);
         unset($company_data['username']);
         unset($company_data['password']);
+        unset($company_data['qx_num']);
         $admin_info = $this->session->userdata('admin_info');
         $company_data['handle_user'] = $admin_info ? $admin_info['admin_id'] : -1;
         $company_data['handle_date'] = date('Y-m-d H:i:s',time());
@@ -885,39 +907,50 @@ class MY_Model extends CI_Model{
        
     }
 
-    //保存企业终审成功信息
-    //第一 指终审通过 和 在终审通过下修改成功的信息
+    //第一 新增报备时 自动保存的 年审信息
     //第二 尽可能的保存多的数据，比如分数，备案号，审核状态，报备状态等信息
     public function save_pass_company($company_id){
+        //先抓取年审年份 这里抓取符合当前时间的,最近一次年审,如果没有年审,就不进行下去
+        //注意,如果真的出现,用户忘记先设置年审时间,就开始新增企业,使其没有出现年审申请,那就需要手动先设置年审时间在当天,然后手动提审
+        $mdate = date('Y-m-d',time());
+        $res_check_ = $this->db->select()->from('term')->where(array('begin_date <=' => $mdate))->order_by('begin_date','desc')->get()->row_array();
+        if(!$res_check_)
+            return false;
+        //以防万一,还是判断下是否存在正在处理的 年审
+        $check_ns_ = $this->db->select()->from('company_pass')->where('id',$company_id)->where_not_in('status', array(-1,3))->order_by('id','desc')->get()->row_array();
+        if($check_ns_)
+            return false;
         $company_data = $this->db->select()->from('company_pending')->where('id',$company_id)->order_by('id','desc')->get()->row_array();
         $company_data['company_id']=$company_data['id'];
         unset($company_data['id']);
+        unset($company_data['annual_date']);
         unset($company_data['username']);
         unset($company_data['password']);
+        $company_data['annual_date'] = $res_check_['annual_year'];
+        $company_data['status'] = 1;
         $admin_info = $this->session->userdata('admin_info');
-        $company_data['handle_user'] = $admin_info ? $admin_info['admin_id'] : -1;
-        $company_data['handle_date'] = date('Y-m-d H:i:s',time());
-
-        $this->db->where('company_id',$company_id)->delete('company_pass');
+        $company_data['tj_user'] = $admin_info ? $admin_info['admin_id'] : -1;
+        $company_data['tj_date'] = date('Y-m-d H:i:s',time());
         $this->db->insert('company_pass',$company_data);
         $pass_id = $this->db->insert_id();
 
 
-        $this->db->where('company_id',$company_id)->delete('company_pass_img');
-        $this->db->select("img_path,m_img_path,folder,company_id")->from('company_pending_img');
+        $this->db->select("img_path,m_img_path,folder,company_id,{$pass_id} pass_id")->from('company_pending_img');
         $this->db->where('company_id',$company_id);
         $pass_img = $this->db->get()->result_array();
         if($pass_img)
             $this->db->insert_batch('company_pass_img',$pass_img);
 
-        $this->db->where('company_id',$company_id)->delete('company_pass_agent');
-        $this->db->select("id agent_id,name,phone,job_code,card,company_id,wq,old_job_code")->from('agent');
+        //经纪人信息 只做暂存,实际 只有在审核结束后有效
+        $this->db->select("id agent_id,name,phone,job_code,card,company_id,wq,old_job_code,{$pass_id} pass_id")->from('agent');
         //$this->db->where('flag',2); //如果是离昆的就不要进行保存 //有什么信息就保存什么信息，真正是否显示，还是要看实际的状态
         $this->db->where('company_id',$company_id);
         $pass_agent = $this->db->get()->result_array();
         if($pass_agent)
             $this->db->insert_batch('company_pass_agent',$pass_agent);
-       
+        //结束前也更新下 company_pending的状态
+        $this->db->where('id', $company_id)->update('company_pending', array('annual_date' => $company_data['annual_date'],'tj_date' => $company_data['tj_date'], 'status' => 1));
+        return true;
     }
 }
 

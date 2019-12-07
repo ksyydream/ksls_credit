@@ -183,6 +183,7 @@ class Common4manager_model extends MY_Model
         $this->db->select('*')->from('agent');
         $this->db->where('job_code',$job_code);
         $this->db->where('flag',2);
+        $this->db->where('grade_no >', 1);
         $agent_detail =  $this->db->get()->row_array();
         if(!$agent_detail)
             return $this->fun_fail('经纪人状态异常!');
