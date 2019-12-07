@@ -104,20 +104,44 @@ class Common4manager_model extends MY_Model
 
     //检查公司名称是否存在
     public function check_company_name($company_name,$without_id=null){
-        $this->db->select()->from('company_pending a')
-            ->join('company_pass b','a.id = b.company_id','left')
-            ->group_start()
-            ->where('a.company_name',trim($company_name))
-            ->or_where('b.company_name',trim($company_name))->group_end();
-        $this->db->where_in('a.status',array(1,2,3,4));
+        /**
+         * 更改企业数据结构 修改判断依据
+         */
+        //$this->db->select()->from('company_pending a')
+        //    ->join('company_pass b','a.id = b.company_id','left')
+        //    ->group_start()
+        //    ->where('a.company_name',trim($company_name))
+        //    ->or_where('b.company_name',trim($company_name))->group_end();
+        //$this->db->where_in('a.status',array(1,2,3,4));
+        //if($without_id)
+        //    $this->db->where('a.id <>',$without_id);
+        //$data_pending = $this->db->get()->row_array();
+
+        //die($this->db->last_query());
+        $this->db->select()->from('company_pending a');
+        $this->db->where_in('a.flag',array(1,2));
+        $this->db->where('a.company_name',trim($company_name));
         if($without_id)
             $this->db->where('a.id <>',$without_id);
         $data_pending = $this->db->get()->row_array();
-        //die($this->db->last_query());
         if($data_pending){
            return $this->fun_fail('公司名已被占用!');
         }else{
             return $this->fun_success('可以使用!');
+        }
+    }
+
+    //检查是否在年审窗口期
+    public function check_is_ns_time(){
+        $mdate = date('Y-m-d',time());
+        $this->db->select();
+        $this->db->from('term');
+        $this->db->where(array('begin_date <=' => $mdate,'end_date >=' => $mdate));
+        $res_check_ = $this->db->get()->row_array();
+        if($res_check_){
+            return $this->fun_success('在年审中!', $res_check_);
+        }else{
+            return $this->fun_fail('不在年审中!');
         }
     }
 

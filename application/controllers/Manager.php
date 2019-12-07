@@ -1055,9 +1055,13 @@ class Manager extends MY_Controller {
      * @date 2019-11-12
      */
     public function company_apply_list($page = 1){
-        $data = $this->manager_model->company_common_list($page, 1, array(1));
+        $data = $this->manager_model->company_common_list($page, array(1,2));
         $base_url = "/manager/company_apply_list/";
         $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $is_ns_ = $this->c4m_model->check_is_ns_time();
+        $this->assign('is_ns', -1);
+        if($is_ns_['status'] == 1)
+            $this->assign('is_ns', 1);
         $this->assign('pager', $pager);
         $this->assign('page', $page);
         $this->assign('data', $data);
@@ -1091,7 +1095,7 @@ class Manager extends MY_Controller {
     }
 
 
-    //报备审核页面 [停用,因为报备审核功能与 报备编辑页面合并]
+    //年审提报
     public function company_apply_audit($m_id){
         $this->assign('f_user_id', $this->admin_id);
         $this->assign('time', time());
@@ -1099,8 +1103,11 @@ class Manager extends MY_Controller {
         if(!$data){
             $this->show_message('未找到信息!');
         }
-        if ($data['flag'] != 1) 
+        if (!in_array($data['flag'], array(1,2)))
             $this->show_message('企业信息已不在报备列表!');
+        $is_ns_ = $this->c4m_model->check_is_ns_time();
+        if($is_ns_['status'] != 1)
+            $this->show_message('不在年审窗口期,不可提报年审!');
         $this->assign('data', $data);
         $this->assign('reload_url', '/manager/company_apply_list');
         $this->display('manager/company/company_apply_audit.html');
@@ -1123,9 +1130,9 @@ class Manager extends MY_Controller {
      * @author yangyang
      * @date 2019-11-12
      */
-    public function company_pending_1_list($page = 1){
+    public function company_pass_1_list($page = 1){
         $data = $this->manager_model->company_common_list($page, 2, array(1));
-        $base_url = "/manager/company_pending_1_list/";
+        $base_url = "/manager/company_pass_1_list/";
         $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
         $this->assign('pager', $pager);
         $this->assign('page', $page);
@@ -1206,9 +1213,9 @@ class Manager extends MY_Controller {
      * @author yangyang
      * @date 2019-11-12
      */
-    public function company_pending_2_list($page = 1){
+    public function company_pass_2_list($page = 1){
         $data = $this->manager_model->company_common_list($page, 2, array(2));
-        $base_url = "/manager/company_pending_2_list/";
+        $base_url = "/manager/company_pass_2_list/";
         $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
         $this->assign('pager', $pager);
         $this->assign('page', $page);
@@ -1221,9 +1228,9 @@ class Manager extends MY_Controller {
      * @author yangyang
      * @date 2019-11-12
      */
-    public function company_pending_3_list($page = 1){
+    public function company_pass_3_list($page = 1){
         $data = $this->manager_model->company_common_list($page, 2, array(3));
-        $base_url = "/manager/company_pending_3_list/";
+        $base_url = "/manager/company_pass_3_list/";
         $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
         $this->assign('pager', $pager);
         $this->assign('page', $page);
@@ -1263,7 +1270,7 @@ class Manager extends MY_Controller {
      * @author yangyang
      * @date 2019-11-12
      */
-     public function company_pending_3_submit(){
+     public function company_pass_3_submit(){
          $res = $this->manager_model->company_audit_save(1);
          $this->ajaxReturn($res);
     }
@@ -1275,9 +1282,9 @@ class Manager extends MY_Controller {
      * @author yangyang
      * @date 2019-11-12
      */
-    public function company_pending_f1_list($page = 1){
+    public function company_pass_f1_list($page = 1){
         $data = $this->manager_model->company_common_list($page, 2, array(-1));
-        $base_url = "/manager/company_pending_f1_list/";
+        $base_url = "/manager/company_pass_f1_list/";
         $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
         $this->assign('pager', $pager);
         $this->assign('page', $page);

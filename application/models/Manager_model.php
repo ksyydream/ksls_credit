@@ -1514,6 +1514,7 @@ class Manager_model extends MY_Model
      *********************************************************************************************
      */
 
+
      /**
      * [作废]历史原因 status 1代表等待初审，2代表审核通过，3代表审核失败，4代表等待终审
       * 以免给自己挖坑,把status 修改为 1代表等待初审，2代表等待终审，3代表审核通过，-1代表审核失败
@@ -1522,44 +1523,45 @@ class Manager_model extends MY_Model
      * @author yangyang
      * @date 2019-11-12
      */
-    public function company_common_list($page = 1, $flag, $status = array()){
+    public function company_common_list($page = 1, $flag = array(), $status = array()){
         $data['limit'] = $this->limit;
         //搜索条件
         $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
-       
+        $data['flag'] = $this->input->get('flag')?trim($this->input->get('flag')):null;
         $this->db->select('count(1) num')->from('company_pending a');
         if($data['keyword']){
+            $this->db->group_start();
             $this->db->like('a.company_name', $data['keyword']);
+            $this->db->like('a.record_num', $data['keyword']);
+            $this->db->group_end();
         }
-        if($flag){
-            $this->db->where('a.flag',$flag);
-        }
+        if($flag)
+            $this->db->where_in('a.flag',$flag);
+        if($data['flag'])
+            $this->db->where('a.flag', $data['flag']);
         if($status){
             $this->db->where_in('a.status',$status);
         }
+
         $num = $this->db->get()->row();
         $data['total_rows'] = $num->num;
 
         //获取详细列
         $this->db->select('a.*')->from('company_pending a');
         if($data['keyword']){
+            $this->db->group_start();
             $this->db->like('a.company_name', $data['keyword']);
+            $this->db->like('a.record_num', $data['keyword']);
+            $this->db->group_end();
         }
-        if($flag){
-            $this->db->where('a.flag',$flag);
-        }
+        if($flag)
+            $this->db->where_in('a.flag',$flag);
+        if($data['flag'])
+            $this->db->where('a.flag', $data['flag']);
         if($status){
             $this->db->where_in('a.status',$status);
         }
-        switch($flag){
-            case 2:
-                $this->db->order_by('a.tj_date','desc');
-                break;
-            default:
-                $this->db->order_by('a.mdate','asc');
-        }
-
-      
+        $this->db->order_by('a.cdate','asc');
         $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
         $data['res_list'] = $this->db->get()->result_array();
         return $data;
