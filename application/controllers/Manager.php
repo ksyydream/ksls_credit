@@ -1054,9 +1054,9 @@ class Manager extends MY_Controller {
      * @author yangyang
      * @date 2019-11-12
      */
-    public function company_apply_list($page = 1){
+    public function company_pending_list($page = 1){
         $data = $this->manager_model->company_pending_list($page, array(1,2));
-        $base_url = "/manager/company_apply_list/";
+        $base_url = "/manager/company_pending_list/";
         $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
         $is_ns_ = $this->c4m_model->check_is_ns_time();
         $this->assign('is_ns', -1);
@@ -1074,17 +1074,17 @@ class Manager extends MY_Controller {
      * @author yangyang
      * @date 2019-11-18
      */
-    public function company_apply_add(){
+    public function company_pending_add(){
         $this->assign('f_user_id', $this->admin_id);
         $this->assign('time', time());
         $this->assign('m_id', -1);
         $this->display('manager/company/company_apply_add.html');
     }
 
-    public function company_apply_edit($m_id){
+    public function company_pending_edit($m_id){
         $this->assign('f_user_id', $this->admin_id);
         $this->assign('time', time());
-         $data = $this->manager_model->company_apply_edit($m_id);
+         $data = $this->manager_model->company_pending_edit($m_id);
         if(!$data){
             $this->show_message('未找到信息!');
         }
@@ -1098,10 +1098,10 @@ class Manager extends MY_Controller {
 
 
     //年审提报 编辑页面
-    public function company_apply_audit($m_id){
+    public function company_pending_audit($m_id){
         $this->assign('f_user_id', $this->admin_id);
         $this->assign('time', time());
-         $data = $this->manager_model->company_apply_edit($m_id);
+         $data = $this->manager_model->company_pending_edit($m_id);
         if(!$data){
             $this->show_message('未找到信息!');
         }
@@ -1116,14 +1116,14 @@ class Manager extends MY_Controller {
     }
 
     //年审 提交页面
-    public function company_apply_pass(){
-        $res = $this->manager_model->company_apply_pass($this->admin_id);
+    public function company_pending_pass(){
+        $res = $this->manager_model->company_pending_pass($this->admin_id);
         $this->ajaxReturn($res);
     }
 
     //企业信息保存
-    public function company_apply_save(){
-        $res = $this->manager_model->company_apply_save();
+    public function company_pending_save(){
+        $res = $this->manager_model->company_pending_save();
         $this->ajaxReturn($res);
     }
 
@@ -1148,12 +1148,12 @@ class Manager extends MY_Controller {
      * @date 2019-11-27
      */
     public function company_pass_1_audit($m_id){
-        $data = $this->manager_model->company_apply_edit($m_id);
+        $data = $this->manager_model->company_pass_data($m_id);
         if(!$data){
             $this->show_message('未找到信息!');
         }
-        if ($data['flag'] != 2 || $data['status'] != 1) 
-            $this->show_message('企业信息已不在初审列表!');
+        if ($data['status'] != 1)
+            $this->show_message('年审信息已不在初审列表!');
         $pass_data = $this->manager_model->company_pass_data($m_id);
         $this->assign('data', $data);
         $this->assign('pass_data', $pass_data);
@@ -1182,7 +1182,7 @@ class Manager extends MY_Controller {
      * @date 2019-11-27
      */
     public function company_pending_2_audit($m_id){
-        $data = $this->manager_model->company_apply_edit($m_id);
+        $data = $this->manager_model->company_pending_edit($m_id);
         if(!$data){
             $this->show_message('未找到信息!');
         }
@@ -1246,7 +1246,7 @@ class Manager extends MY_Controller {
      * @date 2019-11-12
      */
      public function company_pending_3_edit($m_id){
-         $data = $this->manager_model->company_apply_edit($m_id);
+         $data = $this->manager_model->company_pending_edit($m_id);
         if(!$data){
             $this->show_message('未找到信息!');
         }

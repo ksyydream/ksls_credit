@@ -39,11 +39,11 @@
                 <!-- /section:settings.box -->
                 <div class="row">
                     <div class="col-xs-12">
-                        <form id="delete_form" method="post" action="/manager/company_apply_cancel">
+                        <form id="delete_form" method="post" action="/manager/company_pending_cancel">
                  <input type="hidden" name="company_id" value="{{$data.id|default:''}}">
             </form>
                         <!-- PAGE CONTENT BEGINS -->
-                        <form id="save_form" class="form-horizontal" role="form" action="/manager/company_apply_pass" method="post">
+                        <form id="save_form" class="form-horizontal" role="form" action="/manager/company_pending_pass" method="post">
                             <input type="hidden" name="folder" value="{{$time}}" id="folder">
                             <input type="hidden" name="company_id" value="{{$data.id|default:''}}">
                            <div class="tabbable">
@@ -266,7 +266,7 @@
 
                                 </button>
                                 &nbsp; &nbsp; &nbsp;
-                                <a href="/manager/company_apply_list" class="btn" type="reset">
+                                <a href="/manager/company_pending_list" class="btn" type="reset">
 
                                     <i class="icon-undo bigger-110"></i>
 
@@ -382,7 +382,7 @@
 
 
     $("#save_btn").click(function(){
-        submit_fun('/manager/company_apply_pass');
+        submit_fun('/manager/company_pending_pass');
     })
     function submit_fun(url_submit){
         var flag = -1;
@@ -453,7 +453,7 @@
                 success : function(data) {
                     var return_ = JSON.parse(data)
                     if(return_.status == 1){
-                        var url = '/manager/company_apply_list/';
+                        var url = '/manager/company_pending_list/';
                         layer.alert('操作成功!', {
                             skin: 'layui-layer-molv' //样式类名
                             ,closeBtn: 0

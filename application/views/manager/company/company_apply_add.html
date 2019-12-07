@@ -39,7 +39,7 @@
                 <div class="row">
                     <div class="col-xs-12">
                         <!-- PAGE CONTENT BEGINS -->
-                        <form id="save_form" class="form-horizontal" role="form" action="/manager/company_apply_save" method="post">
+                        <form id="save_form" class="form-horizontal" role="form" action="/manager/company_pending_save" method="post">
                             <input type="hidden" name="folder" value="{{$time}}" id="folder">
                             <input type="hidden" name="company_id" value="{{$data.id|default:''}}">
                            <div class="tabbable">
@@ -275,7 +275,7 @@
 
                                 </button>
                                 &nbsp; &nbsp; &nbsp;
-                                <a href="/manager/company_apply_list" class="btn" type="reset">
+                                <a href="/manager/company_pending_list" class="btn" type="reset">
 
                                     <i class="icon-undo bigger-110"></i>
 
@@ -392,14 +392,14 @@
         //    btn: ['确定','取消'], //按钮
         //    area: ['400px', 'auto']
         //}, function(){
-        //    submit_fun('/manager/company_apply_pass');
+        //    submit_fun('/manager/company_pending_pass');
         //},function(){
 //
         //});
     })
 
     $("#save_btn").click(function(){
-        submit_fun('/manager/company_apply_save');
+        submit_fun('/manager/company_pending_save');
     })
 
     function submit_fun(url_submit){
@@ -478,7 +478,7 @@
                 success: function (data) {
                     var return_ = JSON.parse(data)
                     if (return_.status == 1) {
-                        var url = '/manager/company_apply_list/';
+                        var url = '/manager/company_pending_list/';
                         layer.alert('操作成功!', {
                             skin: 'layui-layer-molv' //样式类名
                             , closeBtn: 0

@@ -1567,7 +1567,7 @@ class Manager_model extends MY_Model
         return $data;
     }
 
-    public function company_apply_edit($id){
+    public function company_pending_edit($id){
         $this->db->select('a.*')->from('company_pending a');
         $this->db->where('a.id', $id);
         $detail =  $this->db->get()->row_array();
@@ -1704,7 +1704,7 @@ class Manager_model extends MY_Model
     }
 
     //企业备案信息保存【重要】对company_pending做处理,理论上只修改信息,不会影响 备案/审核/信用等级 等状态.
-    public function company_apply_save(){
+    public function company_pending_save(){
         $data = array(
             'company_name'=>trim($this->input->post('company_name')),
             'register_path'=>trim($this->input->post('register_path')),
@@ -1817,7 +1817,7 @@ class Manager_model extends MY_Model
     }
 
     //年审提交
-    public function company_apply_pass($admin_id){
+    public function company_pending_pass($admin_id){
         $this->load->model('common4manager_model', 'c4m_model');
         $res_check_ = $this->c4m_model->check_is_ns_time();
         if($res_check_['status'] != 1)
@@ -1897,16 +1897,15 @@ class Manager_model extends MY_Model
     }
 
     //获取最近一次终审通过的信息
-    public function company_pass_data($company_id){
+    public function company_pass_data($pass_id){
         $this->db->select('a.*')->from('company_pass a');
-        $this->db->where('a.company_id', $company_id);
+        $this->db->where('a.id', $pass_id);
         $detail =  $this->db->get()->row_array();
         $this->db->select()->from('company_pass_img');
-        $this->db->where('company_id', $company_id);
+        $this->db->where('pass_id', $pass_id);
         $detail['img'] = $this->db->get()->result_array();
-        $this->db->select('b.*,a.wq pass_wq_')->from('company_pass_agent a');
-        $this->db->join('agent b', 'a.agent_id = b.id','inner');
-        $this->db->where('a.company_id', $company_id);
+        $this->db->select('a.*')->from('company_pass_agent a');
+        $this->db->where('a.pass_id', $pass_id);
         $detail['agent'] = $this->db->get()->result_array();
         return $detail;
     }
