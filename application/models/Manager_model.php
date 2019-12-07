@@ -1971,7 +1971,7 @@ class Manager_model extends MY_Model
         $data['total_rows'] = $num->num;
 
         //获取详细列
-        $this->db->select('a.company_name,a.legal_name,a.tj_date,a.director_name,b.record_num')->from('company_pass a');
+        $this->db->select('a.id,a.company_name,a.legal_name,a.tj_date,a.director_name,b.record_num')->from('company_pass a');
         $this->db->join('company_pending b','b.id = a.company_id','left');
         if($data['keyword']){
             $this->db->group_start();

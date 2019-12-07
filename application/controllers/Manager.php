@@ -1154,12 +1154,12 @@ class Manager extends MY_Controller {
         }
         if ($data['status'] != 1)
             $this->show_message('年审信息已不在初审列表!');
-        $pass_data = $this->manager_model->company_pass_data($m_id);
+        $pending_data = $this->manager_model->company_pending_edit($data['company_id']);
         $this->assign('data', $data);
-        $this->assign('pass_data', $pass_data);
-        $this->assign('pass_url', "/manager/company_pending_1_submit");
+        $this->assign('pending_data', $pending_data);
+        $this->assign('pass_url', "/manager/company_pass_1_submit");
         $this->assign('pass_btn_value', "初审通过");
-        $this->display('manager/company/company_pending_audit.html');
+        $this->display('manager/company/company_pass_audit.html');
     }
 
      /**
@@ -1167,8 +1167,8 @@ class Manager extends MY_Controller {
      * @author yangyang
      * @date 2019-11-27
      */
-    public function company_pending_1_submit(){
-        $res = $this->manager_model->company_pending_submit(2);
+    public function company_pass_1_submit(){
+        $res = $this->manager_model->company_pass_submit(2);
         if($res['status'] == 1){
             $this->show_message($res['msg'], site_url('/manager/company_pending_1_list'));
         }else{
