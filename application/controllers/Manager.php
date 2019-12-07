@@ -430,6 +430,7 @@ class Manager extends MY_Controller {
     }
 
     public function agent_grade_add(){
+        $this->assign('s_no', array(1,2));
         $this->display('manager/event_agent/agent_grade_detail.html');
     }
 
@@ -438,6 +439,7 @@ class Manager extends MY_Controller {
         if(!$data){
             $this->show_message('未找到信息!');
         }
+        $this->assign('s_no', array(1,2));
         $this->assign('data', $data);
         $this->display('manager/event_agent/agent_grade_detail.html');
     }
@@ -721,6 +723,7 @@ class Manager extends MY_Controller {
     }
 
     public function company_grade_add(){
+        $this->assign('s_no', array(1,2));
         $this->display('manager/event_company/company_grade_detail.html');
     }
 
@@ -729,6 +732,7 @@ class Manager extends MY_Controller {
         if(!$data){
             $this->show_message('未找到信息!');
         }
+        $this->assign('s_no', array(1,2));
         $this->assign('data', $data);
         $this->display('manager/event_company/company_grade_detail.html');
     }

@@ -48,6 +48,14 @@
                                 </div>
                             </div>
 
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="grade_no"> 等级级别 </label>
+                                <div class="col-sm-9">
+                                    <input type="text" id="grade_no" name="grade_no" required="required"  {{if $data.grade_no|in_array:$s_no}}readonly="readonly" {{/if}} class="rcol-xs-10 col-sm-5 js4phone" value="{{$data.grade_no|default:''}}">
+                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                </div>
+                            </div>
+
                             <div class="col-md-offset-2 col-md-9">
                                 <button id="save_btn" class="btn btn-info" type="button">
 
@@ -88,6 +96,11 @@
         var grade_name = $.trim($("#grade_name").val());
         if(grade_name == "" ) {
             layer.msg('分数等级名称不能为空', {icon: 2});
+            return false;
+        }
+        var grade_no = $.trim($("#grade_no").val());
+        if(grade_no == "" ) {
+            layer.msg('等级级别不能为空', {icon: 2});
             return false;
         }
         {{if $data.flag|default:'1' == 1}}

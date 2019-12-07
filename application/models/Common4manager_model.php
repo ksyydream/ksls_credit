@@ -213,6 +213,45 @@ class Common4manager_model extends MY_Model
                         return $this->fun_fail('企业审核状态为审核失败，不可直接退回终审!');
                      break;
         }
+        return $this->fun_success('可以使用!');
+    }
+
+    //检查企业与经纪人等级修改与保存时的合法性
+    public function check_grade_lawful($table, $data, $grade_id = null){
+        $grade_name = $data['grade_name'];
+        $min_score = $data['min_score'];
+        $grade_no = $data['grade_no'];
+        //第一步 先检查是否有相同名称的等级
+        $this->db->select('id')->from($table);
+        $this->db->where('grade_name', $grade_name);
+        if($grade_id)
+            $this->db->where('id <>', $grade_id);
+        $res = $this->db->get()->row_array();
+        if($res)
+            return $this->fun_fail('存在相同等级名称');
+        //第二步 先检查是否有相同分数的等级
+        $this->db->select('id')->from($table);
+        $this->db->where('min_score', $min_score);
+        if($grade_id)
+            $this->db->where('id <>', $grade_id);
+        $res = $this->db->get()->row_array();
+        if($res)
+            return $this->fun_fail('存在相同分数线');
+        //第三步 先检查是否有相同级别的等级
+        $this->db->select('id')->from($table);
+        $this->db->where('grade_no', $grade_no);
+        if($grade_id)
+            $this->db->where('id <>', $grade_id);
+        $res = $this->db->get()->row_array();
+        if($res)
+            return $this->fun_fail('存在相同级别');
+        //第四步 检查等级与分数是否存在问题
+        $res = $this->db->select('id')->from($table)->where('grade_no <', $grade_no)->where('min_score >', $min_score)->get()->row_array();
+        if($res)
+            return $this->fun_fail('级别与分数设置不规范');
+        $res = $this->db->select('id')->from($table)->where('grade_no >', $grade_no)->where('min_score <', $min_score)->get()->row_array();
+        if($res)
+            return $this->fun_fail('级别与分数设置不规范');
         return $this->fun_success('可以使用!');;
     }
 

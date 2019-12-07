@@ -561,7 +561,7 @@ class Manager_model extends MY_Model
         $this->db->select('a.*')->from('agent_grade a');
 
         $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
-        $this->db->order_by('a.min_score','desc');
+        $this->db->order_by('a.grade_no','desc');
         $data['res_list'] = $this->db->get()->result_array();
         return $data;
     }
@@ -576,6 +576,7 @@ class Manager_model extends MY_Model
         $data =array(
             'grade_name' => trim($this->input->post('grade_name')),
             'min_score' => trim($this->input->post('min_score')) ? trim($this->input->post('min_score')) : 0,
+            'grade_no' => trim($this->input->post('grade_no')),
         );
         if(!$data['grade_name']){
             return $this->fun_fail('请输入等级名称');
@@ -583,6 +584,10 @@ class Manager_model extends MY_Model
         if(!isset($data['min_score'])){
             return $this->fun_fail('分数线设置异常');
         }
+        if(!isset($data['grade_no'])){
+            return $this->fun_fail('等级设置异常');
+        }
+        $this->load->model('common4manager_model', 'c4m_model');
         $grade_id = $this->input->post('grade_id');
         if($grade_id){
             $info_ = $this->readByID($table_, 'id', $grade_id);
@@ -594,22 +599,18 @@ class Manager_model extends MY_Model
                 if((int)$data['min_score'] < 0)
                     return $this->fun_fail('分数线设置异常');
             }
-            $res = $this->db->select('')->from($table_)->where(array('grade_name'=>$data['grade_name'],'id <>' => $grade_id))->get()->row_array();
-            if($res)
-                return $this->fun_fail('存在相同等级名称');
-            $res1 = $this->db->select('')->from($table_)->where(array('min_score'=>$data['min_score'],'id <>' => $grade_id))->get()->row_array();
-            if($res1)
-                return $this->fun_fail('存在相同分数线');
+            if(in_array($info_['grade_no'],array(1,2)))
+                $data['grade_no'] = $info_['grade_no'];
+            $check_ = $this->c4m_model->check_grade_lawful($table_, $data, $grade_id);
+            if($check_['status'] != 1)
+                return $this->fun_fail($check_['msg']);
             $res2 = $this->db->where('id',$this->input->post('grade_id'))->update($table_,$data);
         }else{
             if((int)$data['min_score'] < 0)
                 return $this->fun_fail('分数线设置异常');
-            $res = $this->db->select('')->from($table_)->where('grade_name',$data['grade_name'])->get()->row_array();
-            if($res)
-                return $this->fun_fail('存在相同等级名称');
-            $res1 = $this->db->select('')->from($table_)->where('min_score',$data['min_score'])->get()->row_array();
-            if($res1)
-                return $this->fun_fail('存在相同分数线');
+            $check_ = $this->c4m_model->check_grade_lawful($table_, $data);
+            if($check_['status'] != 1)
+                return $this->fun_fail($check_['msg']);
             $res2 = $this->db->insert($table_,$data);
         }
 
@@ -628,6 +629,8 @@ class Manager_model extends MY_Model
             return $this->fun_fail('分数线不存在');
         if($info_['flag'] == -1)
             return $this->fun_fail('失信分数线不可删除');
+        if(in_array($info_['grade_no'], array(1,2)))
+            return $this->fun_fail('特殊分数线不可删除');
         $res = $this->db->where('id', $id)->delete('agent_grade');
         if($res)
             return $this->fun_success('删除成功');
@@ -993,7 +996,7 @@ class Manager_model extends MY_Model
         $this->db->select('a.*')->from('company_grade a');
 
         $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
-        $this->db->order_by('a.min_score','desc');
+        $this->db->order_by('a.grade_no','desc');
         $data['res_list'] = $this->db->get()->result_array();
         return $data;
     }
@@ -1008,6 +1011,7 @@ class Manager_model extends MY_Model
         $data =array(
             'grade_name' => trim($this->input->post('grade_name')),
             'min_score' => trim($this->input->post('min_score')) ? trim($this->input->post('min_score')) : 0,
+            'grade_no' => trim($this->input->post('grade_no')),
         );
         if(!$data['grade_name']){
             return $this->fun_fail('请输入等级名称');
@@ -1015,7 +1019,10 @@ class Manager_model extends MY_Model
         if(!isset($data['min_score'])){
             return $this->fun_fail('分数线设置异常');
         }
-        
+        if(!isset($data['grade_no'])){
+            return $this->fun_fail('等级设置异常');
+        }
+        $this->load->model('common4manager_model', 'c4m_model');
         $grade_id = $this->input->post('grade_id');
         if($grade_id){
             $info_ = $this->readByID($table_, 'id', $grade_id);
@@ -1027,22 +1034,18 @@ class Manager_model extends MY_Model
                 if((int)$data['min_score'] < 0)
                     return $this->fun_fail('分数线设置异常');
             }
-            $res = $this->db->select('')->from($table_)->where(array('grade_name'=>$data['grade_name'],'id <>' => $grade_id))->get()->row_array();
-            if($res)
-                return $this->fun_fail('存在相同等级名称');
-            $res1 = $this->db->select('')->from($table_)->where(array('min_score'=>$data['min_score'],'id <>' => $grade_id))->get()->row_array();
-            if($res1)
-                return $this->fun_fail('存在相同分数线');
+            if(in_array($info_['grade_no'],array(1,2)))
+                $data['grade_no'] = $info_['grade_no'];
+            $check_ = $this->c4m_model->check_grade_lawful($table_, $data, $grade_id);
+            if($check_['status'] != 1)
+                return $this->fun_fail($check_['msg']);
             $res2 = $this->db->where('id',$this->input->post('grade_id'))->update($table_,$data);
         }else{
             if((int)$data['min_score'] < 0)
                     return $this->fun_fail('分数线设置异常');
-            $res = $this->db->select('')->from($table_)->where('grade_name',$data['grade_name'])->get()->row_array();
-            if($res)
-                return $this->fun_fail('存在相同等级名称');
-            $res1 = $this->db->select('')->from($table_)->where('min_score',$data['min_score'])->get()->row_array();
-            if($res1)
-                return $this->fun_fail('存在相同分数线');
+            $check_ = $this->c4m_model->check_grade_lawful($table_, $data);
+            if($check_['status'] != 1)
+                return $this->fun_fail($check_['msg']);
             $res2 = $this->db->insert($table_,$data);
         }
 
@@ -1061,6 +1064,8 @@ class Manager_model extends MY_Model
             return $this->fun_fail('分数线不存在');
         if($info_['flag'] == -1)
             return $this->fun_fail('失信分数线不可删除');
+        if(in_array($info_['grade_no'],array(1,2)))
+            return $this->fun_fail('特殊分数线不可删除');
         $res = $this->db->where('id', $id)->delete('company_grade');
         if($res)
             return $this->fun_success('删除成功');
