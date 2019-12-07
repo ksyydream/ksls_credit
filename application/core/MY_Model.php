@@ -917,7 +917,7 @@ class MY_Model extends CI_Model{
         if(!$res_check_)
             return false;
         //以防万一,还是判断下是否存在正在处理的 年审
-        $check_ns_ = $this->db->select()->from('company_pass')->where('id',$company_id)->where_not_in('status', array(-1,3))->order_by('id','desc')->get()->row_array();
+        $check_ns_ = $this->db->select()->from('company_pass')->where('company_id',$company_id)->where_not_in('status', array(-1,3))->order_by('id','desc')->get()->row_array();
         if($check_ns_)
             return false;
         $company_data = $this->db->select()->from('company_pending')->where('id',$company_id)->order_by('id','desc')->get()->row_array();

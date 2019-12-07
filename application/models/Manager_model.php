@@ -1823,7 +1823,7 @@ class Manager_model extends MY_Model
         if($res_check_['status'] != 1)
             return $this->fun_fail('不在年审窗口期,不可年审!');
         $company_id = $this->input->post('company_id');
-        $check_ns_ = $this->db->select()->from('company_pass')->where('id',$company_id)->where_not_in('status', array(-1,3))->order_by('id','desc')->get()->row_array();
+        $check_ns_ = $this->db->select()->from('company_pass')->where('company_id',$company_id)->where_not_in('status', array(-1,3))->order_by('id','desc')->get()->row_array();
         if($check_ns_)
             return $this->fun_fail('存在未处理的年审,不可年审!');
         $company_data = $this->db->select()->from('company_pending')->where('id',$company_id)->order_by('id','desc')->get()->row_array();
@@ -1864,6 +1864,7 @@ class Manager_model extends MY_Model
         if($agent_num < 3)
             return $this->fun_fail('年审提交,持证经纪人不能小于三个!');
         $this->db->trans_start();//--------开始事务
+
         $this->db->insert('company_pass',$company_data);
         $pass_id = $this->db->insert_id();
         $pic_short = $this->input->post('pic_short');
