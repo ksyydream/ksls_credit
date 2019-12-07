@@ -1888,6 +1888,7 @@ class Manager_model extends MY_Model
             $this->db->insert_batch('company_pass_agent',$pass_agent);
         //结束前也更新下 company_pending的状态
         $this->db->where('id', $company_id)->update('company_pending', array('annual_date' => $company_data['annual_date'],'tj_date' => $company_data['tj_date'], 'status' => 1));
+        $this->db->trans_complete();//------结束事务
         if ($this->db->trans_status() === FALSE) {
             return $this->fun_fail('保存失败!');
         } else {
