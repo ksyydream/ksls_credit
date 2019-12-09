@@ -196,6 +196,38 @@
 
                                             </div>
 
+                                             <div class="space-4"></div>
+                                            <h4 class="blue">
+                                                <i class="green ace-icon fa fa-list bigger-110"></i>
+                                               企业信用指标信息
+                                            </h4>
+                                            <div class="form-group">
+                                             <label class="col-sm-1 control-label no-padding-right" for="fz_num"> 分支机构数量 </label>
+                                        <div class="col-sm-9">
+                                        <input type="text" id="fz_num" name="fz_num"  class="rcol-xs-10 col-sm-5 js4phone" value="{{$data.fz_num|default:'0'}}">
+                                            <span class="help-inline col-xs-12 col-sm-7"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                                <label class="col-sm-1 control-label no-padding-right"></label>
+                                                <div class="col-sm-9">
+                                                    {{foreach from=$icon_list key=k item=v}}
+                                                    <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox"  name="icon_list[]" {{if $v.is_check_ == 1}}checked="checked"{{/if}} value="{{$v.icon_no}}" class="ace" />
+                                                        <span class="lbl"> {{$v.name}} ({{if $v.type == -1}}-{{/if}}{{$v.score}}分)</span>
+                                                    </label>
+                                                </div>
+                                                    {{/foreach}}
+                                                    
+
+                                        
+                                                </div>
+                                
+                                        </div>
+
+
+
                                         </div>
 
                                         <div id="faq-tab-2" class="tab-pane fade">

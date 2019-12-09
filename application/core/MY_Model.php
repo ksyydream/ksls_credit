@@ -782,6 +782,36 @@ class MY_Model extends CI_Model{
         return $username;
     }
 
+    //获取企业当前的经纪人人数，因为使用的地方比较多，写成公共方法
+    public function get_agent_num4company($company_id){
+         $this->db->select('count(1) num')->from('agent a');
+        $this->db->where('flag', 2);
+        $this->db->where('grade_no >', 1);
+        $this->db->where('company_id', $company_id);
+        $num = $this->db->get()->row();
+        return $num->num;
+    }
+
+    //按备案存续有效年份
+    public function get_ns_num4company($company_id, $annul_year = null){
+        $year_num_ = 0;
+        $this->db->select('a.annual_year, b.id')->from('term a');
+        $this->db->join('company_ns_list b', 'a.annual_year = b.year and  b.company_id = ' . $company_id . ' and b.status = 1', 'left');
+        if ($annul_year) 
+            $this->db->where('a.annual_year <', $annul_year);
+        $this->db->order_by('annual_year', 'desc');
+        $annul_year_list_ = $this->db->get()->result_array();
+        foreach ($annul_year_list_ as $k_ => $v_) {
+            //如果没有输入审核年份，可能是在非年审窗口期内 计算，这个时候如果第一个年审期没有年审记录就略过，因为可能还没有开始
+            if (!$annul_year && $k_ == 0 && !$v_['id'])
+                continue;
+            if (!$v_['id'])
+                break;
+            $year_num_ += 1;
+        }
+        return $year_num_;
+    }
+
     /**
      *********************************************************************************************
      * 通用逻辑类函数
@@ -791,12 +821,15 @@ class MY_Model extends CI_Model{
     /**
     *重新计算企业总分/企业异常标记
      * @param $company_id 企业ID
-     * @param $is_ns 是否年审计算,当年审时,会增加一些新的规则
+     * @param $annul_year 年审年份，在年审审核计算分数时带入
      * @return bool
      * 因为企业存在多种分值，在计算结束后，无论结果如何都要相加计算，以方便之后排名和查看分数线
      */
-    public function save_company_total_score($company_id, $is_ns = -1){
-
+    public function save_company_total_score($company_id, $annul_year = null){
+        $company_pending_info_ = $this->db->select()->from('company_pending')->where('id', $company_id)->get()->row_array();
+        if (!$company_pending_info_) {
+            return false;
+        }
         $zz_status_ = 1;        //异常状态
         $sys_score = 0;         //系统分 (经纪人分数 + 标签分)
         //第一步基础分，无需操作
@@ -804,15 +837,9 @@ class MY_Model extends CI_Model{
         //第二步事件分，无需操作
 
         //第三步系统分，主要由实际的经纪人数量和状态决定
+       
         // 1 先加入人员分数
-        // 2 再计算标签分数 计划所有标签如果存在修改,均需要在此通用方法前进行
-        //DBY重要
-        $this->db->select('count(1) num')->from('agent a');
-        $this->db->where('flag', 2);
-        $this->db->where('grade_no >', 1);
-        $this->db->where('company_id', $company_id);
-        $num = $this->db->get()->row();
-        $agent_num = $num->num;
+        $agent_num = $this->get_agent_num4company($company_id);
         $company_agent_score_ = $this->config->item('company_agent_score') ? $this->config->item('company_agent_score') : 0;
         $company_agent_score_max_ = $this->config->item('company_agent_score_max') ? $this->config->item('company_agent_score_max') : 0;
         $agent_score_total = $agent_num * $company_agent_score_;
@@ -820,7 +847,40 @@ class MY_Model extends CI_Model{
             $sys_score += $company_agent_score_max_;
         else
             $sys_score += $agent_score_total;
+        // 2 计算有效年份
+        $ns_num = $this->get_ns_num4company($company_id, $annul_year);
+        $company_ns_score_ = $this->config->item('company_ns_score') ? $this->config->item('company_ns_score') : 0;
+        $company_ns_score_max_ = $this->config->item('company_ns_score_max') ? $this->config->item('company_ns_score_max') : 0;
+        $ns_score_total = $ns_num * $company_ns_score_;
+        if($ns_score_total > $company_ns_score_max_)
+            $sys_score += $company_ns_score_max_;
+        else
+            $sys_score += $ns_score_total;
+        // 3 计算分支机构
+        $company_fz_score_ = $this->config->item('company_fz_score') ? $this->config->item('company_fz_score') : 0;
+        $company_fz_score_max_ = $this->config->item('company_fz_score_max') ? $this->config->item('company_fz_score_max') : 0;
+        $fz_num = $company_pending_info_['fz_num'] ? $company_pending_info_['fz_num'] : 0;
+        if ($fz_num > 0) {
+            $fz_score_total = $fz_num * $company_fz_score_;
+            if($fz_score_total > $company_fz_score_max_)
+                $sys_score += $company_fz_score_max_;
+            else
+                $sys_score += $fz_score_total;
+        }
+        // 4 计算缺席分数
+        $company_qx_score_ = $this->config->item('company_qx_score') ? $this->config->item('company_qx_score') : 0;
+        if($company_pending_info_['qx_num'] > 0)
+            $sys_score += $company_qx_score_;
+        // 5 再计算标签分数 计划所有标签如果存在修改,均需要在此通用方法前进行
+        $icon_ = $this->db->select("sum(a.score) sum_score_")->from('sys_score_icon a')
+                ->join('company_pending_icon b','a.icon_no = b.icon_no', 'left')->where('a.status', 1)->where('b.company_id', $company_id)->get()->row_array();
+        if($icon_){
+            $sys_score += $icon_['sum_score_'];
+        }
+        //DBY重要
+
         $this->db->where('id', $company_id)->set('sys_score', $sys_score)->update('company_pending');
+
         //最后一步 把各个分值相加
         $this->db->where('id', $company_id)->set('total_score', 'event_score + sys_score + base_score', FALSE)->update('company_pending');
         if($agent_num < 3)

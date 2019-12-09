@@ -41,15 +41,13 @@
                 <!-- /section:settings.box -->
                 <div class="row">
                     <div class="col-xs-12">
-                        <form id="cancel_form" method="post" action="/manager/company_pending_cancel">
-                            <input type="hidden" name="company_id" value="{{$data.id|default:''}}">
+                        <form id="cancel_form" method="post" action="{{$cancel_url}}">
+                            <input type="hidden" name="pass_id" value="{{$data.id|default:''}}">
                          </form>
                          <form id="pass_form" method="post" action="{{$pass_url}}">
-                            <input type="hidden" name="company_id" value="{{$data.id|default:''}}">
+                            <input type="hidden" name="pass_id" value="{{$data.id|default:''}}">
                          </form>
-                         <form id="delete_form" method="post" action="/manager/company_pending_delete">
-                            <input type="hidden" name="company_id" value="{{$data.id|default:''}}">
-                         </form>
+                
                         <!-- PAGE CONTENT BEGINS -->
                         <!--<form id="save_form" class="form-horizontal" role="form" action="/manager/" method="post">-->
                            <div class="tabbable">
@@ -179,7 +177,7 @@
                                                         <div class="col-sm-6">
                                                             <div class="row">
                                                                 <div class="col-xs-11 label label-lg label-success arrowed-in arrowed-right">
-                                                                    <b>最近一次终审信息</b>
+                                                                    <b>当前信息</b>
                                                                 </div>
                                                             </div>
 
@@ -287,59 +285,6 @@
 
                                             <div class="space-8"></div>
                                              <div class="row">
-                                                        <div class="col-sm-6">
-                                                            <div class="row">
-                                                                <div class="col-xs-11 label label-lg label-info arrowed-in arrowed-right">
-                                                                    <b>审核信息</b>
-                                                                </div>
-                                                            </div>
- <div class="space-4"></div>
-                                                            <div>
-                                                                   <table class="table table-striped table-bordered">
-                                                    <thead>
-
-                                <tr>
-
-                                    <th style="width:15%;">姓名</th>
-                                    <th style="width:25%;">执业证号</th>
-
-                                    <th style="width:25%;">身份证号</th>
-                                    <th style="width:15%;">联系电话</th>
-                                    <th style="width:10%;">网签</th>
-                                </tr>
-
-                                </thead>
-
-                                <tbody>
-                                    {{if !empty($data.agent) }}
-                            {{foreach from=$data.agent item=item}}
-                            <tr>
-                                        <td>{{$item.name}}</td>
-                                        <td>{{$item.job_code}}</td>
-                                          <td>{{$item.card}}</td>
-                                            <td>{{$item.phone}}</td>
-                                            <td>
-                                                <input type="hidden" name="setwq[]" value="{{if $item.wq == 2}}2{{else}}1{{/if}}">
-                                                <input readonly="readonly" disabled="disabled" name="ckwq[]" {{if $item.wq == 2}} checked{{/if}} type="checkbox" />
-                                            </td>
-                                    </tr>
-                            {{/foreach}}
-                            {{/if}}
-                                  
-                                </tbody>
-                            </table>
-
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="col-sm-6">
-                                                            <div class="row">
-                                                                <div class="col-xs-11 label label-lg label-success arrowed-in arrowed-right">
-                                                                    <b>最近一次终审信息</b>
-                                                                </div>
-                                                            </div>
-                                                             <div class="space-4"></div>
-                                                            <div>
                                                                   <table class="table table-striped table-bordered">
                                                     <thead>
 
@@ -356,16 +301,16 @@
                                 </thead>
 
                                 <tbody>
-                                    {{if !empty($pass_data.agent) }}
-                            {{foreach from=$pass_data.agent item=item}}
+                                    {{if !empty($pending_data.agent) }}
+                            {{foreach from=$pending_data.agent item=item}}
                             <tr>
                                         <td>{{$item.name}}</td>
                                         <td>{{$item.job_code}}</td>
                                           <td>{{$item.card}}</td>
                                             <td>{{$item.phone}}</td>
                                             <td>
-                                                <input type="hidden" name="setwq[]" value="{{if $item.pass_wq_ == 2}}2{{else}}1{{/if}}">
-                                                <input readonly="readonly" disabled="disabled" name="ckwq[]" {{if $item.pass_wq_ == 2}} checked{{/if}} type="checkbox" />
+                                                <input type="hidden" name="setwq[]" value="{{if $item.wq == 2}}2{{else}}1{{/if}}">
+                                                <input readonly="readonly" disabled="disabled" name="ckwq[]" {{if $item.wq == 2}} checked{{/if}} type="checkbox" />
                                             </td>
                                     </tr>
                             {{/foreach}}
@@ -373,9 +318,6 @@
                                   
                                 </tbody>
                             </table>
-
-                                                            </div>
-                                                        </div>
                                                     </div>
                                              <div class="form-group">
                                            
@@ -388,6 +330,7 @@
                                         </div>
                         
                                     </div>
+                                    <div class="hr hr32 hr-dotted"></div>
                                     <form class="form-horizontal">
                                         <div class="space-4"></div>
                                             <h4 class="blue">
@@ -447,14 +390,7 @@
                                     审核失败
 
                                 </button>
-                                &nbsp; &nbsp; &nbsp;
-                                <button id="delete_btn" class="btn btn-info red" type="button">
-
-                                    <i class="icon-ok bigger-110"></i>
-
-                                    作 废
-
-                                </button>
+                               
                             </div>
                         <!--</form>-->
                         <!-- PAGE CONTENT ENDS -->
@@ -475,24 +411,64 @@
 
 
  $("#pass_btn").click(function(){
-       $("#pass_form").submit();
-    })
-
- $("#delete_btn").click(function(){
-       layer.confirm('是否确定作废，作废后不可恢复！', {
+       layer.confirm('是否确定审核通过！', {
             btn: ['确定','取消'], //按钮
             area: ['400px', 'auto']
         }, function(){
-            $("#delete_form").submit();
+            post_form('pass_form', '{{$pass_url}}');
+        },function(){
+
+        });
+})
+
+ $("#cancel_btn").click(function(){
+    layer.confirm('是否确定审核失败，审核失败后将直接计算分数并保存审核结果！', {
+            btn: ['确定','取消'], //按钮
+            area: ['400px', 'auto']
+        }, function(){
+             post_form('cancel_form', '{{$cancel_url}}');
         },function(){
 
         });
     })
-
- $("#cancel_btn").click(function(){
-        $("#cancel_form").submit();
-    })
    
+
+   function post_form(form_name, url_submit){
+
+            var form = document.getElementById(form_name);
+
+            var formdata = new FormData(form);
+            $.ajax({
+                type : "POST",
+                url : url_submit,
+                data : formdata,
+                async: true,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success : function(data) {
+                    var return_ = JSON.parse(data)
+                    if(return_.status == 1){
+                        var url = '{{$return_url_}}';
+                        layer.alert('操作成功!', {
+                            skin: 'layui-layer-molv' //样式类名
+                            ,closeBtn: 0
+                        }, function(){
+                            window.location.replace(url);
+                        });
+                        //window.location.replace(url);
+                    }else{
+                        //layer.close(index);
+                        layer.msg(return_.msg);
+                    }
+                    //layer.close(index);
+                },
+                error:function(){
+                    //layer.close(index);
+                    layer.msg('网络异常!');
+                }
+            });
+   }
 </script>
 </body>
 </html>

@@ -102,6 +102,18 @@ class Common4manager_model extends MY_Model
         return $res;
     }
 
+    public function get_company_sys_icon(){
+        $this->db->select('*, -1 is_check_',false);
+        $this->db->from('sys_score_icon');
+        $this->db->where('status', 1);
+        $this->db->order_by('icon_class', 'asc');
+        $this->db->order_by('icon_no', 'asc');
+        return $this->db->get()->result_array();
+
+    }
+
+    /** check fun */
+
     //检查公司名称是否存在
     public function check_company_name($company_name,$without_id=null){
         /**
@@ -228,14 +240,10 @@ class Common4manager_model extends MY_Model
                         return $this->fun_fail('企业审核状态为待终审，不可直接退回初审!');
                      break;
                 case 3:
-                    if ($new_status == 2)
-                        return $this->fun_fail('企业审核状态为终审成功，不可直接退回终审!');
+                     return $this->fun_fail('企业审核状态为终审成功，不可审核!');
                      break;
                 case -1:
-                    if ($new_status == 3)
-                        return $this->fun_fail('企业审核状态为审核失败，不可直接终审成功!');
-                    if ($new_status == 2)
-                        return $this->fun_fail('企业审核状态为审核失败，不可直接退回终审!');
+                     return $this->fun_fail('企业审核状态为审核失败，不可审核!');
                      break;
         }
         return $this->fun_success('可以使用!');

@@ -1580,6 +1580,9 @@ class Manager_model extends MY_Model
         $this->db->select()->from('agent');
         $this->db->where('company_id', $id);
         $detail['agent'] = $this->db->get()->result_array();
+        $this->db->select()->from('company_pending_icon');
+        $this->db->where('company_id', $id);
+        $detail['icon'] = $this->db->get()->result_array();
         return $detail;
     }
 
@@ -1751,6 +1754,18 @@ class Manager_model extends MY_Model
             if(count($code_) < 3)
                 return $this->fun_fail('新增报备时,经纪人不能小于三人!');
         }
+        //事务开始前 判断标签
+        $post_icon_list = $this->input->post('icon_list');
+
+        $this->db->select('count(id)')->from('sys_score_icon');
+        $this->db->where('status', 1)->where_in('icon_no', $post_icon_list);
+        $this->db->group_by('icon_class');
+        $this->db->having('count(id) > 1');
+        $check_icon_ = $this->db->get()->result_array();
+        if($check_icon_)
+            return $this->fun_fail('标签选择异常!');
+        $icon_list = array();
+
         $this->db->trans_start();//--------开始事务
         if($company_id){
             unset($data['cdate']);
@@ -1797,6 +1812,12 @@ class Manager_model extends MY_Model
                 $this->db->insert('company_pending_img', $company_pic);
             }
         }
+        //处理基本信用标签
+        $this->db->delete('company_pending_icon', array('company_id' => $company_id));
+        $icon_insert_data = $this->db->select("{$company_id} company_id, icon_no")->from('sys_score_icon')->where('status', 1)->where_in('icon_no', $post_icon_list)->get()->result_array();
+        if ($icon_insert_data)
+            $this->db->insert_batch('company_pending_icon', $icon_insert_data);
+
         //判断如果是新增的 就自动提报年审
         if(!$this->input->post('company_id'))
             $this->save_pass_company($company_id);
@@ -1855,12 +1876,7 @@ class Manager_model extends MY_Model
         $check_company_name_ = $this->c4m_model->check_company_name($company_data['company_name'], $company_id);
         if($check_company_name_['status'] != 1)
             return $this->fun_fail($check_company_name_['msg']);
-        $this->db->select('count(1) num')->from('agent a');
-        $this->db->where('flag', 2);
-        $this->db->where('grade_no >', 1);
-        $this->db->where('company_id', $company_id);
-        $num = $this->db->get()->row();
-        $agent_num = $num->num;
+        $agent_num = $this->get_agent_num4company($company_id);
         if($agent_num < 3)
             return $this->fun_fail('年审提交,持证经纪人不能小于三个!');
         $this->db->trans_start();//--------开始事务
@@ -1882,12 +1898,13 @@ class Manager_model extends MY_Model
         //经纪人信息 只做暂存,实际 只有在审核结束后有效
         $this->db->select("id agent_id,name,phone,job_code,card,company_id,wq,old_job_code,{$pass_id} pass_id")->from('agent');
         $this->db->where('flag',2); //如果是离昆的就不要进行保存 //有什么信息就保存什么信息，真正是否显示，还是要看实际的状态
-        $this->db->where('company_id',$company_id);
+        $this->db->where('company_id', $company_id);
         $pass_agent = $this->db->get()->result_array();
         if($pass_agent)
             $this->db->insert_batch('company_pass_agent',$pass_agent);
         //结束前也更新下 company_pending的状态
         $this->db->where('id', $company_id)->update('company_pending', array('annual_date' => $company_data['annual_date'],'tj_date' => $company_data['tj_date'], 'status' => 1));
+        $this->save_company_total_score($company_id, $company_data['annual_date']);
         $this->db->trans_complete();//------结束事务
         if ($this->db->trans_status() === FALSE) {
             return $this->fun_fail('保存失败!');
@@ -1911,19 +1928,17 @@ class Manager_model extends MY_Model
     }
 
     //审核操作
-    public function company_pending_submit($status){
-        $company_id = $this->input->post('company_id');
-        if($company_id){
-             $company_info_ = $this->db->where('id', $company_id)->from('company_pending')->get()->row_array();
-             if (!$company_info_) {
+    public function company_pass_submit($status, $admin_id){
+        $pass_id = $this->input->post('pass_id');
+        if($pass_id){
+             $pass_info_ = $this->db->where('id', $pass_id)->from('company_pass')->get()->row_array();
+             if (!$pass_info_) {
                  return $this->fun_fail('企业信息丢失!');
              }
-             if ($company_info_['flag'] != 2) {
-                 return $this->fun_fail('企业备案状态异常!');
-             }
+            
              //如果审核状态相同，就只是编辑
-             if ($status != $company_info_['status']) {
-                 $check_status_change4company_ = $this->c4m_model->check_status_change4company($company_info_['status'], $status);
+             if ($status != $pass_info_['status']) {
+                 $check_status_change4company_ = $this->c4m_model->check_status_change4company($pass_info_['status'], $status);
                  if ($check_status_change4company_['status'] != 1) {
                      return $this->fun_fail($check_status_change4company_['msg']);
                  }
@@ -1935,19 +1950,35 @@ class Manager_model extends MY_Model
         }
 
         $update_data = array(
-            'status' => $status,
-            'mdate' => date('Y-m-d H:i:s',time()),
+            'status' => $status
         );
+        if($status != -1){
+            $agent_num = $this->get_agent_num4company($pass_info_['company_id']);
+            if($agent_num < 3)
+                return $this->fun_fail('年审通过,持证经纪人不能小于三个!');
+        }
+        if ($status == 2){
+           $update_data['cs_date'] = date('Y-m-d H:i:s',time());
+           $update_data['cs_user'] = $admin_id;
+        }
+        if ($status == 3){
+           $update_data['s_date'] = date('Y-m-d H:i:s',time());
+           $update_data['s_user'] = $admin_id;
+        }
+        $this->db->trans_start();//--------开始事务
+        $this->db->where('id', $pass_id)->update('company_pass', $update_data);
+        //审核均重新计算下分数
+        $this->save_company_total_score($pass_info_['company_id'], $pass_info_['annual_date']);
 
-        if ($status == 2) 
-           $update_data['csdate'] = date('Y-m-d H:i:s',time());
-        if ($status == 3)
-           $update_data['sdate'] = date('Y-m-d H:i:s',time());
-       $this->db->where('id', $company_id)->update('company_pending', $update_data);
-       $this->save_log_company($company_id);
-        if ($status == 3)
-           $this->save_pass_company($company_id);
-       return $this->fun_success('通过成功!');
+        if ($status == 3) {
+            # code...
+        }
+        $this->db->trans_complete();//------结束事务
+        if ($this->db->trans_status() === FALSE) {
+            return $this->fun_fail('操作失败!');
+        } else {
+            return $this->fun_success('操作成功!');
+        }
     }
 
     //企业审核列表
@@ -1971,7 +2002,7 @@ class Manager_model extends MY_Model
         $data['total_rows'] = $num->num;
 
         //获取详细列
-        $this->db->select('a.id,a.company_name,a.legal_name,a.tj_date,a.director_name,b.record_num')->from('company_pass a');
+        $this->db->select('a.id,a.company_name,a.legal_name,a.tj_date,a.director_name,b.record_num,cs_date,s_date')->from('company_pass a');
         $this->db->join('company_pending b','b.id = a.company_id','left');
         if($data['keyword']){
             $this->db->group_start();
@@ -1980,9 +2011,21 @@ class Manager_model extends MY_Model
         }
         if($data['record_num'])
             $this->db->where('b.flag', $data['record_num']);
-        if($status)
+        if($status){
             $this->db->where_in('a.status',$status);
-        $this->db->order_by('a.tj_date','desc');
+            if (in_array(3, $status))
+                $this->db->order_by('a.s_date','desc');
+            if (in_array(-1, $status))
+                $this->db->order_by('a.s_date','desc');
+            if (in_array(2, $status))
+                $this->db->order_by('a.cs_date','desc');
+            if (in_array(1, $status))
+                $this->db->order_by('a.tj_date','desc');
+        }else{
+            $this->db->order_by('a.tj_date','desc');
+        }
+        
+    
         $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
         $data['res_list'] = $this->db->get()->result_array();
         return $data;
