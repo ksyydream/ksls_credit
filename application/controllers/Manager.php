@@ -1186,6 +1186,28 @@ class Manager extends MY_Controller {
         $this->display('manager/company/company_cancel_list.html');
     }
 
+    public function company_cancel_edit($m_id){
+
+        $data = $this->manager_model->company_pending_edit($m_id);
+        if(!$data){
+            $this->show_message('未找到信息!');
+        }
+        if (!in_array($data['flag'], array(-1)))
+            $this->show_message('企业信息已不在注销企业列表!');
+        $icon_list = $this->c4m_model->get_company_sys_icon();
+        foreach ($icon_list as $k1 => $v1) {
+            foreach ($data['icon'] as $k2 => $v2) {
+                if ($v1['icon_no'] == $v2['icon_no']) {
+                    $icon_list[$k1]['is_check_'] = 1;
+                }
+            }
+        }
+        $this->assign('icon_list', $icon_list);
+        $this->assign('data', $data);
+        $this->assign('m_id', $m_id);
+        $this->display('manager/company/company_cancel_result.html');
+    }
+
     /**
      * 企业初审列表
      * @author yangyang

@@ -1809,6 +1809,12 @@ class Manager_model extends MY_Model
         if(!$this->input->post('company_id')){
             if(count($code_) < 3)
                 return $this->fun_fail('新增报备时,经纪人不能小于三人!');
+        }else{
+            $check_company_flag_ = $this->db->select('flag')->from('company_pending')->where('id',$company_id)->order_by('id','desc')->get()->row_array();
+            if(!$check_company_flag_)
+                return $this->fun_fail('企业信息丢失!');
+            if(!in_array($check_company_flag_['flag'], array(1, 2)))
+                return $this->fun_fail('企业状态变更,不可编辑!');
         }
         //事务开始前 判断标签
         $post_icon_list = $this->input->post('icon_list');
