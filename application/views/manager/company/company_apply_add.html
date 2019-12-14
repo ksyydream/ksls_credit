@@ -57,13 +57,14 @@
                                                 执业经纪人
                                             </a>
                                         </li>
-
+                                        {{if $data.id|default:'' > 0}}
                                         <li>
                                             <a data-toggle="tab" href="#faq-tab-3">
                                                 <i class="red ace-icon fa fa-archive bigger-120"></i>
                                                 年审记录
                                             </a>
                                         </li>
+                                        {{/if}}
                                     </ul>
 
                                     <div class="tab-content no-border padding-24">
@@ -308,6 +309,9 @@
                                          
                                         </div>
                                         <div id="faq-tab-3" class="tab-pane fade">
+                                            <div class="wizard-actions">
+                                                <a href="javascript:;" id="cancel_btn" class="refresh_pwd_"><i class="ace-icon fa fa-trash red bigger-100"></i>注销企业</a>&nbsp;
+                                            </div>
                                             <h4 class="blue">
                                                 <i class="red ace-icon fa fa-archive bigger-110"></i>
                                                 年审记录
@@ -648,6 +652,31 @@ $("#tbody_id").on("click",".delete_yy_",function(){
         $("#check_list").find("." + data_class + ":not(#" + id + ")").prop("checked",false);
         //$(this).prop("checked",true);
    })
+
+    $("#cancel_btn").click(function(){
+        var la_ = layer.prompt({title: '请输入注销备注!(必填)',value:'', formType: 2}, function(text, index){
+            layer.close(index);
+            if($.trim(text) == ""){
+                layer.msg('注销备注必须填写!');
+            }else{
+                var company_id_ = $("#company_id").val();
+                $.post('/manager/company_pending_cancel',{id: company_id_, cancel_remark:text}, function(html){
+                    var data = JSON.parse(html);
+                    if(data.status == 1){
+                        var url = '/manager/company_pending_list/';
+                        layer.alert(data.msg, {
+                            skin: 'layui-layer-molv' //样式类名
+                            , closeBtn: 0
+                        }, function () {
+                            window.location.replace(url);
+                        });
+                    }
+                    else
+                        layer.msg(data.msg, {icon: 2});
+                });
+            }
+        });
+    })
 </script>
 </body>
 </html>

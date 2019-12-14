@@ -1166,6 +1166,26 @@ class Manager extends MY_Controller {
         $this->ajaxReturn($res);
     }
 
+    public function company_pending_cancel(){
+        $res = $this->manager_model->company_pending_cancel($this->admin_id);
+        $this->ajaxReturn($res);
+    }
+
+    /**
+     * 注销企业列表
+     * @author yangyang
+     * @date 2019-11-12
+     */
+    public function company_cancel_list($page = 1){
+        $data = $this->manager_model->company_pending_list($page, array(-1));
+        $base_url = "/manager/company_cancel_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('manager/company/company_cancel_list.html');
+    }
+
     /**
      * 企业初审列表
      * @author yangyang

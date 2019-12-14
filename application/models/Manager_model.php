@@ -533,7 +533,9 @@ class Manager_model extends MY_Model
             //增加经纪人初始信用分
             $data['score'] = $this->config->item('agent_score');
             $this->db->insert('agent', $data);
+            $id = $this->db->insert_id();
         }
+        $this->handle_agent_flag($id);
         return $this->fun_success('保存成功!');
     }
 
@@ -1604,6 +1606,8 @@ class Manager_model extends MY_Model
         if($status){
             $this->db->where_in('a.status',$status);
         }
+        if(in_array(-1, $flag))
+            $this->db->order_by('a.cancel_date','desc');
         $this->db->order_by('a.cdate','desc');
         $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
         $data['res_list'] = $this->db->get()->result_array();
@@ -1900,7 +1904,10 @@ class Manager_model extends MY_Model
         if($check_ns_)
             return $this->fun_fail('存在未处理的年审,不可年审!');
         $company_data = $this->db->select()->from('company_pending')->where('id',$company_id)->order_by('id','desc')->get()->row_array();
-
+        if(!$company_data)
+            return $this->fun_fail('企业信息丢失!');
+        if(!in_array($company_data['flag'], array(1, 2)))
+            return $this->fun_fail('企业状态变更,不可年审!');
         $company_data['annual_date'] = $res_check_['result']['annual_year'];
         $company_data['status'] = 1;
         $company_data['tj_user'] = $admin_id;
@@ -2232,5 +2239,50 @@ class Manager_model extends MY_Model
             return $this->fun_fail('信息缺失!');
         $this->db->where(array('id' => $company_id, 'username' => $username))->update('company_pending', array('password' => sha1('123456')));
         return $this->fun_success('重置成功!');
+    }
+
+    //重置企业密码
+    public function company_pending_cancel($admin_id){
+        $company_id = $this->input->post('id');
+        $cancel_remark = trim($this->input->post('cancel_remark'));
+        if(!$company_id || !$cancel_remark)
+            return $this->fun_fail('信息丢失!');
+        $company_info = $this->db->select()->from('company_pending')->where('id', $company_id)->get()->row_array();
+        if(!$company_info)
+            return $this->fun_fail('未找到企业信息!');
+        if(!in_array($company_info['flag'], array(1, 2)))
+            return $this->fun_fail('企业状态已变更!');
+        $this->db->trans_start();//--------开始事务
+        $this->db->where(array('id' => $company_id))->where_in('flag', array(1,2))
+            ->update('company_pending', array(
+                'flag' => -1,
+                'cancel_remark' => $cancel_remark,
+                'cancel_date' => date('Y-m-d H:i:s',time()),
+                'cancel_user' => $admin_id
+            ));
+        $agent_ids_ = $this->db->select()->from('agent')->where('company_id', $company_id)->get()->result_array();
+        if($agent_ids_){
+            $data_insert = array();
+            foreach($agent_ids_ as $k_ => $v_){
+                $data_insert[] = array(
+                    'to_company_id'         =>      null,
+                    'to_company_name'       =>      null,
+                    'from_company_id'       =>      $company_id,
+                    'from_company_name'     =>      $company_info['company_name'],
+                    'agent_id'              =>      $v_['id'],
+                    'status'                =>      8,
+                    'create_date'           =>      date('Y-m-d H:i:s',time()),
+                );
+            }
+            $this->db->insert_batch('agent_track',$data_insert);
+        }
+
+
+        $this->db->trans_complete();//------结束事务
+        if ($this->db->trans_status() === FALSE) {
+            return $this->fun_fail('注销失败!');
+        } else {
+            return $this->fun_success('注销成功!');
+        }
     }
 }

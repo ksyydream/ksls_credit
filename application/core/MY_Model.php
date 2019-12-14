@@ -1175,6 +1175,40 @@ class MY_Model extends CI_Model{
         }else{
             $this->db->where('id', $agent_id)->update('agent', array('grade_no' => $grade_no_['grade_no']));
         }
+        return true;
+    }
+
+    //判断经纪人状态，是否需要解绑操作
+    public function handle_agent_flag($agent_id){
+        $agent_info = $this->db->select()->from('agent')->where('id', $agent_id)->get()->row_array();
+        if(!$agent_info)
+            return false;
+        $company_info_ = $this->db->select('company_name')->from('company_pending')->where('id', $agent_info['company_id'])->get()->row_array();
+        if($agent_info['flag'] != 2 && $company_info_){
+            $data_insert = array(
+                'to_company_id'         =>      null,
+                'to_company_name'       =>      null,
+                'from_company_id'       =>      $agent_info['company_id'],
+                'from_company_name'     =>      $company_info_['company_name'],
+                'agent_id'              =>      $agent_id,
+                'create_date'           =>      date('Y-m-d H:i:s',time()),
+            );
+            switch($agent_info['flag']){
+                case 1:
+                    $data_insert['status'] = 7;
+                    break;
+                case -1:
+                    $data_insert['status'] = 6;
+                    break;
+                default:
+                    return false;
+            }
+            $this->db->where('id', $agent_id)->update('agent', array('company_id' => -1));
+            $this->save_company_total_score($agent_info['company_id']);//重新计算企业信用分和异常状态
+
+            $this->db->insert('agent_track',$data_insert);
+        }
+        return true;
     }
 }
 
