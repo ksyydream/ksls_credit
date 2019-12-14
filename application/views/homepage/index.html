@@ -1,0 +1,92 @@
+<!doctype html>
+<html class="no-js">
+<head>
+ {{include file='homepage/public/head.html'}}
+</head>
+<body>
+
+
+
+<div class="ind_main">
+  <div class="ind_main_inner ">
+       <div class="ind_head">
+         <a href="/home" class="logo"></a>
+         <a href="/home/login" class="login-btn">登录</a>
+       </div>
+       <div class="search_box">
+
+
+            <ul class="slide02-control" id ="slide02-control">
+                    <li><a href="">公司查询<i class="am-icon-angle"></i></a></li>
+                    <li><a href="">经纪人查询<i class="am-icon-angle"></i></a></li>
+                </ul>
+
+              <div id="slide02" class="tab">
+                    <div class="content" style="display:block">
+                        <form action="">
+                           <div class="s-ipt">
+                            <input type="search" placeholder="请输入公司名/税号/法定代表人姓名进行查询" class="search_ipt" />
+                            <a href="javascript:" class="search-btn"></a>
+                          </div>
+                        </form>
+                    </div>
+                    <div class="content">
+                          <form action="">
+                           <div class="s-ipt">
+                            <input type="search" placeholder="请输入经纪人证号/身份证查询" class="search_ipt" />
+                            <a href="javascript:" class="search-btn"></a>
+                          </div>
+                        </form>
+                    </div>
+                </div>
+
+
+
+
+<!--           <div class="am-tabs" data-am-tabs>
+  <ul class="am-tabs-nav am-nav am-nav-tabs">
+    <li class="am-active"><a href="javascript: void(0)">公司查询</a></li>
+    <li><a href="javascript: void(0)">经纪人查询</a></li>
+  </ul>
+
+  <div class="am-tabs-bd">
+    <div class="am-tab-panel am-active">
+      <form action="">
+         <div class="s-ipt">
+          <input type="search" placeholder="请输入公司名/税号/法定代表人姓名进行查询" class="search_ipt" />
+          <a href="javascript:" class="search-btn"></a>
+        </div>
+      </form>
+    </div>
+    <div class="am-tab-panel">
+      <form action="">
+        <div class="s-ipt">
+          <input type="search" placeholder="请输入公司名/税号/法定代表人姓名进行查询" class="search_ipt" />
+         <a href="javascript:" class="search-btn"></a>
+        </div>
+        </form>
+    </div>
+  </div>
+</div>
+ -->
+
+
+          
+       </div>
+  </div>
+</div>
+
+
+{{include file='homepage/public/foot.html'}}
+<script type="text/javascript">
+$(function(){
+      new Slide({
+            target: $( '#slide02 .content'),
+            control: $( '#slide02-control li'),
+            type:"click"
+        });
+
+})
+</script>
+</body>
+</html>

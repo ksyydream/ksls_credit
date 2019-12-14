@@ -31,49 +31,32 @@
                     <div class="col-xs-12">
                     
                         <!-- PAGE CONTENT BEGINS -->
-                        <form id="save_form" class="form-horizontal" role="form" action="/manager/event4company_GRecord_update" method="post">
+                        <form id="save_form" class="form-horizontal" role="form" action="{{$update_url}}" method="post">
                              <input type="hidden" id="record_id" name="record_id" value="{{$data.record_id|default:''}}">
                             <div class="form-group">
-                                <label class="col-sm-1 control-label no-padding-right"> 事件状态 </label>
+                                <label class="col-sm-1 control-label no-padding-right" for="agent_id"> 事件状态 </label>
                                 <div class="col-sm-9 yy_m_7">
                                    {{if $data.status == 1}}<span class="label label-success">有效</span>{{/if}}
                                     {{if $data.status == -1}}<span class="label label-danger">作废</span>{{/if}}
-                                  
+                               
                                 </div>
                             </div>
                              <div class="space-4"></div>
                              <div class="form-group">
-                                <label class="col-sm-1 control-label no-padding-right"> 事件分数 </label>
+                                <label class="col-sm-1 control-label no-padding-right" for="agent_id"> 事件分数 </label>
                                 <div class="col-sm-9 yy_m_7">{{if $data.event_type_type == 1}}+{{/if}}{{$data.score}}
                                    
                                 </div>
                             </div>
                              <div class="space-4"></div>
                             <div class="form-group">
-                                <label class="col-sm-1 control-label no-padding-right"> 企业名称(原) </label>
+                                <label class="col-sm-1 control-label no-padding-right" for="agent_id"> 执业经纪人 </label>
                                 <div class="col-sm-9">
-                                   <input type="text" readonly="readonly" class="rcol-xs-10 col-sm-6" value="{{$data.old_company_name}}">
+                                   <input type="text" readonly="readonly" required="required" class="rcol-xs-10 col-sm-6" value="{{$data.agent_name_}}({{$data.agent_job_code_}})">
                                     <span class="help-inline col-xs-12 col-sm-7"></span>
                                 </div>
                             </div>
-                        <div class="space-4"></div>
-                            <div class="form-group">
-                                <label class="col-sm-1 control-label no-padding-right"> 企业名称(现) </label>
-                                <div class="col-sm-9">
-                                   <input type="text" readonly="readonly" class="rcol-xs-10 col-sm-6" value="{{$data.new_company_name_}}">
-                                    <span class="help-inline col-xs-12 col-sm-7"></span>
-                                </div>
-                            </div>
-
-                            <div class="space-4"></div>
-                            <div class="form-group">
-                                <label class="col-sm-1 control-label no-padding-right"> 备案号 </label>
-                                <div class="col-sm-9">
-                                   <input type="text" readonly="readonly" class="rcol-xs-10 col-sm-6" value="{{$data.record_num_}}">
-                                    <span class="help-inline col-xs-12 col-sm-7"></span>
-                                </div>
-                            </div>
-
+                        
 
                             <div class="space-4"></div>
                             <div class="form-group">
@@ -145,7 +128,7 @@
                                 </button>
                                 &nbsp; &nbsp; &nbsp;
                                 {{/if}}
-                                <a href="/manager/event4company_GRecord_list" class="btn" type="reset">
+                                <a href="{{$return_url}}" class="btn" type="reset">
 
                                     <i class="icon-undo bigger-110"></i>
 
@@ -203,7 +186,7 @@
             btn: ['确认','取消'], //按钮
             area: ['200px', 'auto']
         }, function(){
-            $.post('/manager/event4company_GRecord_cancel/',{record_id: record_id, del_remark:del_remark}, function(html){
+            $.post('{{$cancel_url}}',{record_id: record_id, del_remark:del_remark}, function(html){
                 var data = JSON.parse(html);
                 if(data.status == 1){
                     location.reload()

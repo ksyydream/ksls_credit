@@ -35,7 +35,8 @@
                             <div class="form-group">
                                 <label class="col-sm-2 control-label no-padding-right" for="event_name"> 事件名称 </label>
                                 <div class="col-sm-9">
-                                    <input type="text" id="event_name" name="event_name" required="required" class="rcol-xs-10 col-sm-6" value="{{$data.event_name|default:''}}">
+                                     <textarea id="event_name" name="event_name" class="autosize-transition form-control">{{$data.event_name|default:''}}</textarea>
+                            
                                     <span class="help-inline col-xs-12 col-sm-7"></span>
                                 </div>
                             </div>

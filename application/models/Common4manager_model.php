@@ -76,11 +76,20 @@ class Common4manager_model extends MY_Model
     //获取企业下拉选项
     //1 企业事件新增时使用
     public function get_company_all($flag = null){
-        $this->db->select();
-        $this->db->from('company_pending');
+        $this->db->select("a.id,a.company_name,a.record_num,b.grade_name");
+        $this->db->from('company_pending a');
+        $this->db->join('company_grade b', 'a.grade_no = b.grade_no', 'left');
         if ($flag) {
-            $this->db->where('flag', $flag);
+            $this->db->where('a.flag', $flag);
         }
+        $res =  $this->db->get()->result_array();
+        return $res;
+    }
+
+    public function get_company_grade_all(){
+        $this->db->select("a.*");
+        $this->db->from('company_grade a');
+        $this->db->order_by('grade_no', 'desc');
         $res =  $this->db->get()->result_array();
         return $res;
     }
@@ -89,9 +98,10 @@ class Common4manager_model extends MY_Model
     public function get_agent4company(){
         if(!$job_code = trim($this->input->post('keyword')))
             return array();
-        $this->db->select('a.*, b.company_name');
+        $this->db->select('a.*, b.company_name, c.grade_name');
         $this->db->from('agent a');
         $this->db->join('company_pending b', 'a.company_id = b.id', 'left');
+        $this->db->join('agent_grade c', 'a.grade_no = c.grade_no', 'left');
         $this->db->where('a.job_code', $job_code);
         $this->db->where('a.flag', 2);
         return $this->db->get()->row_array();
@@ -160,12 +170,26 @@ class Common4manager_model extends MY_Model
     //检查备案号是否存在
     public function check_record_num($record_num,$without_id=null){
         $this->db->select()->from('company_pending')->where('record_num',trim($record_num));
-        $this->db->where_in('status',array(1,2,3,4));
+        //$this->db->where_in('status',array(1,2,3,4));
         if($without_id)
             $this->db->where('id <>',$without_id);
         $data_pending = $this->db->get()->row_array();
         if($data_pending){
              return $this->fun_fail('备案号存在!');
+        }else{
+            return $this->fun_success('可以使用!');
+        }
+    }
+
+    //检查商业注册号是否存在 如果不用判断，可以直接改这个函数
+    public function check_business_no($record_num,$without_id=null){
+        $this->db->select()->from('company_pending')->where('business_no',trim($record_num));
+        //$this->db->where_in('status',array(1,2,3,4));
+        if($without_id)
+            $this->db->where('id <>',$without_id);
+        $data_pending = $this->db->get()->row_array();
+        if($data_pending){
+             return $this->fun_fail('商业注册号存在!');
         }else{
             return $this->fun_success('可以使用!');
         }
@@ -297,8 +321,6 @@ class Common4manager_model extends MY_Model
         $data['keyword'] = $this->input->get('keyword') ? trim($this->input->get('keyword')):null;
 
         $this->db->select('count(1) num')->from('agent_track a');
-        $this->db->join('company_pass b','a.to_company_id = b.company_id','left');
-        $this->db->join('company_pass c','a.from_company_id = c.company_id','left');
         $this->db->join('company_pending d','a.to_company_id = d.id','left');
         $this->db->join('company_pending e','a.from_company_id = e.id','left');
         $this->db->where('a.agent_id',$id);
@@ -307,10 +329,8 @@ class Common4manager_model extends MY_Model
         }
         $num = $this->db->get()->row();
         $data['total_rows'] = $num->num;
-        $this->db->select('a.*,b.company_name to_name,c.company_name from_name,
-		d.status to_company_status,d.flag to_company_flag,e.status from_company_status,e.flag from_company_flag')->from('agent_track a');
-        $this->db->join('company_pass b','a.to_company_id = b.company_id','left');
-        $this->db->join('company_pass c','a.from_company_id = c.company_id','left');
+        $this->db->select('a.*,d.company_name to_name,e.company_name from_name,
+		d.flag to_company_flag,e.flag from_company_flag')->from('agent_track a');
         $this->db->join('company_pending d','a.to_company_id = d.id','left');
         $this->db->join('company_pending e','a.from_company_id = e.id','left');
         $this->db->where('a.agent_id',$id);

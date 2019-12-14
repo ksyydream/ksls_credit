@@ -64,11 +64,19 @@
                                                                                 <span>{{$data.score|default:''}}</span>
                                                                             </div>
                                                                         </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 信用等级 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$data.grade_name|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
                                                                         <div class="profile-info-row">
                                                                             <div class="profile-info-name">  </div>
 
                                                                             <div class="profile-info-value">
-                                                                                {{if $data.company_id == -1}}
+                                                                                {{if $data.company_id == -1 && $data.flag == 2 && $data.grade_no != 1}}
                                                                                 <button id="insert_btn_agent_" class="pull-right btn btn-sm btn-primary btn-white btn-round" type="button">
                                                                                 加入
                                                                                 <i class="ace-icon fa fa-arrow-right icon-on-right bigger-110"></i> </button>

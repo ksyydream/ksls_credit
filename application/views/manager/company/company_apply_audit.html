@@ -79,6 +79,14 @@
                                                 </div>
                                             </div>
                                             <div class="space-4"></div>
+                                        <div class="form-group">
+                                             <label class="col-sm-1 control-label no-padding-right" for="business_no"> 工商注册号 </label>
+                                        <div class="col-sm-9">
+                                        <input type="text" id="business_no" name="business_no" class="rcol-xs-10 col-sm-5" value="{{$data.business_no|default:''}}">
+                                            <span class="help-inline col-xs-12 col-sm-7"></span>
+                                            </div>
+                                        </div>
+                                            <div class="space-4"></div>
                                             <div class="form-group">
                                                 <label class="col-sm-1 control-label no-padding-right" for="register_path"> 注册地址 </label>
                                                 <div class="col-sm-9">
@@ -389,6 +397,11 @@
         var company_name = $.trim($("#company_name").val());
         if(company_name == "" ) {
             layer.msg('企业名称不能为空', {icon: 2});
+            return false;
+        }
+        var business_no = $.trim($("#business_no").val());
+        if(business_no == "" ) {
+            layer.msg('工商注册号不能为空', {icon: 2});
             return false;
         }
         var register_path = $.trim($("#register_path").val());

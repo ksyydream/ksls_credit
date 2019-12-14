@@ -41,7 +41,7 @@
                         <!-- PAGE CONTENT BEGINS -->
                         <form id="save_form" class="form-horizontal" role="form" action="/manager/company_pending_save" method="post">
                             <input type="hidden" name="folder" value="{{$time}}" id="folder">
-                            <input type="hidden" name="company_id" value="{{$data.id|default:''}}">
+                            <input type="hidden" id="company_id" name="company_id" value="{{$data.id|default:''}}">
                            <div class="tabbable">
                                     <ul class="nav nav-tabs padding-18 tab-size-bigger" id="myTab">
                                         <li class="active">
@@ -55,6 +55,13 @@
                                             <a data-toggle="tab" href="#faq-tab-2">
                                                 <i class="green ace-icon fa fa-user bigger-120"></i>
                                                 执业经纪人
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a data-toggle="tab" href="#faq-tab-3">
+                                                <i class="red ace-icon fa fa-archive bigger-120"></i>
+                                                年审记录
                                             </a>
                                         </li>
                                     </ul>
@@ -71,6 +78,14 @@
                                              <label class="col-sm-1 control-label no-padding-right" for="company_name"> 企业名称 </label>
                                         <div class="col-sm-9">
                                         <input type="text" id="company_name" name="company_name" class="rcol-xs-10 col-sm-5" value="{{$data.company_name|default:''}}">
+                                            <span class="help-inline col-xs-12 col-sm-7"></span>
+                                            </div>
+                                        </div>
+                                        <div class="space-4"></div>
+                                        <div class="form-group">
+                                             <label class="col-sm-1 control-label no-padding-right" for="business_no"> 工商注册号 </label>
+                                        <div class="col-sm-9">
+                                        <input type="text" id="business_no" name="business_no" class="rcol-xs-10 col-sm-5" value="{{$data.business_no|default:''}}">
                                             <span class="help-inline col-xs-12 col-sm-7"></span>
                                             </div>
                                         </div>
@@ -210,11 +225,11 @@
                                         </div>
                                         <div class="form-group">
                                                 <label class="col-sm-1 control-label no-padding-right"></label>
-                                                <div class="col-sm-9">
+                                                <div class="col-sm-9" id="check_list">
                                                     {{foreach from=$icon_list key=k item=v}}
                                                     <div class="checkbox">
                                                     <label>
-                                                        <input type="checkbox"  name="icon_list[]" {{if $v.is_check_ == 1}}checked="checked"{{/if}} value="{{$v.icon_no}}" class="ace" />
+                                                        <input type="checkbox" id="icon_no_{{$v.icon_no}}" data_class = "icon_list_{{$v.icon_class}}" class="icon_list_{{$v.icon_class}}"  name="icon_list[]" {{if $v.is_check_ == 1}}checked="checked"{{/if}} value="{{$v.icon_no}}" class="ace" />
                                                         <span class="lbl"> {{$v.name}} ({{if $v.type == -1}}-{{/if}}{{$v.score}}分)</span>
                                                     </label>
                                                 </div>
@@ -292,7 +307,39 @@
                           
                                          
                                         </div>
-                        
+                                        <div id="faq-tab-3" class="tab-pane fade">
+                                            <h4 class="blue">
+                                                <i class="red ace-icon fa fa-archive bigger-110"></i>
+                                                年审记录
+                                            </h4>
+                                            <table class="table table-striped table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                         <th>年审年份</th>
+                                                        <th>年审结果</th>
+                                                        <th>信用等级(历史数据)</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {{foreach from=$data.ns_list key=k item=v}}
+                                                            <tr>
+                                                                <td>
+                                                            {{$v.annual_year}}
+                                                                </td>
+                                                                <td>
+                                                            {{if $v.status == 1}}年审失败{{/if}}
+                                                            {{if $v.status == 2}}年审成功{{/if}}
+                                                            {{if $v.status == -1}}缺席{{/if}}
+                                                                </td>
+                                                                    <td>
+                                                             {{$v.grade_name}}
+                                                                    </td>
+                                                            </tr>
+                                                    {{/foreach}}
+                                                        
+                                                        </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -441,6 +488,11 @@
             layer.msg('企业名称不能为空', {icon: 2});
             return false;
         }
+        var business_no = $.trim($("#business_no").val());
+        if(business_no == "" ) {
+            layer.msg('工商注册号不能为空', {icon: 2});
+            return false;
+        }
         var register_path = $.trim($("#register_path").val());
         if(register_path == "" ) {
             layer.msg('注册地址不能为空', {icon: 2});
@@ -488,13 +540,15 @@
             return false;
         }
         //报备时可以随意修改 审核时再做判断，以免在审核中有人员变动
-        {{if $m_id < 1}}
-        var length = $("#tbody_id").find(".delete_yy_").length;
-        if(length < 3){
+        var company_id_ = $("#company_id").val();
+        if (company_id_ == "") {
+            var length = $("#tbody_id").find(".delete_yy_").length;
+            if(length < 3){
             layer.msg('新增报备,需持证经纪人不能小于三个!', {icon: 2});
-            flag=1;return false;
+                flag=1;return false;
+            }
         }
-        {{/if}}
+        
         if(flag != 1) {
             var form = document.getElementById('save_form');
 
@@ -588,6 +642,12 @@ $("#tbody_id").on("click",".delete_yy_",function(){
            }
        })
    
+   $("input[name='icon_list[]']").click(function(){
+        var data_class =  $(this).attr('data_class');
+        var id = $(this).attr('id');
+        $("#check_list").find("." + data_class + ":not(#" + id + ")").prop("checked",false);
+        //$(this).prop("checked",true);
+   })
 </script>
 </body>
 </html>

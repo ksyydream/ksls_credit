@@ -215,6 +215,10 @@ class Manager_login extends MY_Controller {
         $data = $this->c4m_model->show_agent_track($page);
         $base_url = "/manager_login/show_agent_track/";
         $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $agent_track_status = $this->config->item('agent_track_status');
+        $agent_track_status_label = $this->config->item('agent_track_status_label');
+        $this->assign('agent_track_status', $agent_track_status);
+        $this->assign('agent_track_status_label', $agent_track_status_label);
         $this->assign('pager', $pager);
         $this->assign('page', $page);
         $this->assign('data', $data);

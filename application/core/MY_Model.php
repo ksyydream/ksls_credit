@@ -793,17 +793,17 @@ class MY_Model extends CI_Model{
     }
 
     //按备案存续有效年份
-    public function get_ns_num4company($company_id, $annul_year = null){
+    public function get_ns_num4company($company_id, $annual_year = null){
         $year_num_ = 0;
         $this->db->select('a.annual_year, b.id')->from('term a');
-        $this->db->join('company_ns_list b', 'a.annual_year = b.year and  b.company_id = ' . $company_id . ' and b.status = 1', 'left');
-        if ($annul_year) 
-            $this->db->where('a.annual_year <', $annul_year);
+        $this->db->join('company_ns_list b', 'a.annual_year = b.annual_year and  b.company_id = ' . $company_id . ' and b.status in (2)', 'left');
+        if ($annual_year) 
+            $this->db->where('a.annual_year <', $annual_year);
         $this->db->order_by('annual_year', 'desc');
-        $annul_year_list_ = $this->db->get()->result_array();
-        foreach ($annul_year_list_ as $k_ => $v_) {
+        $annual_year_list_ = $this->db->get()->result_array();
+        foreach ($annual_year_list_ as $k_ => $v_) {
             //如果没有输入审核年份，可能是在非年审窗口期内 计算，这个时候如果第一个年审期没有年审记录就略过，因为可能还没有开始
-            if (!$annul_year && $k_ == 0 && !$v_['id'])
+            if (!$annual_year && $k_ == 0 && !$v_['id'])
                 continue;
             if (!$v_['id'])
                 break;
@@ -820,64 +820,125 @@ class MY_Model extends CI_Model{
 
     /**
     *重新计算企业总分/企业异常标记
-     * @param $company_id 企业ID
-     * @param $annul_year 年审年份，在年审审核计算分数时带入
+     * @param $company_id       企业ID
+     * @param $annual_year      年审年份，在年审审核计算分数时带入
+     * @param $is_ns_           年审标记位，当为 2时表示年审成功，1时表示年审失败，并将执行相关代码
+     * @param $pass_id          company_pass的主键ID，用于回写一些结果信息
      * @return bool
      * 因为企业存在多种分值，在计算结束后，无论结果如何都要相加计算，以方便之后排名和查看分数线
      */
-    public function save_company_total_score($company_id, $annul_year = null){
-        $company_pending_info_ = $this->db->select()->from('company_pending')->where('id', $company_id)->get()->row_array();
+    public function save_company_total_score($company_id, $annual_year = null, $is_ns_ = null, $pass_id = null){
+        $company_pending_info_ = $this->db->select('fz_num, qx_num,total_score, event_score, sys_score, base_score')->from('company_pending')->where('id', $company_id)->get()->row_array();
         if (!$company_pending_info_) {
             return false;
         }
+        $pass_score_log = array();
+
         $zz_status_ = 1;        //异常状态
         $sys_score = 0;         //系统分 (经纪人分数 + 标签分)
         //第一步基础分，无需操作
-
+        $pass_score_log[] = array(
+            'company_id' => $company_id,
+            'pass_id' => $pass_id,
+            'type' => 1, 
+            'msg' => '初始分：' . $company_pending_info_['base_score'] . '分'
+        );
         //第二步事件分，无需操作
-
+        $pass_score_log[] = array(
+            'company_id' => $company_id,
+            'pass_id' => $pass_id,
+            'type' => 2, 'msg' => '事件分总分：' . $company_pending_info_['event_score'] . '分');
         //第三步系统分，主要由实际的经纪人数量和状态决定
        
         // 1 先加入人员分数
         $agent_num = $this->get_agent_num4company($company_id);
         $company_agent_score_ = $this->config->item('company_agent_score') ? $this->config->item('company_agent_score') : 0;
         $company_agent_score_max_ = $this->config->item('company_agent_score_max') ? $this->config->item('company_agent_score_max') : 0;
-        $agent_score_total = $agent_num * $company_agent_score_;
-        if($agent_score_total > $company_agent_score_max_)
-            $sys_score += $company_agent_score_max_;
-        else
-            $sys_score += $agent_score_total;
+        if($agent_num > 3){
+            $agent_score_total = ($agent_num - 3) * $company_agent_score_;
+            if($agent_score_total > $company_agent_score_max_){
+                $pass_score_log[] = array(
+                     'company_id' => $company_id,
+                    'pass_id' => $pass_id,
+                    'type' => 3,
+                     'msg' => '额外注册持证经纪人' . ($agent_num - 3) . '个，每个' . $company_agent_score_ . '分，因不可超过' . $company_agent_score_max_ . '分，最终计分' . $company_agent_score_max_ . '分'
+                 );
+                $sys_score += $company_agent_score_max_;
+            }
+            else{
+                $pass_score_log[] = array(
+                     'company_id' => $company_id,
+                    'pass_id' => $pass_id,
+                    'type' => 3,
+                     'msg' => '额外注册持证经纪人' . ($agent_num - 3) . '个，每个' . $company_agent_score_ . '分，最终计分' . $agent_score_total . '分'
+                 );
+                $sys_score += $agent_score_total;
+            }
+        }
+        
         // 2 计算有效年份
-        $ns_num = $this->get_ns_num4company($company_id, $annul_year);
+        $ns_num = $this->get_ns_num4company($company_id, $annual_year);
         $company_ns_score_ = $this->config->item('company_ns_score') ? $this->config->item('company_ns_score') : 0;
         $company_ns_score_max_ = $this->config->item('company_ns_score_max') ? $this->config->item('company_ns_score_max') : 0;
         $ns_score_total = $ns_num * $company_ns_score_;
-        if($ns_score_total > $company_ns_score_max_)
+        if($ns_score_total > $company_ns_score_max_){
+            $pass_score_log[] = array(
+                'company_id' => $company_id,
+                'pass_id' => $pass_id,
+                'type' => 3, 
+                'msg' => '备案存续有效年份累计' . ($ns_num) . '年，每年' . $company_ns_score_ . '分，因不可超过' . $company_ns_score_max_ . '分，最终计分' . $company_ns_score_max_ . '分'
+            );
             $sys_score += $company_ns_score_max_;
-        else
+        }
+        else{
+            $pass_score_log[] = array(
+                'company_id' => $company_id,
+                'pass_id' => $pass_id,
+                'type' => 3, 
+                'msg' => '备案存续有效年份累计' . ($ns_num) . '年，每年' . $company_ns_score_ . '分，最终计分' . $ns_score_total . '分'
+            );
             $sys_score += $ns_score_total;
+        }
         // 3 计算分支机构
         $company_fz_score_ = $this->config->item('company_fz_score') ? $this->config->item('company_fz_score') : 0;
         $company_fz_score_max_ = $this->config->item('company_fz_score_max') ? $this->config->item('company_fz_score_max') : 0;
         $fz_num = $company_pending_info_['fz_num'] ? $company_pending_info_['fz_num'] : 0;
         if ($fz_num > 0) {
             $fz_score_total = $fz_num * $company_fz_score_;
-            if($fz_score_total > $company_fz_score_max_)
+            if($fz_score_total > $company_fz_score_max_){
+                $pass_score_log[] = array(
+                    'company_id' => $company_id,
+                    'pass_id' => $pass_id,
+                    'type' => 3, 'msg' => '开设分支机构并备案' . ($fz_num) . '个，每个' . $company_fz_score_ . '分，因不可超过' . $company_fz_score_max_ . '分，最终计分' . $company_fz_score_max_ . '分');
                 $sys_score += $company_fz_score_max_;
-            else
+            }
+            else{
+                $pass_score_log[] = array(
+                    'company_id' => $company_id,
+                    'pass_id' => $pass_id,
+                    'type' => 3, 'msg' => '开设分支机构并备案' . ($fz_num) . '个，每个' . $company_fz_score_ . '分，最终计分' . $fz_score_total . '分');
                 $sys_score += $fz_score_total;
+            }
         }
         // 4 计算缺席分数
         $company_qx_score_ = $this->config->item('company_qx_score') ? $this->config->item('company_qx_score') : 0;
-        if($company_pending_info_['qx_num'] > 0)
+        if($company_pending_info_['qx_num'] > 0){
+            $pass_score_log[] = array(
+                'company_id' => $company_id,
+                'pass_id' => $pass_id,
+                'type' => 3, 'msg' => '存在缺席行为，计分' . $company_qx_score_ . '分');
             $sys_score += $company_qx_score_;
+        }
         // 5 再计算标签分数 计划所有标签如果存在修改,均需要在此通用方法前进行
-        $icon_ = $this->db->select("sum(a.score) sum_score_")->from('sys_score_icon a')
+        $icon_ = $this->db->select("ifnull(sum(a.score),0) sum_score_")->from('sys_score_icon a')
                 ->join('company_pending_icon b','a.icon_no = b.icon_no', 'left')->where('a.status', 1)->where('b.company_id', $company_id)->get()->row_array();
         if($icon_){
+            $pass_score_log[] = array(
+                'company_id' => $company_id,
+                'pass_id' => $pass_id,
+                'type' => 3, 'msg' => '信用指标，总计分' . $icon_['sum_score_'] . '分');
             $sys_score += $icon_['sum_score_'];
         }
-        //DBY重要
 
         $this->db->where('id', $company_id)->set('sys_score', $sys_score)->update('company_pending');
 
@@ -887,7 +948,67 @@ class MY_Model extends CI_Model{
             $zz_status_ = -1;
         $this->db->where('id', $company_id)->set('zz_status', $zz_status_)->update('company_pending');
         $this->db->where('id', $company_id)->where('qx_num >', 1)->set('zz_status', -1)->update('company_pending');
+
+        if ($annual_year && $is_ns_ && in_array($is_ns_, array(1, 2))) {
+            $annual_info_ = $this->db->select('*')->from('company_ns_list')->where(array('annual_year' => $annual_year, 'company_id' => $company_id))->get()->row_array();
+            $admin_info = $this->session->userdata('admin_info');
+            $admin_id = -1;
+            if($admin_info)
+                $admin_id = $admin_info['admin_id'];
+            if ($annual_info_) {
+                //如果存在 当前年审的年审结果，就不再重置和结算信用登记，只更改审核结果
+                $this->db->where(array('annual_year' => $annual_year, 'company_id' => $company_id));
+                $this->db->update('company_ns_list', array('status' => $is_ns_, 'modify_date' => date('Y-m-d H:i:s',time()), 'modify_user' => $admin_id));
+            }else{
+                //如果不存在，当前年审的年审结果，就除了要增加年审结果记录，还需要计算信用登记 和 重置分数
+                $insert_annual_year_ = array(
+                    'annual_year' => $annual_year,
+                    'company_id'  => $company_id,
+                    'status'      => $is_ns_,
+                    'create_date' => date('Y-m-d H:i:s',time()),
+                    'create_user' => $admin_id
+                );
+                //获取信用等级
+                $company_pending_ns_ =  $this->db->select('total_score, event_score, sys_score, base_score')->from('company_pending')->where('id', $company_id)->get()->row_array();
+                $total_score = $company_pending_ns_['total_score'];
+                $grade_no_ = $this->db->select()->from('company_grade')->where('min_score <=', $total_score)->order_by('grade_no','desc')->get()->row_array();
+                if($grade_no_){
+                    $insert_annual_year_['grade_no'] = $grade_no_['grade_no'];
+                    $insert_annual_year_['grade_name'] = $grade_no_['grade_name'];
+                }else{
+                    $insert_annual_year_['grade_no'] = 1;
+                    $insert_annual_year_['grade_name'] = '失信';
+                }
+                $this->db->insert('company_ns_list', $insert_annual_year_);
+
+                //更新 company_pass 的信息
+                if($pass_id){
+                    $update_pass_data = array(
+                        'total_score' => $company_pending_ns_['total_score'],
+                        'event_score' => $company_pending_ns_['event_score'],
+                        'sys_score' => $company_pending_ns_['sys_score'],
+                        'base_score' => $company_pending_ns_['base_score'],
+                        'grade_no' => $insert_annual_year_['grade_no'] ? $insert_annual_year_['grade_no'] : 1,
+                        'grade_name' => $insert_annual_year_['grade_name'] ? $insert_annual_year_['grade_name'] : '失信'
+                    );
+                    $this->db->where('id', $pass_id)->update('company_pass', $update_pass_data);
+                }
+                //重置分数
+                $this->db->where('id', $company_id)->set('event_score', 0)->update('company_pending');
+                $this->db->where(array('status' => 1, 'is_nscz' => -1, 'company_id' => $company_id))->update('event4company_record', array('is_nscz' => 1, 'annual_year' => $annual_year));
+                $this->db->where('id', $company_id)->set('total_score', 'event_score + sys_score + base_score', FALSE)->update('company_pending');
+                //更新company_pending的最新年审时间和信用等级
+                $this->db->where('id', $company_id)->where('annual_date <=', $annual_year)->update('company_pending', array('grade_no' => $insert_annual_year_['grade_no'], 'annual_date' => $annual_year, 'qx_num' => 0));
+                $this->db->where('pass_id', $pass_id)->delete('company_pass_score_log');
+                $this->db->insert_batch('company_pass_score_log', $pass_score_log);
+            }
+        }
         return true;
+    }
+
+
+    public function save_company_ns_info($status, $company_id, $pass_id = null){
+
     }
 
     public function save_agent_track($company_id,$company_data,$agent_old,$agent_new){
@@ -949,6 +1070,9 @@ class MY_Model extends CI_Model{
         unset($company_data['username']);
         unset($company_data['password']);
         unset($company_data['qx_num']);
+        unset($company_data['cancel_date']);
+        unset($company_data['cancel_user']);
+        unset($company_data['cancel_remark']);
         $admin_info = $this->session->userdata('admin_info');
         $company_data['handle_user'] = $admin_info ? $admin_info['admin_id'] : -1;
         $company_data['handle_date'] = date('Y-m-d H:i:s',time());
@@ -964,7 +1088,13 @@ class MY_Model extends CI_Model{
         $data['agent'] = $this->db->get()->result_array();
         if($data['agent'])
             $this->db->insert_batch('company_log_agent',$data['agent']);
-       
+        $this->db->where('log_id', $log_id)->delete('company_log_icon');
+        $this->db->select("a.icon_no,a.icon_class,a.`name`,a.short_name,b.company_id,a.type,(a.score * a.type) score,a.status,{$log_id} log_id")->from('fm_sys_score_icon a');
+        $this->db->join('company_pending_icon b','a.icon_no = b.icon_no ','left');
+        $this->db->where('company_id',$company_id);
+        $log_icon = $this->db->get()->result_array();
+        if($log_icon)
+            $this->db->insert_batch('company_log_icon',$log_icon);
     }
 
     //第一 新增报备时 自动保存的 年审信息
@@ -986,6 +1116,9 @@ class MY_Model extends CI_Model{
         unset($company_data['annual_date']);
         unset($company_data['username']);
         unset($company_data['password']);
+        unset($company_data['cancel_date']);
+        unset($company_data['cancel_user']);
+        unset($company_data['cancel_remark']);
         $company_data['annual_date'] = $res_check_['annual_year'];
         $company_data['status'] = 1;
         $admin_info = $this->session->userdata('admin_info');
@@ -1011,6 +1144,37 @@ class MY_Model extends CI_Model{
         //结束前也更新下 company_pending的状态
         $this->db->where('id', $company_id)->update('company_pending', array('annual_date' => $company_data['annual_date'],'tj_date' => $company_data['tj_date'], 'status' => 1));
         return true;
+    }
+
+    //判断经纪人分数，并设置等级，和处理失信时的一些特殊处理
+    public function handle_agent_score($agent_id){
+        $agent_info = $this->db->select()->from('agent')->where('id', $agent_id)->get()->row_array();
+        if(!$agent_info)
+            return false;
+        $grade_no_ = $this->db->select()->from('agent_grade')->where('min_score <=', $agent_info['score'])->order_by('grade_no','desc')->get()->row_array();
+        if(!$grade_no_){
+            $grade_no_['grade_no'] = 1;
+        }
+        if ($grade_no_['grade_no'] == 1) {
+            $this->db->where('id', $agent_id)->update('agent', array('grade_no' => $grade_no_['grade_no'], 'company_id' => -1));
+            $company_info_ = $this->db->select('company_name')->from('company_pending')->where('id', $agent_info['company_id'])->get()->row_array();
+            if ($company_info_) {
+               $this->save_company_total_score($agent_info['company_id']);//重新计算企业信用分和异常状态
+               $data_insert = array(
+                    'to_company_id'         =>      null,
+                    'to_company_name'       =>      null,
+                    'from_company_id'       =>      $agent_info['company_id'],
+                    'from_company_name'     =>      $company_info_['company_name'],
+                    'agent_id'              =>      $agent_id,
+                    'status'                =>      3,
+                    'create_date'           =>      date('Y-m-d H:i:s',time()),
+                );
+               $this->db->insert('agent_track',$data_insert);
+            }
+            
+        }else{
+            $this->db->where('id', $agent_id)->update('agent', array('grade_no' => $grade_no_['grade_no']));
+        }
     }
 }
 

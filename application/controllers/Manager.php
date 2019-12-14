@@ -599,7 +599,9 @@ class Manager extends MY_Controller {
         $this->assign('event_type_all', $event_type_all);
         $get_agent_all = $this->c4m_model->get_agent_all(2);
         $this->assign('agent_all', $get_agent_all);
-        $this->display('manager/event_agent/event4agent_GRecord_add.html');
+        $this->assign('return_url', '/manager/event4agent_GRecord_list');
+        $this->assign('save_url', '/manager/event4agent_GRecord_save');
+        $this->display('manager/event_agent/event4agent_Record_add.html');
     }
 
     //保存
@@ -629,7 +631,10 @@ class Manager extends MY_Controller {
             $this->show_message('未找到信息!');
         }
         $this->assign('data', $data);
-        $this->display('manager/event_agent/event4agent_GRecord_edit.html');
+        $this->assign('return_url', '/manager/event4agent_GRecord_list');
+        $this->assign('update_url', '/manager/event4agent_GRecord_update');
+        $this->assign('cancel_url', '/manager/event4agent_GRecord_cancel');
+        $this->display('manager/event_agent/event4agent_Record_edit.html');
     }
 
     //作废
@@ -662,7 +667,9 @@ class Manager extends MY_Controller {
         $this->assign('event_type_all', $event_type_all);
         $get_agent_all = $this->c4m_model->get_agent_all(2);
         $this->assign('agent_all', $get_agent_all);
-        $this->display('manager/event_agent/event4agent_BRecord_add.html');
+        $this->assign('return_url', '/manager/event4agent_BRecord_list');
+        $this->assign('save_url', '/manager/event4agent_BRecord_save');
+        $this->display('manager/event_agent/event4agent_Record_add.html');
     }
 
     //保存
@@ -692,7 +699,10 @@ class Manager extends MY_Controller {
             $this->show_message('未找到信息!');
         }
         $this->assign('data', $data);
-        $this->display('manager/event_agent/event4agent_BRecord_edit.html');
+        $this->assign('return_url', '/manager/event4agent_BRecord_list');
+        $this->assign('update_url', '/manager/event4agent_BRecord_update');
+        $this->assign('cancel_url', '/manager/event4agent_BRecord_cancel');
+        $this->display('manager/event_agent/event4agent_Record_edit.html');
     }
 
     //作废
@@ -893,7 +903,11 @@ class Manager extends MY_Controller {
         $this->assign('event_type_all', $event_type_all);
         $get_company_all = $this->c4m_model->get_company_all(2);
         $this->assign('company_all', $get_company_all);
-        $this->display('manager/event_company/event4company_GRecord_add.html');
+        $grade_list = $this->c4m_model->get_company_grade_all();
+        $this->assign('grade_list', $grade_list);
+        $this->assign('return_url', '/manager/event4company_GRecord_list');
+        $this->assign('save_url', '/manager/event4company_GRecord_save');
+        $this->display('manager/event_company/event4company_Record_add.html');
     }
 
     //保存
@@ -923,7 +937,12 @@ class Manager extends MY_Controller {
             $this->show_message('未找到信息!');
         }
         $this->assign('data', $data);
-        $this->display('manager/event_company/event4company_GRecord_edit.html');
+        $grade_list = $this->c4m_model->get_company_grade_all();
+        $this->assign('grade_list', $grade_list);
+        $this->assign('return_url', '/manager/event4company_GRecord_list');
+        $this->assign('update_url', '/manager/event4company_GRecord_update');
+        $this->assign('cancel_url', '/manager/event4company_GRecord_cancel');
+        $this->display('manager/event_company/event4company_Record_edit.html');
     }
 
     //作废
@@ -956,7 +975,11 @@ class Manager extends MY_Controller {
         $this->assign('event_type_all', $event_type_all);
         $get_company_all = $this->c4m_model->get_company_all(2);
         $this->assign('company_all', $get_company_all);
-        $this->display('manager/event_company/event4company_BRecord_add.html');
+        $grade_list = $this->c4m_model->get_company_grade_all();
+        $this->assign('grade_list', $grade_list);
+        $this->assign('return_url', '/manager/event4company_BRecord_list');
+        $this->assign('save_url', '/manager/event4company_BRecord_save');
+        $this->display('manager/event_company/event4company_Record_add.html');
     }
 
     //保存
@@ -985,8 +1008,13 @@ class Manager extends MY_Controller {
         if(!$data){
             $this->show_message('未找到信息!');
         }
+        $grade_list = $this->c4m_model->get_company_grade_all();
+        $this->assign('grade_list', $grade_list);
         $this->assign('data', $data);
-        $this->display('manager/event_company/event4company_BRecord_edit.html');
+        $this->assign('return_url', '/manager/event4company_BRecord_list');
+        $this->assign('update_url', '/manager/event4company_BRecord_update');
+        $this->assign('cancel_url', '/manager/event4company_BRecord_cancel');
+        $this->display('manager/event_company/event4company_Record_edit.html');
     }
 
     //作废
@@ -1168,6 +1196,15 @@ class Manager extends MY_Controller {
         $pending_data = $this->manager_model->company_pending_edit($data['company_id']);
         $this->assign('data', $data);
         $this->assign('pending_data', $pending_data);
+        $icon_list = $this->c4m_model->get_company_sys_icon();
+        foreach ($icon_list as $k1 => $v1) {
+            foreach ($pending_data['icon'] as $k2 => $v2) {
+               if ($v1['icon_no'] == $v2['icon_no']) {
+                   $icon_list[$k1]['is_check_'] = 1;
+               }
+            }
+        }
+        $this->assign('icon_list', $icon_list);
         $this->assign('pass_url', "/manager/company_pass_1_submit");
         $this->assign('cancel_url', "/manager/company_pass_1_cancel");
         $this->assign('return_url_', "/manager/company_pass_1_list");
@@ -1193,9 +1230,59 @@ class Manager extends MY_Controller {
     public function company_pass_1_cancel(){
         $res = $this->manager_model->company_pass_submit(-1, $this->admin_id);
         $this->ajaxReturn($res);
-    }
+    }  
 
     /**
+     * 初审审核编辑页面
+     * @author yangyang
+     * @date 2019-12-12
+     */
+    public function company_pass_1_edit($pass_id){
+        $data = $this->manager_model->company_pass_data($pass_id);
+        if(!$data){
+            $this->show_message('未找到信息!');
+        }
+        if ($data['status'] != 1)
+            $this->show_message('年审信息不在初审审核列表!');
+        $pending_data = $this->manager_model->company_pending_edit($data['company_id']);
+        $this->assign('data', $data);
+        $this->assign('pending_data', $pending_data);
+        $this->assign('save_url', "/manager/company_pass_1_save");
+        $this->assign('return_url', "/manager/company_pass_1_list");
+        $this->display('manager/company/company_pass_edit.html');
+    }
+
+    public function company_pass_1_save(){
+        $res = $this->manager_model->company_pass_save(1, $this->admin_id);
+        $this->ajaxReturn($res);
+    }
+    
+    /**
+     * 待终审列表
+     * @author yangyang
+     * @date 2019-11-12
+     */
+    public function company_pass_2_list($page = 1){
+        $data = $this->manager_model->company_pass_list($page, array(2));
+        $base_url = "/manager/company_pass_2_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('manager/company/company_pass_2_list.html');
+    }
+
+     /**
+     * 终审审核通过
+     * @author yangyang
+     * @date 2019-11-27
+     */
+    public function company_pass_2_submit(){
+        $res = $this->manager_model->company_pass_submit(3, $this->admin_id);
+        $this->ajaxReturn($res);
+    }
+
+     /**
      * 终审审核页面
      * @author yangyang
      * @date 2019-11-27
@@ -1210,21 +1297,20 @@ class Manager extends MY_Controller {
         $pending_data = $this->manager_model->company_pending_edit($data['company_id']);
         $this->assign('data', $data);
         $this->assign('pending_data', $pending_data);
+        $icon_list = $this->c4m_model->get_company_sys_icon();
+        foreach ($icon_list as $k1 => $v1) {
+            foreach ($pending_data['icon'] as $k2 => $v2) {
+               if ($v1['icon_no'] == $v2['icon_no']) {
+                   $icon_list[$k1]['is_check_'] = 1;
+               }
+            }
+        }
+        $this->assign('icon_list', $icon_list);
         $this->assign('pass_url', "/manager/company_pass_2_submit");
         $this->assign('cancel_url', "/manager/company_pass_2_cancel");
         $this->assign('return_url_', "/manager/company_pass_2_list");
         $this->assign('pass_btn_value', "终审通过");
         $this->display('manager/company/company_pass_audit.html');
-    }
-
-     /**
-     * 终审审核通过
-     * @author yangyang
-     * @date 2019-11-27
-     */
-    public function company_pass_2_submit(){
-        $res = $this->manager_model->company_pending_submit(3);
-        $this->ajaxReturn($res);
     }
 
     /**
@@ -1238,18 +1324,28 @@ class Manager extends MY_Controller {
     }
 
     /**
-     * 待终审列表
+     * 终审审核编辑页面
      * @author yangyang
-     * @date 2019-11-12
+     * @date 2019-12-12
      */
-    public function company_pass_2_list($page = 1){
-         $data = $this->manager_model->company_pass_list($page, array(2));
-        $base_url = "/manager/company_pass_2_list/";
-        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
-        $this->assign('pager', $pager);
-        $this->assign('page', $page);
+    public function company_pass_2_edit($pass_id){
+        $data = $this->manager_model->company_pass_data($pass_id);
+        if(!$data){
+            $this->show_message('未找到信息!');
+        }
+        if ($data['status'] != 2)
+            $this->show_message('年审信息不在终审审核列表!');
+        $pending_data = $this->manager_model->company_pending_edit($data['company_id']);
         $this->assign('data', $data);
-        $this->display('manager/company/company_pass_2_list.html');
+        $this->assign('pending_data', $pending_data);
+        $this->assign('save_url', "/manager/company_pass_2_save");
+        $this->assign('return_url', "/manager/company_pass_2_list");
+        $this->display('manager/company/company_pass_edit.html');
+    }
+
+    public function company_pass_2_save(){
+        $res = $this->manager_model->company_pass_save(2, $this->admin_id);
+        $this->ajaxReturn($res);
     }
 
     /**
@@ -1267,44 +1363,21 @@ class Manager extends MY_Controller {
         $this->display('manager/company/company_pass_3_list.html');
     }
 
-    /**
-     * 编辑终审审核
-     * @author yangyang
-     * @date 2019-11-12
-     */
-     public function company_pending_3_edit($m_id){
-         $data = $this->manager_model->company_pending_edit($m_id);
+    //审核成功的详情
+    public function company_pass_3_edit($pass_id){
+        $data = $this->manager_model->company_pass_data($pass_id);
         if(!$data){
             $this->show_message('未找到信息!');
         }
-        if ($data['flag'] != 2 || !in_array($data['status'], array(3)))
-            $this->show_message('企业信息已不在终审列表!');
-         $this->assign('reload_url', '/manager/company_pending_3_list');
+        if ($data['status'] != 3)
+            $this->show_message('年审信息不在终审成功列表!');
+        $pending_data = $this->manager_model->company_pending_edit($data['company_id']);
         $this->assign('data', $data);
-        $this->display('manager/company/company_pending_3_edit.html');
+        $this->assign('pending_data', $pending_data);
+        $this->display('manager/company/company_pass_result.html');
     }
 
-    /**
-     * 保存终审信息
-     * @author yangyang
-     * @date 2019-11-12
-     */
-     public function company_pending_3_save(){
-         $res = $this->manager_model->company_audit_save(3);
-         $this->ajaxReturn($res);
-    }
-
-    /**
-     * 提交审核信息
-     * @author yangyang
-     * @date 2019-11-12
-     */
-     public function company_pass_3_submit(){
-         $res = $this->manager_model->company_audit_save(1);
-         $this->ajaxReturn($res);
-    }
-
-
+    
 
     /**
      * 审核失败列表
@@ -1321,7 +1394,25 @@ class Manager extends MY_Controller {
         $this->display('manager/company/company_pass_f1_list.html');
     }
 
+        //审核失败的详情
+    public function company_pass_f1_edit($pass_id){
+        $data = $this->manager_model->company_pass_data($pass_id);
+        if(!$data){
+            $this->show_message('未找到信息!');
+        }
+        if ($data['status'] != -1)
+            $this->show_message('年审信息不在终审失败列表!');
+        $pending_data = $this->manager_model->company_pending_edit($data['company_id']);
+        $this->assign('data', $data);
+        $this->assign('pending_data', $pending_data);
+        $this->display('manager/company/company_pass_result.html');
+    }
 
+    //重置企业密码
+    public function refresh_company_password(){
+        $res = $this->manager_model->refresh_company_password();
+        $this->ajaxReturn($res);
+    }
 
 
 }

@@ -30,17 +30,17 @@
                 <div class="row">
                     <div class="col-xs-12">
                         <!-- PAGE CONTENT BEGINS -->
-                        <form id="save_form" class="form-horizontal" role="form" action="/manager/event4agent_BRecord_save" method="post">
+                        <form id="save_form" class="form-horizontal" role="form" action="{{$save_url}}" method="post">
                             <div class="form-group">
-                                <label class="col-sm-2 control-label no-padding-right" for="agent_id"> 执业经纪人 </label>
-                                <div class="col-sm-5">
-                                   <select id="agent_id" name="agent_id" class="form-control">
-                                    <option value="">--请选择--</option>
-                                    {{foreach from=$agent_all key=k item=v}}
-                                    <option  value="{{$v.id}}">{{$v.name}}-{{$v.job_code}}</option>
+                                <label class="col-sm-2 control-label no-padding-right" for="company_id"> 企业 </label>
+                                <div class="col-sm-7">
+                                   <select id="company_id" name="company_id" class="form-control">
+                                    <option data_grade="" value="">--请选择--</option>
+                                    {{foreach from=$company_all key=k item=v}}
+                                    <option data_grade="{{$v.grade_name}}"  value="{{$v.id}}">{{$v.company_name}}-{{$v.record_num}}</option>
                                     {{/foreach}}
                                     </select>
-                                    <span class="lbl"></span>
+                                    
                                 </div>
                             </div>
                         
@@ -50,9 +50,9 @@
                                 <label class="col-sm-2 control-label no-padding-right" for="type_id"> 一级类别 </label>
                                 <div class="col-sm-5 yy_m_7">
                                     <select id="type_id" name="type_id" class="form-control">
-                                    <option value="">--请选择--</option>
+                                    <option data_change_grade='' value="">--请选择--</option>
                                     {{foreach from=$event_type_all key=k item=v}}
-                                    <option {{if $v.id == $data.type_id|default:''}}selected{{/if}} value="{{$v.id}}">{{$v.event_type_name}}</option>
+                                    <option data_change_grade='{{$v.is_change_grade}}' {{if $v.id == $data.type_id|default:''}}selected{{/if}} value="{{$v.id}}">{{$v.event_type_name}}</option>
                                     {{/foreach}}
                                     </select>
                                     <span class="lbl"></span>
@@ -60,10 +60,30 @@
                                 </div>
 
                             </div>
+                            <div id="div_show_" style="display: none;">
+                                 <div class="form-group">
+                                 <label class="col-sm-2 control-label no-padding-right"> </label>
+                                  <div class="col-sm-5 yy_m_7">
+                                       <span id="span_show_" class="help-inline col-xs-12 col-sm-7 yy_m_7"></span>
+                                  </div>
+                            </div>
+                             <div class="form-group">
+                                 <label class="col-sm-2 control-label no-padding-right">调整的等级</label>
+                                  <div class="col-sm-5">
+                                     <select id="grade_id" name="grade_no" class="form-control">
+                                    <option value="">--请选择--</option>
+                                    {{foreach from=$grade_list key=k item=v}}
+                                    <option value="{{$v.grade_no}}">{{$v.grade_name}}</option>
+                                    {{/foreach}}
+                                    </select>
+                                  </div>
+                            </div>
+                            </div>
+                           
                              <div class="space-4"></div>
                             <div class="form-group">
                                 <label class="col-sm-2 control-label no-padding-right" for="event_id"> 事件列表 </label>
-                                <div class="col-sm-5 yy_m_7">
+                                <div class="col-sm-7 yy_m_7">
                                     <select id="event_id" name="event_id" class="form-control">
                                     <option value="">--请选择--</option>
                                     </select>
@@ -106,7 +126,7 @@
 
                                 </button>
                                 &nbsp; &nbsp; &nbsp;
-                                <a href="/manager/event4agent_BRecord_list" class="btn" type="reset">
+                                <a href="{{$return_url}}" class="btn" type="reset">
 
                                     <i class="icon-undo bigger-110"></i>
 
@@ -132,13 +152,17 @@
 <link rel="stylesheet" href="/manager_statics/app/select2.min.css">
 
 <script type="text/javascript">
-    $("#agent_id").select2();
+    $("#company_id").select2();
     $("#type_id").select2();
     $("#event_id").select2();
     $("#type_id").change(function(){
         var type_id = $(this).val();
-
-        $.post('/ajax_api/get_eventByType4agent', {type_id:type_id}, function(data) {
+        var data_change_grade = $('#type_id option:selected').attr('data_change_grade');
+        if(data_change_grade == '1')
+            $("#div_show_").show();
+        else
+            $("#div_show_").hide();
+        $.post('/ajax_api/get_eventByType4company', {type_id:type_id}, function(data) {
             var data = JSON.parse(data);
             var card_list = data;
             $("#event_id").select2('destroy').empty();
@@ -155,15 +179,23 @@
     $('#type_id').change();
 
     $("#save_btn").click(function(){
-        var agent_id = $.trim($("#agent_id").val());
-        if(agent_id == "" ) {
-            layer.msg('执业经纪人不能为空', {icon: 2});
+        var company_id = $.trim($("#company_id").val());
+        if(company_id == "" ) {
+            layer.msg('企业不能为空', {icon: 2});
             return false;
         }
           var type_id = $.trim($("#type_id").val());
         if(type_id == ""){
             layer.msg('请选择类别!', {icon: 3});
             return false;
+        }
+        var data_change_grade = $('#type_id option:selected').attr('data_change_grade');
+        if(data_change_grade == '1'){
+            var type_id = $.trim($("#grade_id").val());
+            if(grade_id == ""){
+                layer.msg('请选择需要调整的企业信用等级!', {icon: 3});
+                return false;
+            }
         }
         var event_id = $.trim($("#event_id").val());
         if(event_id == ""){
@@ -188,7 +220,13 @@
         $("#save_form").submit();
     })
 
-
+$("#company_id").change(function(){
+        var data_grade = $('#company_id option:selected').attr('data_grade');
+        if(data_grade)
+            $("#span_show_").html('企业当前信用等级：' + data_grade);
+        else
+            $("#span_show_").html('');
+    });
 </script>
 </body>
 </html>

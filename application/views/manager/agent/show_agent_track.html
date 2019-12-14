@@ -9,28 +9,11 @@
         {{foreach from=$data.res_list key=key item=item}}
         <tr>
             <td style="text-align: left;font-size: small">
-                {{if $item.status==1}}
-                <span class="am-badge am-badge-success">企业添加</span>{{$item.create_date|date_format:'%Y-%m-%d'}}被<span style="font-weight: bold">{{$item.to_company_name}}</span>{{if $item.to_name!=$item.to_company_name}}{{if $item.to_name}}<span style="font-weight: bold">(现称:{{$item.to_name}})</span>{{/if}}{{/if}}添加并提交审核
-                {{/if}}
-                {{if $item.status==2}}
-                <span class="am-badge am-badge-primary">企业移除</span>{{$item.create_date|date_format:'%Y-%m-%d'}}被<span style="font-weight: bold">{{$item.from_company_name}}</span>{{if $item.from_name!=$item.from_company_name}}{{if $item.from_name}}<span style="font-weight: bold">(现称:{{$item.from_name}})</span>{{/if}}{{/if}}移除并提交审核
-                {{/if}}
-                {{if $item.status==3}}
-                <span class="am-badge am-badge-warning">自提变动</span>{{$item.create_date|date_format:'%Y-%m-%d'}}经纪人提出人事变动从
-                <span style="font-weight: bold">{{$item.from_company_name|default:'非执业状态'}}</span>{{if $item.from_name!=$item.from_company_name}}{{if $item.from_name}}<span style="font-weight: bold">(现称:{{$item.from_name}})</span>{{/if}}{{/if}}
-                转移至
+                <span class="label {{$agent_track_status_label[$item.status]}} arrowed-right">{{$agent_track_status[$item.status]}}</span>{{$item.create_date|date_format:'%Y-%m-%d'}}
+                从<span style="font-weight: bold">{{$item.from_company_name|default:'非执业状态'}}</span>{{if $item.from_name!=$item.from_company_name}}{{if $item.from_name}}<span style="font-weight: bold">(现称:{{$item.from_name}})</span>{{/if}}{{/if}}
+                到
                 <span style="font-weight: bold">{{$item.to_company_name|default:'非执业状态'}}</span>{{if $item.to_name!=$item.to_company_name}}{{if $item.to_name}}<span style="font-weight: bold">(现称:{{$item.to_name}})</span>{{/if}}{{/if}}
-                ,管理员审核通过
-                {{/if}}
-                {{if $item.status==4}}
-                <span class="am-badge am-badge-danger">备案失败</span>{{$item.create_date|date_format:'%Y-%m-%d'}}企业<span style="font-weight: bold">{{$item.from_company_name}}</span>{{if $item.from_name!=$item.from_company_name}}{{if $item.from_name}}<span style="font-weight: bold">(现称:{{$item.from_name}})</span>{{/if}}{{/if}}备案失败,经纪人自动释放
-                {{/if}}
-                {{if $item.status==5}}
-                <span class="am-badge am-badge-danger">企业作废</span>{{$item.create_date|date_format:'%Y-%m-%d'}}企业<span style="font-weight: bold">{{$item.from_company_name}}</span>{{if $item.from_name!=$item.from_company_name}}{{if $item.from_name}}<span style="font-weight: bold">(现称:{{$item.from_name}})</span>{{/if}}{{/if}}账号作废,经纪人自动释放
-                {{/if}}
-                {{if $item.status==6}}
-                <span class="am-badge am-badge-warning">管理员导入</span>{{$item.create_date|date_format:'%Y-%m-%d'}}管理员导入从<span style="font-weight: bold">{{$item.from_company_name|default:'非执业状态'}}</span>{{if $item.from_name!=$item.from_company_name}}{{if $item.from_name}}<span style="font-weight: bold">(现称:{{$item.from_name}})</span>{{/if}}{{/if}}转移至<span style="font-weight: bold">{{$item.to_company_name|default:'非执业状态'}}</span>{{if $item.to_name!=$item.to_company_name}}{{if $item.to_name}}<span style="font-weight: bold">(现称:{{$item.to_name}})</span>{{/if}}{{/if}}
-                {{/if}}
+               
             </td>
 
 

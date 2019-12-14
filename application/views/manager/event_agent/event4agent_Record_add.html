@@ -30,14 +30,14 @@
                 <div class="row">
                     <div class="col-xs-12">
                         <!-- PAGE CONTENT BEGINS -->
-                        <form id="save_form" class="form-horizontal" role="form" action="/manager/event4company_GRecord_save" method="post">
+                        <form id="save_form" class="form-horizontal" role="form" action="{{$save_url}}" method="post">
                             <div class="form-group">
-                                <label class="col-sm-2 control-label no-padding-right" for="company_id"> 企业 </label>
+                                <label class="col-sm-2 control-label no-padding-right" for="agent_id"> 执业经纪人 </label>
                                 <div class="col-sm-5">
-                                   <select id="company_id" name="company_id" class="form-control">
+                                   <select id="agent_id" name="agent_id" class="form-control">
                                     <option value="">--请选择--</option>
-                                    {{foreach from=$company_all key=k item=v}}
-                                    <option  value="{{$v.id}}">{{$v.company_name}}-{{$v.record_num}}</option>
+                                    {{foreach from=$agent_all key=k item=v}}
+                                    <option  value="{{$v.id}}">{{$v.name}}-{{$v.job_code}}(当前{{$v.score}}分)</option>
                                     {{/foreach}}
                                     </select>
                                     <span class="lbl"></span>
@@ -71,6 +71,15 @@
 
                                 </div>
 
+                            </div>
+                             <div class="space-4"></div>
+                             <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="score"> 事件分数 </label>
+                                <div class="col-sm-5">
+                                     <input type="text" id="score" name="score" required="required" maxlength="2" class="rcol-xs-10 col-sm-6 js4phone" value="">
+                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                   
+                                </div>
                             </div>
                             <div class="space-4"></div>
                             <div class="form-group">
@@ -106,7 +115,7 @@
 
                                 </button>
                                 &nbsp; &nbsp; &nbsp;
-                                <a href="/manager/event4company_GRecord_list" class="btn" type="reset">
+                                <a href="{{$return_url}}" class="btn" type="reset">
 
                                     <i class="icon-undo bigger-110"></i>
 
@@ -132,19 +141,19 @@
 <link rel="stylesheet" href="/manager_statics/app/select2.min.css">
 
 <script type="text/javascript">
-    $("#company_id").select2();
+    $("#agent_id").select2();
     $("#type_id").select2();
     $("#event_id").select2();
     $("#type_id").change(function(){
         var type_id = $(this).val();
 
-        $.post('/ajax_api/get_eventByType4company', {type_id:type_id}, function(data) {
+        $.post('/ajax_api/get_eventByType4agent', {type_id:type_id}, function(data) {
             var data = JSON.parse(data);
             var card_list = data;
             $("#event_id").select2('destroy').empty();
             var html = '<option value="">--请选择--</option>';
             for(var i=0 ;i< card_list.length; i++){
-                html += "<option value='" + card_list[i]['id'] + "'>" + card_list[i]['event_name'] + "</option>"
+                html += "<option data_score = '" + card_list[i]['score'] + "' value='" + card_list[i]['id'] + "'>" + card_list[i]['event_name'] + "</option>"
             }
             $("#event_id").html(html);
             $("#event_id").select2();
@@ -152,12 +161,17 @@
 
         });
     });
+
+    $("#event_id").change(function(){
+        var data_score = $('#event_id option:selected').attr('data_score');
+        $("#score").val(data_score);
+    });
     $('#type_id').change();
 
     $("#save_btn").click(function(){
-        var company_id = $.trim($("#company_id").val());
-        if(company_id == "" ) {
-            layer.msg('企业不能为空', {icon: 2});
+        var agent_id = $.trim($("#agent_id").val());
+        if(agent_id == "" ) {
+            layer.msg('执业经纪人不能为空', {icon: 2});
             return false;
         }
           var type_id = $.trim($("#type_id").val());
@@ -168,6 +182,11 @@
         var event_id = $.trim($("#event_id").val());
         if(event_id == ""){
             layer.msg('请选择事件!', {icon: 3});
+            return false;
+        }
+         var score = $.trim($("#score").val());
+        if(score == ""){
+            layer.msg('事件分数不能为空!', {icon: 3});
             return false;
         }
         var event_date = $.trim($("#event_date").val());

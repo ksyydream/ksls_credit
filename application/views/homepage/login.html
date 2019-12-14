@@ -1,0 +1,63 @@
+<!doctype html>
+<html class="no-js">
+<head>
+  {{include file='homepage/public/head.html'}}
+</head>
+<body>
+
+
+
+<div class="login_main">
+    <div class="main1200">
+     <img src="/web_assets/i/login_txt.png">
+     
+     <div class="login-div">
+                <ul class="slide01-control" id ="slide01-control">
+                    <li><a href="">公司登录</a></li>
+                    <li><a href="">经纪人登录</a></li>
+                </ul>
+                <div id="slide01" class="tab">
+                    <div class="content message" style="display:block">
+                        <form>
+                           <ul class="login-ul">
+                              <li class="li-input"><em class="ipt-icon"></em><input type="text"  name="username" class="login-txt" placeholder="请输入企业税号"></li>
+                              <li class="li-input"><em class="ipt-icon icon-lock"></em><input type="text" name="userpwd" class="login-txt" placeholder="请输入登录密码"></li>
+                              <li class="li-input"><em class="ipt-icon icon-confirm"></em><input type="text" name="userconfirm" class="login-txt login-confirm" placeholder="请输入验证码">
+                                <span class="confirm-pic"><img src="/web_assets/i/confirm.jpg"></span></li>
+                           </ul>  
+                            <a href="" class="login-btn">登  录</a>
+                        </form>
+                    </div>
+                    <div class="content">
+                           <form>
+                           <ul class="login-ul">
+                              <li class="li-input"><em class="ipt-icon"></em><input type="text"  name="username" class="login-txt" placeholder="请输入经纪人证书号"></li>
+                              <li class="li-input"><em class="ipt-icon icon-lock"></em><input type="text" name="userpwd" class="login-txt" placeholder="请输入登录密码"></li>
+                              <li class="li-input"><em class="ipt-icon icon-confirm"></em><input type="text" name="userconfirm" class="login-txt login-confirm" placeholder="请输入验证码">
+                                <span class="confirm-pic"><img src="/web_assets/i/confirm.jpg"></span></li>
+                           </ul>  
+                            <a href="" class="login-btn">登  录</a>
+                        </form>
+                    </div>
+                </div>
+    </div>
+</div>
+
+
+
+
+{{include file='homepage/public/foot.html'}}
+<script type="text/javascript">
+$(function(){
+      new Slide({
+            target: $( '#slide01 .content' ),
+            control: $( '#slide01-control li' ),
+            type:"click"
+        });
+
+})
+
+
+</script>
+</body>
+</html>

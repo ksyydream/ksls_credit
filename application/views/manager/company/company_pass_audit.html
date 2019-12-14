@@ -41,6 +41,7 @@
                 <!-- /section:settings.box -->
                 <div class="row">
                     <div class="col-xs-12">
+                        <div class="alert alert-danger">页面中的审核信息在终审成功后会自动覆盖企业真实信息，其他信息均为实时信息。</div>
                         <form id="cancel_form" method="post" action="{{$cancel_url}}">
                             <input type="hidden" name="pass_id" value="{{$data.id|default:''}}">
                          </form>
@@ -71,7 +72,7 @@
                                         <div id="faq-tab-1" class="tab-pane fade in active">
                                              <h4 class="blue">
                                                 <i class="green ace-icon fa fa-list bigger-110"></i>
-                                               企业信息
+                                               企业信息(审核信息)
                                             </h4>
                                             <div class="row">
                                                         <div class="col-sm-6">
@@ -89,6 +90,14 @@
 
                                                                             <div class="profile-info-value {{if $data.company_name|default:'' != $pending_data.company_name|default:''}} yy_change{{/if}}">
                                                                                 <span>{{$data.company_name|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 工商注册号 </div>
+
+                                                                            <div class="profile-info-value {{if $data.business_no|default:'' != $pending_data.business_no|default:''}} yy_change{{/if}}">
+                                                                                <span>{{$data.business_no|default:''}}</span>
                                                                             </div>
                                                                         </div>
 
@@ -193,6 +202,14 @@
                                                                         </div>
 
                                                                         <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 工商注册号 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$pending_data.business_no|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
                                                                             <div class="profile-info-name"> 注册地址 </div>
 
                                                                             <div class="profile-info-value">
@@ -260,7 +277,7 @@
                                                                     <div class="space-4"></div>
                                                                     <ul class="ace-thumbnails clearfix">
                                                                         {{if !empty($pending_data.img) }}
-                                                                                {{foreach from=$data.img key=k item=item}}
+                                                                                {{foreach from=$pending_data.img key=k item=item}}
                                                                         <li>
                                                                             <a class="example-image-link" href="{{$item.img_path}}" data-lightbox="example_num-2" data-title="原始资料">
                                                                                 <img width="150" height="150" alt="150x150" src="{{$item.img_path}}?imageView2/0/w/200/h/200/q/75|imageslim" />
@@ -319,53 +336,81 @@
                                 </tbody>
                             </table>
                                                     </div>
-                                             <div class="form-group">
-                                           
-                                        <div class="col-sm-9">
-                                          
-                                            </div>
-                                        </div>
-                          
-                                         
-                                        </div>
+                                            
                         
                                     </div>
                                     <div class="hr hr32 hr-dotted"></div>
-                                    <form class="form-horizontal">
-                                        <div class="space-4"></div>
-                                            <h4 class="blue">
+                                    <h4 class="blue">
                                                 <i class="green ace-icon fa fa-list bigger-110"></i>
                                                状态信息
                                             </h4>
-                                             <div class="space-4"></div>
-                                    <div class="form-group">
-                                        <label class="col-sm-1 control-label no-padding-right"> 备案号 </label>
-                                            <div class="col-sm-9 yy_m_7">
-                                                        {{$pending_data.record_num|default:''}}
-                                                    </div>
-                                         </div>
-                                    <div class="space-4"></div>
-                                     <div class="form-group">
-                                        <label class="col-sm-1 control-label no-padding-right"> 信用分 </label>
-                                            <div class="col-sm-9 yy_m_7">
-                                                        {{$pending_data.total_score|default:''}}(在终审时,会重新计算)
-                                                    </div>
-                                         </div>
-                                    <div class="space-4"></div>
-                                    <div class="form-group">
-                                        <label class="col-sm-1 control-label no-padding-right"> 审核状态 </label>
-                                            <div class="col-sm-9 yy_m_7">
-                                            {{if $data.status == 3}}<span class="label label-xlg label-success">终审成功</span>{{/if}}
+                                            <div class="col-xs-11">
+                                       <div class="profile-user-info profile-user-info-striped">
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 备案号 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$pending_data.record_num|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                         <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 信用分 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$pending_data.total_score|default:''}}(在终审时,会重新计算)</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                         <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 审核状态 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                               {{if $data.status == 3}}<span class="label label-xlg label-success">终审成功</span>{{/if}}
                                             {{if $data.status == 1}}<span class="label label-xlg label-grey">待初审</span>{{/if}}
                                             {{if $data.status == 2}}<span class="label label-xlg label-primary">待终审</span>{{/if}}
                                             {{if $data.status == -1}}<span class="label label-xlg label-warning">审核失败</span>{{/if}}
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 分支机构数量 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$pending_data.fz_num|default:'0'}}</span>
+                                                                            </div>
+                                                                        </div>
+                                                        </div>
                                                     </div>
-                                         </div>
-                                    </form>
+                                        <div class="col-xs-11">
+                                                        <div class="widget-box widget-color-dark">
+                                           
+
+                                                <div class="widget-body">
+                                                    <div class="widget-main">
+                                                        <ul class="list-unstyled spaced2">
+                                                            {{foreach from=$icon_list key=k item=v}}
+                                                            <li>
+                                                            <i class="ace-icon fa {{if $v.is_check_ == 1}}fa-check green{{else}}fa-times red{{/if}}"></i>
+                                                            {{$v.name}} ({{if $v.type == -1}}-{{/if}}{{$v.score}}分)
+                                                            </li>
+                                    
+                                                    {{/foreach}}
+                                                            
+                                                    </ul>
+
+                                                
+                                                    
+                                                </div>
+
+                                                
+                                            </div>
+
+                                
+                                        </div>
                                 </div>
-
                       
-
+                           <hr />
                             <div class="col-md-offset-2 col-md-9">
                                 <button id="pass_btn" class="btn btn-info" type="button">
 
