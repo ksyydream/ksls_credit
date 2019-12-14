@@ -1,0 +1,415 @@
+{{include file='manager/public/head.html'}}
+<body class="no-skin">
+{{include file='manager/public/header.html'}}
+<link rel="stylesheet" href="/manager_statics/app/lightbox.min.css?v3"/>
+
+<div class="main-container" id="main-container">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('main-container', 'fixed')
+        } catch (e) {
+        }
+    </script>
+    <style>
+        .yy_ul_ li{
+            list-style: none;
+            float: left;
+            position: relative;
+            margin-bottom: 10px;
+            margin-right: 10px;
+        }
+        .lb-nav{display: none}
+        pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+        .string { color: green; }
+        .number { color: darkorange; }
+        .boolean { color: blue; }
+        .null { color: magenta; }
+        .key { color: red; }
+
+         .yy_change{color: red}
+    </style>
+    {{include file='manager/public/sidebar.html'}}
+    <div class="main-content">
+        <div class="main-content-inner">
+            <!-- #section:basics/content.breadcrumbs -->
+            {{include file='manager/public/breadcrumbs.html'}}
+
+            <!-- /section:basics/content.breadcrumbs -->
+            <div class="page-content">
+                {{include file='manager/public/set.html'}}
+
+                <!-- /section:settings.box -->
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="alert alert-info">以下信息除'备案号'外，均为审核结束时的历史信息</div>
+                        
+                
+                        <!-- PAGE CONTENT BEGINS -->
+                        <!--<form id="save_form" class="form-horizontal" role="form" action="/manager/" method="post">-->
+                           <div class="tabbable">
+                                    <ul class="nav nav-tabs padding-18 tab-size-bigger" id="myTab">
+                                        <li class="active">
+                                            <a data-toggle="tab" href="#faq-tab-1">
+                                                <i class="blue ace-icon fa fa-question-circle bigger-120"></i>
+                                                企业基本信息
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a data-toggle="tab" href="#faq-tab-2">
+                                                <i class="green ace-icon fa fa-user bigger-120"></i>
+                                                执业经纪人
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a data-toggle="tab" href="#faq-tab-3">
+                                                <i class="red ace-icon fa fa-archive bigger-120"></i>
+                                                审核结果
+                                            </a>
+                                        </li>
+                                    </ul>
+
+                                    <div class="tab-content no-border padding-24">
+                                        <div id="faq-tab-1" class="tab-pane fade in active">
+                                             <h4 class="blue">
+                                                <i class="green ace-icon fa fa-list bigger-110"></i>
+                                               企业信息
+                                            </h4>
+                                            <div class="row">
+                                                        <div class="col-sm-11">
+                                                            
+                                                            <div>
+                                                                 <div class="space-4"></div>
+                                                                 <div class="profile-user-info profile-user-info-striped">
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 企业名称 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$data.company_name|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 商业注册号 </div>
+
+                                                                            <div class="profile-info-value">
+                                                            
+                                                                                <span>{{$data.business_no|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 注册地址 </div>
+
+                                                                            <div class="profile-info-value">
+                                                            
+                                                                                <span>{{$data.register_path|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 经营地址 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$data.business_path|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 备案号 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$pending_data.record_num|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 发证日期 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$data.issuing_date|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 企业电话 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$data.company_phone|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 负责人姓名 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$data.director_name|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 负责人电话 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$data.director_phone|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 法人姓名 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$data.legal_name|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 法人电话 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$data.legal_phone|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 分支机构数量 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$data.fz_num|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 上一年是否缺席 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{if $data.qx_num > 0}}是{{else}}否{{/if}}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="space-4"></div>
+                                                                    <ul class="ace-thumbnails clearfix">
+                                                                        {{if !empty($data.img) }}
+                                                                                {{foreach from=$data.img key=k item=item}}
+                                                                                 <li>
+                                                                           <a class="example-image-link" href="{{$item.img_path}}" data-lightbox="example-set example_num1" data-title="审核资料">
+                                                                                <img width="150" height="150" data-lightbox="example_num1" alt="150x150" src="{{$item.img_path}}?imageView2/0/w/200/h/200/q/75|imageslim" />
+                                                                            </a>
+                                                                        </li>
+                           
+                                                                                    {{/foreach}}
+                                                                        {{/if}}
+                                                                       
+                                                                    </ul>
+                                                                     <div class="col-xs-11">
+                                                                         <h4 class="blue">
+                                                <i class="green ace-icon fa fa-list bigger-110"></i>
+                                               信用指标信息
+                                            </h4>        
+                                                                         {{if !empty($data.icon) }}
+                                                        <div class="widget-box widget-color-dark">
+                                           
+                                                          
+                                                <div class="widget-body">
+                                                    <div class="widget-main">
+                                                        <ul class="list-unstyled spaced2">
+                                                            {{foreach from=$data.icon key=k item=v}}
+                                                            <li>
+                                                         <i class="ace-icon fa fa-check green"></i>
+                                                            {{$v.name}}({{$v.score}}分)
+                                                            </li>
+                                    
+                                                    {{/foreach}}
+                                                            
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        
+                                        </div>{{/if}}
+                                </div>
+                                                            </div>
+                                                        </div><!-- /.col -->
+
+                                                
+                                                    </div><!-- /.row -->
+                            
+                                        </div>
+
+                                        <div id="faq-tab-2" class="tab-pane fade">
+                                            <h4 class="blue">
+                                                <i class="green ace-icon fa fa-user bigger-110"></i>
+                                                执业经纪人
+                                            </h4>
+
+                                            <div class="space-8"></div>
+                                             <div class="row">
+                                                                  <table class="table table-striped table-bordered">
+                                                    <thead>
+
+                                <tr>
+
+                                    <th style="width:15%;">姓名</th>
+                                    <th style="width:25%;">执业证号</th>
+
+                                    <th style="width:25%;">身份证号</th>
+                                    <th style="width:15%;">联系电话</th>
+                                    <th style="width:10%;">网签</th>
+                                </tr>
+
+                                </thead>
+
+                                <tbody>
+                                    {{if !empty($data.agent) }}
+                            {{foreach from=$data.agent item=item}}
+                            <tr>
+                                        <td>{{$item.name}}</td>
+                                        <td>{{$item.job_code}}</td>
+                                          <td>{{$item.card}}</td>
+                                            <td>{{$item.phone}}</td>
+                                            <td>
+                                                <input type="hidden" name="setwq[]" value="{{if $item.wq == 2}}2{{else}}1{{/if}}">
+                                                <input readonly="readonly" disabled="disabled" name="ckwq[]" {{if $item.wq == 2}} checked{{/if}} type="checkbox" />
+                                            </td>
+                                    </tr>
+                            {{/foreach}}
+                            {{/if}}
+                                  
+                                </tbody>
+                            </table>
+                                                    </div>
+                                            
+                        
+                                    </div>
+                                     <div id="faq-tab-3" class="tab-pane fade">
+                                            <h4 class="blue">
+                                                <i class="red ace-icon fa fa-archive bigger-110"></i>
+                                                审核结果
+                                            </h4>
+                                             <div class="row">
+                                                        <div class="col-sm-11">
+                                                            
+                                                        
+                                                                 <div class="space-4"></div>
+                                                                 <div class="profile-user-info profile-user-info-striped">
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 审核结果 </div>
+
+                                                                            <div class="profile-info-value">
+                                            {{if $data.status == 3}}<span class="label label-xlg label-success">终审成功</span>{{/if}}
+                                            {{if $data.status == 1}}<span class="label label-xlg label-grey">待初审</span>{{/if}}
+                                            {{if $data.status == 2}}<span class="label label-xlg label-primary">待终审</span>{{/if}}
+                                            {{if $data.status == -1}}<span class="label label-xlg label-warning">审核失败</span>{{/if}}
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 提交时间 </div>
+
+                                                                            <div class="profile-info-value">
+                                                            
+                                                                                <span>{{$data.tj_date|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 初审时间 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                               <span>{{$data.cs_date|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 终审时间 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$data.s_date|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 信用分 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$data.total_score|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 信用等级 </div>
+                                                                                    <span>{{$data.grade_name|default:''}}</span>
+                                                                            <div class="profile-info-value">
+                                                                                <span></span>
+                                                                            </div>
+                                                                        </div>
+                                                                
+                                                                    </div>
+                                                                  </div>
+                                                              </div>
+                                                              <h4 class="blue">
+                                                <i class="red ace-icon fa fa-archive bigger-110"></i>
+                                                分数简述
+                                            </h4>
+                                                             <div class="row">
+                                                                <div class="col-sm-10">
+                                                                    {{if !empty($data.score_log) }}
+                                                                    <table class="table table-bordered table-striped">
+                                                                    <tbody>
+
+                                                                {{foreach from=$data.score_log item=item}}
+                                                                    <tr>
+                                                                    <td>{{$item.msg}}</td>
+                                                                    </tr>
+                                                                    {{/foreach}}
+                                                                    
+                                                                     
+                                                                    </tbody>
+                                                                </table>
+                                                                {{else}}
+                                                                <div class="alert alert-danger">此审核信息未结算分数，可能存在同一年较早的审核记录</div>
+                                                                {{/if}}
+                                                                </div>
+                                                                 
+
+                                                              </div>
+                                                              </div>    
+                                                                     
+                                </div>
+                                    <div class="hr hr32 hr-dotted"></div>
+                                       
+                      
+                           <hr />
+                            <div class="col-md-offset-2 col-md-9">
+                               
+                              
+                                <a href="/manager/company_apply_list" class="btn" type="reset">
+
+                                    <i class="icon-undo bigger-110"></i>
+
+                                    返 回
+
+                                </a>
+                          
+                               
+                            </div>
+                        <!--</form>-->
+                        <!-- PAGE CONTENT ENDS -->
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.page-content -->
+        </div>
+    </div><!-- /.main-content -->
+    {{include file='manager/public/footer.html'}}
+
+</div><!-- /.main-container -->
+
+{{include file='manager/public/footerjs.html'}}
+<!-- inline scripts related to this page -->
+
+<script type="text/javascript" src="/manager_statics/app/lightbox-plus-jquery.min.js?v2"></script>
+<script type="text/javascript">
+
+
+ 
+</script>
+</body>
+</html>
