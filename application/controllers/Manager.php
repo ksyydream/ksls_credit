@@ -408,6 +408,12 @@ class Manager extends MY_Controller {
         $this->display('manager/agent/agent_view.html');
     }
 
+    //重置经纪人密码
+    public function refresh_agent_password(){
+        $res = $this->manager_model->refresh_agent_password();
+        $this->ajaxReturn($res);
+    }
+
     /**
      *********************************************************************************************
      * 经纪人事件

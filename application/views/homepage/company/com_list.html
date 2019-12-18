@@ -1,0 +1,115 @@
+<!doctype html>
+<html class="no-js">
+<head>
+ {{include file='homepage/public/head.html'}}
+</head>
+<body class="page">
+   <div class="page-hd">
+      <div class="main1200">
+           <a href="index.html" class="logo"></a>
+            <a href="" class="login-btn">登录</a>
+      </div>
+   </div> 
+<div class="page-bd">
+    <div class="main1200">
+      <div class="search_box">
+          <form id="search_company_form" method="get" action="/home/company_list">
+           <div class="s-ipt">
+            <input type="search" placeholder="请输入公司名/税号/法定代表人姓名进行查询" value="{{$data.c_k|default:''}}" name="c_k" id="c_k" class="search_ipt" />
+            <a href="javascript:" id="search_btn" class="search-btn"></a>
+          </div>
+        </form>
+      </div>
+    <div class="company-info">
+      <p class="result-p">共计搜索到<i class="num">{{$data.total_rows|default:'0'}}</i>家符合条件的公司</p>
+       {{foreach from=$data.res_list key=k item=v}}
+ <a href="" class="result-alink">
+        <dl class="res-dl">
+          <dt>{{$v.company_name}}</dt>
+          <dd>
+            <p>社会统一信用代码：{{$v.business_no}}</p>
+            <p>法定代表人：{{$v.legal_name}}</p>
+            <p>备案号：{{$v.record_num}}</p>
+            <p>信用等级：{{$v.b_grade_name_}}</p>
+          </dd>
+      </dl>  
+     </a>
+        {{/foreach}}
+     
+   
+     <div class="clear"></div>
+     <div id="company_page">
+            {{$pager}}
+       </div>
+    </div>
+
+
+
+      </div>
+   </div>
+
+       </div>
+  </div>
+</div>
+
+
+
+<!-- 以上页面内容 开发时删除 -->
+
+
+{{include file='homepage/public/foot.html'}}
+<script>
+
+$(function(){
+  /**
+     * 模拟select
+     **/
+    $(".select-header").click(function(){
+        $(this).parent().siblings(".select-box").find(".select-content").slideUp("fast");
+        if($(this).siblings(".select-content").is(":hidden")){
+            $(this).addClass("select-arrow");
+            $(this).siblings(".select-content").slideDown("fast");
+            var evt =  new Object;
+            if ( typeof(window.event) == "undefined" ){//如果是火狐浏览器
+                evt = arguments.callee.caller.arguments[0];
+            }else{
+                evt = event || window.event;
+            }
+            evt.cancelBubble = true;
+        }else{
+            $(this).removeClass("select-arrow");
+            $(this).siblings(".select-content").slideUp("fast");
+      //去除事件冒泡
+            var evt =  new Object;
+            if ( typeof(window.event) == "undefined" ){//如果是火狐浏览器
+                evt = arguments.callee.caller.arguments[0];
+            }else{
+                evt = event || window.event;
+            }
+            evt.cancelBubble = true;
+        }
+    });
+  $(document).click(function(){
+        $(".select-header").removeClass("select-arrow");
+        $(".select-content").slideUp("fast");
+    });
+    $(".select-content li").on("click",function(){
+        $(this).parent().siblings(".select-header").removeClass("select-arrow");
+        $(this).parent().siblings(".select-header").text($(this).text()).end().slideUp("fast");
+    });
+    $(".select-content li").hover(function(){
+        $(this).css("background-color","#cfcfcf");
+    },function(){
+        $(this).css("background-color","#fff");
+    });
+
+    $("#search_btn").click(function(){
+        $("#search_company_form").submit();
+      })
+
+});
+
+
+</script>
+</body>
+</html>

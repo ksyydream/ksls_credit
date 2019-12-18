@@ -539,6 +539,16 @@ class Manager_model extends MY_Model
         return $this->fun_success('保存成功!');
     }
 
+     //重置经纪人密码
+    public function refresh_agent_password(){
+        $agent_id = $this->input->post('id');
+        $job_code = $this->input->post('job_code');
+        if(!$agent_id || !$job_code)
+            return $this->fun_fail('信息缺失!');
+        $this->db->where(array('id' => $agent_id, 'job_code' => $job_code))->update('agent', array('pwd' => sha1('666666')));
+        return $this->fun_success('重置成功!');
+    }
+
     /**
      *********************************************************************************************
      * 经纪人事件
@@ -1478,10 +1488,22 @@ class Manager_model extends MY_Model
             'modify_user' => $admin_id,
             'modify_date'=>date('Y-m-d H:i:s',time())
         );
+        if(!$data['annual_year'] || !$data['begin_date'] || !$data['end_date'])
+            return $this->fun_fail('缺失信息！');
+        try {
+            $end_year_ =  date('Y', strtotime($data['end_date']));
+            $begin_year_ =  date('Y', strtotime($data['begin_date']));
+            if($data['annual_year'] != $end_year_ || $data['annual_year'] != $begin_year_)
+                return $this->fun_fail('年审窗口期只可在年审年份内！');
+        } catch (Exception $e) {
+            return $this->fun_fail('信息异常！');
+        }
         if($term_id = $this->input->post('id')){
             $detail =  $this->readByID('term', 'id', $term_id);
             if (!$detail)
                 return $this->fun_fail('年审时间 已不存在');
+            if(strtotime($detail['end_date']) < strtotime (date("y-m-d h:i:s")))
+                return $this->fun_fail('窗口期已过期，不可修改！');
             $check_pass_ = $this->db->select('id')->from('company_pass')->where('annual_date', $detail['annual_year'])->get()->row_array();
             if ($check_pass_ && $data['annual_year'] != $detail['annual_year']){
                 return $this->fun_fail('已有年审提交，不可改年份');
@@ -1636,126 +1658,6 @@ class Manager_model extends MY_Model
         return $detail;
     }
 
-    /**
-    * 企业审核信息保存【重要】
-    * 通过变更的 审核状态自动判断是否保存 company_pass
-    * @param $status 需要变更的审核状态
-     * 把status 修改为 1代表等待初审，2代表等待终审，3代表审核通过，-1代表审核失败
-    * 
-    */
-    public function company_audit_save($status){
-        die('');
-        $this->load->model('common4manager_model', 'c4m_model');
-        $data = array(
-            'company_name'=>trim($this->input->post('company_name')),
-            'register_path'=>trim($this->input->post('register_path')),
-            'business_path'=>trim($this->input->post('business_path')),
-            'issuing_date'=>trim($this->input->post('issuing_date')),
-            'company_phone'=>trim($this->input->post('company_phone')),
-            'director_name'=>trim($this->input->post('director_name')),
-            'director_phone'=>trim($this->input->post('director_phone')),
-            'legal_name'=>trim($this->input->post('legal_name')),
-            'legal_phone'=>trim($this->input->post('legal_phone')),
-            'mdate'=>date('Y-m-d H:i:s',time()),
-            'tj_date'=>date('Y-m-d H:i:s',time()),
-            'status' => $status,    
-        );
-        //先判断变更的状态是否正确
-        if (!in_array($status, array(1, 2, 3, -1)))
-            return $this->fun_fail('审核状态不规范!');
-        //判断企业信息是否符合变更条件
-        $company_id = $this->input->post('company_id');
-        if($company_id){
-             $company_info_ = $this->db->where('id', $company_id)->from('company_pending')->get()->row_array();
-             if (!$company_info_) {
-                 return $this->fun_fail('企业信息丢失!');
-             }
-             if ($company_info_['flag'] != 2) {
-                 return $this->fun_fail('企业备案状态异常!');
-             }
-             //如果审核状态相同，就只是编辑
-             if ($status != $company_info_['status']) {
-                 $check_status_change4company_ = $this->c4m_model->check_status_change4company($company_info_['status'], $status);
-                 if ($check_status_change4company_['status'] != 1) {
-                     return $this->fun_fail($check_status_change4company_['msg']);
-                 }
-             }else{
-                //如果只是编辑 就不修改提交时间
-                unset($data['tj_date']);
-             }
-        }else{
-            return $this->fun_fail('请求异常!');
-        }
-        
-        
-        if(!$data['company_name'] || !$data['register_path'] || !$data['business_path'] || 
-            !$data['issuing_date'] || !$data['company_phone'] || !$data['director_name'] || 
-            !$data['director_phone'] || !$data['legal_name'] || !$data['legal_phone']){
-            return $this->fun_fail('缺少必要信息!');
-        }
-        //检查企业名称是否唯一
-        $check_company_name_ = $this->c4m_model->check_company_name($data['company_name'], $company_id);
-        if($check_company_name_['status'] != 1)
-            return $this->fun_fail($check_company_name_['msg']);
-        //检查执业证号是否可用或者重复
-        $code_ = $this->input->post('agent_job_code');
-        $check_repeat_agent_ = $this->c4m_model->check_repeat_agent($company_id, $code_);
-        if($check_repeat_agent_['status'] != 1)
-            return $this->fun_fail($check_repeat_agent_['msg']);
-
-        $save4track_old = array();
-        $this->db->trans_start();//--------开始事务
-        $this->db->where('id', $company_id)->update('company_pending', $data);
-        $this->db->select('a.*')->from('agent a');
-        $this->db->where('a.company_id',$company_id);
-        $save4track_old = $this->db->get()->result_array();
-        $where_arr_ = array('id' => $company_id, 'flag' => 2);
-        $this->db->where($where_arr_)->update('company_pending', $data);
-        //处理经纪人
-        $this->db->where('company_id',$company_id)->update('agent',array('company_id'=>-1));
-        $arr_agent_job_code = $this->input->post('agent_job_code');
-        $arr_agent_wq = $this->input->post('setwq');
-        $arr_agent_company_id = array(
-            'company_id' => $company_id,
-        );
-        if ($arr_agent_job_code && is_array($arr_agent_job_code)) {
-             foreach($arr_agent_job_code as $idx => $pic) {
-            $update_data4agent_ = $arr_agent_company_id;
-            $update_data4agent_['wq'] = $arr_agent_wq[$idx];
-            $this->db->where('job_code',$pic)->where('flag',2)->update('agent', $update_data4agent_);
-            }
-        }
-       
-        //处理图片
-        $this->db->delete('company_pending_img', array('company_id' => $company_id));
-        $pic_short = $this->input->post('pic_short');
-        if($pic_short){
-            foreach($pic_short as $idx => $pic) {
-                $company_pic = array(
-                    'company_id' => $company_id,
-                    'img_path' => $pic,
-                    'm_img_path' => $pic . '?imageView2/0/w/200/h/200/q/75|imageslim'
-                );
-                $this->db->insert('company_pending_img', $company_pic);
-            }
-        }
-        $this->save_company_total_score($company_id);
-        if ($status == 3)
-            $this->save_pass_company($company_id);
-        $this->db->trans_complete();//------结束事务
-        if ($this->db->trans_status() === FALSE) {
-           return $this->fun_fail('保存失败!');
-        } else {
-            $this->db->select('a.*')->from('agent a');
-            $this->db->where('a.company_id',$company_id);
-            $save4track_new = $this->db->get()->result_array();
-            $this->save_agent_track($company_id, $data, $save4track_old, $save4track_new);
-            $this->save_log_company($company_id);
-            return $this->fun_success('保存成功!');
-        }
-        
-    }
-
     //企业备案信息保存【重要】对company_pending做处理,理论上只修改信息,不会影响 备案/审核/信用等级 等状态.
     public function company_pending_save(){
         $data = array(
@@ -1847,7 +1749,7 @@ class Manager_model extends MY_Model
             $company_id = $this->db->insert_id();
         }
         //处理经纪人
-        $this->db->where('company_id',$company_id)->update('agent',array('company_id' => -1));
+        $this->db->where('company_id',$company_id)->update('agent',array('company_id' => -1, 'wq' => 1));
         $arr_agent_job_code = $this->input->post('agent_job_code');
         $arr_agent_wq = $this->input->post('setwq');
         $arr_agent_company_id = array(
@@ -2110,8 +2012,12 @@ class Manager_model extends MY_Model
             if($pass_icon)
                 $this->db->insert_batch('company_pass_icon',$pass_icon);
         }
+        $temp_update_data = array('status'=>$status);
+        if($status == 3 || $status == -1)
+            $temp_update_data['qx_num'] = 0;
         //每次审核后都同步一下company_pending 的status 栏位，没有实际意义，只做暂存，
-         $this->db->where('id', $company_id)->update('company_pending', array('status', $status));
+        $this->db->where('id', $company_id)->update('company_pending', $temp_update_data);
+        
 
         $this->db->trans_complete();//------结束事务
         if ($this->db->trans_status() === FALSE) {
@@ -2270,6 +2176,7 @@ class Manager_model extends MY_Model
         if($agent_ids_){
             $data_insert = array();
             foreach($agent_ids_ as $k_ => $v_){
+                //DBY 重要 发生人事变动 ，经纪人所申请的人事申请自动作废
                 $data_insert[] = array(
                     'to_company_id'         =>      null,
                     'to_company_name'       =>      null,

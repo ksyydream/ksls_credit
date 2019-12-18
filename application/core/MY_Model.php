@@ -13,6 +13,7 @@ class MY_Model extends CI_Model{
     public $model_success = array('status' => 1, 'msg' => '', 'result' => array());
     public $model_fail = array('status' => -1, 'msg' => '操作失败!', 'result' => array());
     public $limit = 15;
+    public $home_limit = 12;
     protected $db_error = "数据操作发生错误，请稍后再试-_-!";
     /**
      * 构造函数
@@ -435,63 +436,6 @@ class MY_Model extends CI_Model{
         return $res;
     }
 
-    //同盾获取征信信息
-    public function get_tongdun_info($account_name = '', $id_number = '', $accout_mobile = ''){
-        $user_id = $this->session->userdata('wx_user_id');
-        $this->db->set('use_td_times','use_td_times + 1',false);
-        $this->db->where('user_id', $user_id);
-        $this->db->update('users');
-        $log_ = array(
-            'account_name' => $account_name,
-            'id_number' => $id_number,
-            'account_mobile' => $accout_mobile,
-            'user_id' => $user_id,
-            'add_time' => time()
-        );
-        //先查看是否有缓存数据
-        $tongdun_info = $this->db->select()->from('tongdun_info')->where(array('id_number' => $id_number))->order_by('add_time', 'desc')->limit(1)->get()->row_array();
-        if($tongdun_info){
-            $td_deadline_ = $this->config->item('td_deadline'); //缓存数据使用限期,这里是秒为单位的
-            //判断是否超过使用限期,如果没有超过,就直接使用
-            if($tongdun_info['add_time'] + $td_deadline_ > time()){
-                $log_['td_id'] = $tongdun_info['id'];
-                $this->db->insert('tongdun_log', $log_);
-                return $this->fun_success('获取成功', $tongdun_info);
-            }
-        }
-        $param = array(
-            'biz_code' => 'loan',
-            'account_name' => $account_name,
-            'id_number' => $id_number,
-            'account_mobile' => $accout_mobile
-        );
-        $curlPost = $param;
-        header("Content-Type: text/html;charset=utf-8");
-        $ch = curl_init(); //初始化curl
-        curl_setopt($ch, CURLOPT_URL, $this->config->item('td_url') . "&partner_key=" . $this->config->item('partner_key')); //抓取指定网页
-        curl_setopt($ch, CURLOPT_HEADER, 0); //设置header
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); //要求结果为字符串且输出到屏幕上
-        curl_setopt($ch, CURLOPT_POST, 1); //post提交方式
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($curlPost));
-        $data = curl_exec($ch); //运行curl
-        //$data = iconv("utf-8", "GBK//ignore", $data);
-        curl_close($ch);
-        $info_ = array(
-            'account_name' => $account_name,
-            'id_number' => $id_number,
-            'account_mobile' => $accout_mobile,
-            'user_id' => $user_id,
-            'add_time' => time(),
-            'json_data' => $data
-        );
-        $this->db->insert('tongdun_info', $info_);
-        $td_id_ = $this->db->insert_id();
-        $log_['td_id'] = $td_id_;
-        $this->db->insert('tongdun_log', $log_);
-        $info_['id'] = $td_id_;
-        return $this->fun_success('获取成功', $info_);
-
-    }
 
     /**
      * 自动增加单号
@@ -795,6 +739,18 @@ class MY_Model extends CI_Model{
     //按备案存续有效年份
     public function get_ns_num4company($company_id, $annual_year = null){
         $year_num_ = 0;
+        $this->db->select('a.annual_year, a.status')->from('company_ns_list a');
+        $this->db->where('a.company_id ', $company_id);
+        $this->db->order_by('annual_year', 'desc');
+        $annual_year_list_ = $this->db->get()->result_array();
+        foreach ($annual_year_list_ as $k_ => $v_) {
+            if ($v_['status'] != 2)
+                break;
+            $year_num_ += 1;
+        }
+        return $year_num_;
+
+        /**$year_num_ = 0;
         $this->db->select('a.annual_year, b.id')->from('term a');
         $this->db->join('company_ns_list b', 'a.annual_year = b.annual_year and  b.company_id = ' . $company_id . ' and b.status in (2)', 'left');
         if ($annual_year) 
@@ -810,6 +766,7 @@ class MY_Model extends CI_Model{
             $year_num_ += 1;
         }
         return $year_num_;
+        */
     }
 
     /**
@@ -920,23 +877,30 @@ class MY_Model extends CI_Model{
                 $sys_score += $fz_score_total;
             }
         }
-        // 4 计算缺席分数
+        // 4 计算缺席分数，直接通过年审记录判断，所见即所得，这样用户也可以直接看到原因
         $company_qx_score_ = $this->config->item('company_qx_score') ? $this->config->item('company_qx_score') : 0;
-        if($company_pending_info_['qx_num'] > 0){
-            $pass_score_log[] = array(
-                'company_id' => $company_id,
-                'pass_id' => $pass_id,
-                'type' => 3, 'msg' => '存在缺席行为，计分' . $company_qx_score_ . '分');
+        $annual_list_ = $this->db->select('*')->from('company_ns_list')->where(array('company_id' => $company_id))->order_by('annual_year', 'desc')->get()->result_array();
+        $is_qx_1_ = false;  //上年缺席
+        $is_qx_2_ = false;  //连续两年缺席
+        if($annual_list_){
+            if($annual_list_[0]['status'] == -1)
+                $is_qx_1_ = true;
+            if(isset($annual_list_[1]) && $annual_list_[1]['status'] == -1)
+                $is_qx_2_ = true;
+        }
+        if($is_qx_1_){
+            $pass_score_log[] = array('company_id' => $company_id,'pass_id' => $pass_id,'type' => 3, 
+                'msg' => '存在缺席行为，计分' . $company_qx_score_ . '分'
+            );
             $sys_score += $company_qx_score_;
         }
         // 5 再计算标签分数 计划所有标签如果存在修改,均需要在此通用方法前进行
         $icon_ = $this->db->select("ifnull(sum(a.score),0) sum_score_")->from('sys_score_icon a')
                 ->join('company_pending_icon b','a.icon_no = b.icon_no', 'left')->where('a.status', 1)->where('b.company_id', $company_id)->get()->row_array();
         if($icon_){
-            $pass_score_log[] = array(
-                'company_id' => $company_id,
-                'pass_id' => $pass_id,
-                'type' => 3, 'msg' => '信用指标，总计分' . $icon_['sum_score_'] . '分');
+            $pass_score_log[] = array('company_id' => $company_id,'pass_id' => $pass_id,'type' => 3, 
+                'msg' => '信用指标，总计分' . $icon_['sum_score_'] . '分'
+            );
             $sys_score += $icon_['sum_score_'];
         }
 
@@ -944,10 +908,9 @@ class MY_Model extends CI_Model{
 
         //最后一步 把各个分值相加
         $this->db->where('id', $company_id)->set('total_score', 'event_score + sys_score + base_score', FALSE)->update('company_pending');
-        if($agent_num < 3)
+        if($agent_num < 3 || $is_qx_2_)
             $zz_status_ = -1;
         $this->db->where('id', $company_id)->set('zz_status', $zz_status_)->update('company_pending');
-        $this->db->where('id', $company_id)->where('qx_num >', 1)->set('zz_status', -1)->update('company_pending');
 
         if ($annual_year && $is_ns_ && in_array($is_ns_, array(1, 2))) {
             $annual_info_ = $this->db->select('*')->from('company_ns_list')->where(array('annual_year' => $annual_year, 'company_id' => $company_id))->get()->row_array();
@@ -1029,6 +992,7 @@ class MY_Model extends CI_Model{
             }
         }
         foreach($agent_arr_ as $k=>$v){
+            //DBY 重要 发生人事变动 ，经纪人所申请的人事申请自动作废
             if($v==1){
                 $data_insert[] = array(
                     'to_company_id'=>$company_id,
@@ -1156,7 +1120,14 @@ class MY_Model extends CI_Model{
             $grade_no_['grade_no'] = 1;
         }
         if ($grade_no_['grade_no'] == 1) {
-            $this->db->where('id', $agent_id)->update('agent', array('grade_no' => $grade_no_['grade_no'], 'company_id' => -1));
+            $update_agent_ = array(
+                'grade_no' => $grade_no_['grade_no'], 
+                'company_id' => -1,
+                'wq' => 1
+            );
+            if($agent_info['grade_no'] != 1)
+                $update_agent_['forbid_time'] =  date('Y-m-d H:i:s',time());
+            $this->db->where('id', $agent_id)->update('agent', $update_agent_);
             $company_info_ = $this->db->select('company_name')->from('company_pending')->where('id', $agent_info['company_id'])->get()->row_array();
             if ($company_info_) {
                $this->save_company_total_score($agent_info['company_id']);//重新计算企业信用分和异常状态
@@ -1169,6 +1140,7 @@ class MY_Model extends CI_Model{
                     'status'                =>      3,
                     'create_date'           =>      date('Y-m-d H:i:s',time()),
                 );
+               //DBY 重要 发生人事变动 ，经纪人所申请的人事申请自动作废
                $this->db->insert('agent_track',$data_insert);
             }
             
@@ -1203,9 +1175,9 @@ class MY_Model extends CI_Model{
                 default:
                     return false;
             }
-            $this->db->where('id', $agent_id)->update('agent', array('company_id' => -1));
+            $this->db->where('id', $agent_id)->update('agent', array('company_id' => -1, 'wq' => 1));
             $this->save_company_total_score($agent_info['company_id']);//重新计算企业信用分和异常状态
-
+            //DBY 重要 发生人事变动 ，经纪人所申请的人事申请自动作废
             $this->db->insert('agent_track',$data_insert);
         }
         return true;

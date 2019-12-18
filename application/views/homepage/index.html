@@ -23,10 +23,10 @@
 
               <div id="slide02" class="tab">
                     <div class="content" style="display:block">
-                        <form action="">
+                        <form action="/home/company_list" method="get" id="search_company_form">
                            <div class="s-ipt">
-                            <input type="search" placeholder="请输入公司名/税号/法定代表人姓名进行查询" class="search_ipt" />
-                            <a href="javascript:" class="search-btn"></a>
+                            <input type="search" name="c_k" placeholder="请输入公司名/税号/法定代表人姓名进行查询" class="search_ipt" />
+                            <a href="javascript:" id="company_btn" class="search-btn"></a>
                           </div>
                         </form>
                     </div>
@@ -86,6 +86,9 @@ $(function(){
             type:"click"
         });
 
+      $("#company_btn").click(function(){
+        $("#search_company_form").submit();
+      })
 })
 </script>
 </body>

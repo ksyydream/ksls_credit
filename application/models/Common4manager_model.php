@@ -182,8 +182,8 @@ class Common4manager_model extends MY_Model
     }
 
     //检查商业注册号是否存在 如果不用判断，可以直接改这个函数
-    public function check_business_no($record_num,$without_id=null){
-        $this->db->select()->from('company_pending')->where('business_no',trim($record_num));
+    public function check_business_no($business_no,$without_id=null){
+        $this->db->select()->from('company_pending')->where('business_no',trim($business_no));
         //$this->db->where_in('status',array(1,2,3,4));
         if($without_id)
             $this->db->where('id <>',$without_id);
@@ -318,14 +318,19 @@ class Common4manager_model extends MY_Model
 
         $data['limit'] = $this->limit;
         //搜索条件
-        $data['keyword'] = $this->input->get('keyword') ? trim($this->input->get('keyword')):null;
+        $data['keyword'] = $this->input->post('keyword') ? trim($this->input->post('keyword')):null;
 
         $this->db->select('count(1) num')->from('agent_track a');
         $this->db->join('company_pending d','a.to_company_id = d.id','left');
         $this->db->join('company_pending e','a.from_company_id = e.id','left');
         $this->db->where('a.agent_id',$id);
         if($data['keyword']){
+            $this->db->group_start();
             $this->db->like('a.to_company_name', $data['keyword']);
+            $this->db->or_like('a.from_company_name', $data['keyword']);
+            $this->db->or_like('d.company_name', $data['keyword']);
+            $this->db->or_like('e.company_name', $data['keyword']);
+            $this->db->group_end();
         }
         $num = $this->db->get()->row();
         $data['total_rows'] = $num->num;
@@ -335,10 +340,15 @@ class Common4manager_model extends MY_Model
         $this->db->join('company_pending e','a.from_company_id = e.id','left');
         $this->db->where('a.agent_id',$id);
         if($data['keyword']){
+            $this->db->group_start();
             $this->db->like('a.to_company_name', $data['keyword']);
+            $this->db->or_like('a.from_company_name', $data['keyword']);
+            $this->db->or_like('d.company_name', $data['keyword']);
+            $this->db->or_like('e.company_name', $data['keyword']);
+            $this->db->group_end();
         }
         $this->db->order_by('a.create_date','desc');
-        $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
+        $this->db->limit($data['limit'], $offset = ($page - 1) * $data['limit']);
         $data['res_list'] = $this->db->get()->result_array();
         //die(var_dump($this->db->last_query()));
         return $data;

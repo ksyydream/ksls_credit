@@ -120,6 +120,15 @@
                                     {{$data.grade_name|default:''}}
                                 </div>
                             </div>
+                            {{if $data.grade_no == 1}}
+                            <div class="space-4"></div>
+                            <div class="form-group">
+                                <label class="col-sm-1 control-label no-padding-right"> 禁业时间 </label>
+                                <div class="col-sm-9 yy_m_7">
+                                    {{$data.forbid_time|default:''}}
+                                </div>
+                            </div>
+                            {{/if}}
                             <div class="space-4"></div>
 
                             <div class="form-group">
@@ -153,7 +162,7 @@
                                             <div class="row">
                                                 <div class="col-xs-9">
                                                     <div class="dataTables_filter">
-                                                        <label>search:<input type="text" id="search_" placeholder="公司名称">&nbsp;<a href="javascript:void(0);" id="btn_add_agent" class="btn btn-white btn-xs btn-primary">搜 索</a></label>
+                                                        <label>search:<input type="text" name="keyword" id="search_" placeholder="公司名称">&nbsp;<a href="javascript:void(0);" id="btn_add_agent" class="btn btn-white btn-xs btn-primary">搜 索</a></label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -199,6 +208,10 @@
             }
         });
     }
+
+    $("#btn_add_agent").click(function(){
+        ajax_get_table('track_form', 1);
+    })
 
 </script>
 </body>
