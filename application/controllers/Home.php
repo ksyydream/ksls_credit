@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Home extends MY_Controller {
+class Home extends Home_Controller {
 
 	/**
 	 * Index Page for this controller.
@@ -22,8 +22,7 @@ class Home extends MY_Controller {
 	public function __construct()
     {
         parent::__construct();
-        $this->load->model('home_model');
-        $this->load->model('agent_model');
+
     }
 
     //前台首页

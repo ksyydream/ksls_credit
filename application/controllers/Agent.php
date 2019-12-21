@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Agent extends MY_Controller {
+class Agent extends Home_Controller {
 
 	/**
 	 * Index Page for this controller.
@@ -19,20 +19,10 @@ class Agent extends MY_Controller {
 	 * @see https://codeigniter.com/user_guide/general/urls.html
 	 */
 
-	public $agent_id = null;
+
 	public function __construct()
     {
         parent::__construct();
-        $this->load->model('agent_model');
-        $agent_id = $this->session->userdata('agent_id');
-		//die(var_dump($agent_id));
-        if($agent_id){
-			$data = $this->agent_model->get_detail($agent_id);
-			if($data && $data['flag'] == 2){
-				$this->assign('data', $data);
-				$this->agent_id = $agent_id;
-			}
-		}
 		if(!$this->agent_id){
 		 if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
             {

@@ -7,7 +7,7 @@ if (! defined('BASEPATH'))
  * @package		app
  * @subpackage	Libraries
  * @category	controller
- * @author      yaobin<645894453@qq.com>
+ * @author      yaobin
  *        
  */
 class MY_Controller extends CI_Controller
@@ -145,6 +145,50 @@ class MY_Controller extends CI_Controller
     	);
     	return $signPackage;
     }
+}
+
+/**
+ * 前台扩展业务控制器
+ *
+ * @package		app
+ * @subpackage	Libraries
+ * @category	controller
+ * @author      yangyang
+ *
+ */
+class Home_Controller extends MY_Controller{
+	public $agent_id = null;
+	public $company_id = null;
+	public function __construct ()
+	{
+		parent::__construct();
+		$this->load->model('home_model');
+		$this->load->model('agent_model');
+		$agent_id = $this->session->userdata('agent_id');
+		if($agent_id){
+			$data = $this->home_model->get_agent_flag($agent_id);
+			if($data && $data['flag'] == 2){
+				$this->assign('user_flag_', 'agent');
+				$this->agent_id = $agent_id;
+				$this->session->unset_userdata('company_id');
+				$this->session->unset_userdata('company_info');
+			}else{
+				redirect('/home/logout');
+			}
+		}
+
+		$company_id = $this->session->userdata('company_id');
+		if($company_id){
+			$data = $this->home_model->get_company_flag($company_id);
+			if($data && $data['flag'] == 2){
+				$this->assign('user_flag_', 'company');
+				$this->company_id = $company_id;
+			}else{
+				redirect('/home/logout');
+			}
+		}
+
+	}
 }
 
 /* End of file MY_Controller.php */

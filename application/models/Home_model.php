@@ -17,6 +17,14 @@ class Home_model extends MY_Model
         parent::__destruct();
     }
 
+    public function get_company_flag($company_id){
+        return $this->db->select('flag')->where('id', $company_id)->from('company_pending')->get()->row_array();
+    }
+
+    public function get_agent_flag($agent_id){
+        return $this->db->select('flag')->where('id', $agent_id)->from('agent')->get()->row_array();
+    }
+
     public function company_list($page = 1) {
         $data['limit'] = $this->home_limit;//每页显示多少调数据
         $data['c_k'] = $this->input->get('c_k')?trim($this->input->get('c_k')):null;
