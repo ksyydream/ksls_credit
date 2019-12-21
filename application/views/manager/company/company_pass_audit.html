@@ -479,7 +479,9 @@
    
 
    function post_form(form_name, url_submit){
-
+       var index_load = layer.load(1, {
+           shade: [0.1,'#fff'] //0.1透明度的白色背景
+       });
             var form = document.getElementById(form_name);
 
             var formdata = new FormData(form);
@@ -492,6 +494,7 @@
                 contentType: false,
                 processData: false,
                 success : function(data) {
+                    layer.close(index_load);
                     var return_ = JSON.parse(data)
                     if(return_.status == 1){
                         var url = '{{$return_url_}}';
@@ -501,15 +504,12 @@
                         }, function(){
                             window.location.replace(url);
                         });
-                        //window.location.replace(url);
                     }else{
-                        //layer.close(index);
                         layer.msg(return_.msg);
                     }
-                    //layer.close(index);
                 },
                 error:function(){
-                    //layer.close(index);
+                    layer.close(index_load);
                     layer.msg('网络异常!');
                 }
             });

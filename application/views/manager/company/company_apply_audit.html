@@ -393,61 +393,75 @@
         submit_fun('/manager/company_pending_pass');
     })
     function submit_fun(url_submit){
+        var index_load = layer.load(1, {
+            shade: [0.1,'#fff'] //0.1透明度的白色背景
+        });
         var flag = -1;
         var company_name = $.trim($("#company_name").val());
         if(company_name == "" ) {
+            layer.close(index_load);
             layer.msg('企业名称不能为空', {icon: 2});
             return false;
         }
         var business_no = $.trim($("#business_no").val());
         if(business_no == "" ) {
+            layer.close(index_load);
             layer.msg('工商注册号不能为空', {icon: 2});
             return false;
         }
         var register_path = $.trim($("#register_path").val());
         if(register_path == "" ) {
+            layer.close(index_load);
             layer.msg('注册地址不能为空', {icon: 2});
             return false;
         }
         var business_path = $.trim($("#business_path").val());
         if(business_path == "" ) {
+            layer.close(index_load);
             layer.msg('经营地址不能为空', {icon: 2});
             return false;
         }
         var issuing_date = $.trim($("#issuing_date").val());
         if(issuing_date == "" ) {
+            layer.close(index_load);
             layer.msg('发证日期不能为空', {icon: 2});
             return false;
         }
 
         var company_phone = $.trim($("#company_phone").val());
         if(company_phone == "" ) {
+            layer.close(index_load);
             layer.msg('企业电话不能为空', {icon: 2});
             return false;
         }
         var director_name = $.trim($("#director_name").val());
         if(director_name == "" ) {
+            layer.close(index_load);
             layer.msg('负责人姓名不能为空', {icon: 2});
             return false;
         }
         var director_phone = $.trim($("#director_phone").val());
         if(director_phone == "" ) {
+            layer.close(index_load);
             layer.msg('负责人电话不能为空', {icon: 2});
             return false;
         }
         var legal_name = $.trim($("#legal_name").val());
         if(legal_name == "" ) {
+            layer.close(index_load);
             layer.msg('法人姓名不能为空', {icon: 2});
             return false;
         }
         var legal_phone = $.trim($("#legal_phone").val());
         if(legal_phone == "" ) {
+            layer.close(index_load);
             layer.msg('法人电话不能为空', {icon: 2});
             return false;
         }
         //报备时可以随意修改 审核时再做判断，以免在审核中有人员变动
         var length = $("#tbody_id").find(".agent_flag_").length;
         if(length < 3){
+            layer.close(index_load);
             layer.msg('年审提审时,持证经纪人不能小于三个!', {icon: 2});
             flag=1;return false;
         }
@@ -464,6 +478,7 @@
                 contentType: false,
                 processData: false,
                 success : function(data) {
+                    layer.close(index_load);
                     var return_ = JSON.parse(data)
                     if(return_.status == 1){
                         var url = '/manager/company_pending_list/';
@@ -473,18 +488,17 @@
                         }, function(){
                             window.location.replace(url);
                         });
-                        //window.location.replace(url);
                     }else{
-                        //layer.close(index);
                         layer.msg(return_.msg);
                     }
-                    //layer.close(index);
                 },
                 error:function(){
-                    //layer.close(index);
+                    layer.close(index_load);
                     layer.msg('网络异常!');
                 }
             });
+        }else{
+            layer.close(index_load);
         }
 
     }

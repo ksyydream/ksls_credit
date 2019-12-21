@@ -2252,10 +2252,10 @@ class Manager_model extends MY_Model
     //重置企业密码
     public function refresh_company_password(){
         $company_id = $this->input->post('id');
-        $username = $this->input->post('username');
-        if(!$company_id || !$username)
+        $business_no = $this->input->post('username');
+        if(!$company_id || !$business_no)
             return $this->fun_fail('信息缺失!');
-        $this->db->where(array('id' => $company_id, 'username' => $username))->update('company_pending', array('password' => sha1('123456')));
+        $this->db->where(array('id' => $company_id, 'business_no' => $business_no))->update('company_pending', array('password' => sha1('123456')));
         return $this->fun_success('重置成功!');
     }
 
