@@ -334,6 +334,8 @@ class Common4manager_model extends MY_Model
         }
         $num = $this->db->get()->row();
         $data['total_rows'] = $num->num;
+        //这里处理如何是在删除情况下 最后一页数据不现实的情况
+        $page = get_right_page($page, $data['total_rows'], $data['limit']);
         $this->db->select('a.*,d.company_name to_name,e.company_name from_name,
 		d.flag to_company_flag,e.flag from_company_flag')->from('agent_track a');
         $this->db->join('company_pending d','a.to_company_id = d.id','left');

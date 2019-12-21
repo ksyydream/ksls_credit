@@ -1,0 +1,29 @@
+ <table class="data-table" width="100%">
+       <tr>
+        <th width="12%">日期</th>
+        <th width="12%">类别</th>
+        <th width="40%">事件</th>
+        <th width="10%">扣/加分标准</th>
+        <th>事实</th>
+       </tr>
+        {{foreach from=$data.res_list key=key item=item}}
+         <tr>
+          <td>{{$item.event_date}}</td>
+          <td>{{$item.event_type_name}}</td>
+          <td>{{$item.event_name}}</td>
+          <td>{{$item.score}}</td>
+          <td>{{$item.record_fact}}</td>
+        </tr>
+        {{/foreach}}
+        
+</table>
+          <div id="ajax_event_page" class="page-fy">
+              {{$pager}}
+       </div>
+<script type="application/javascript">
+    $("#ajax_event_page  a").click(function(){
+        event_page = $(this).data('ci-pagination-page');
+        ajax_event_table('event_form', event_page);
+        return false;
+    });
+</script>

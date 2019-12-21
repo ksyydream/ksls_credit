@@ -6,7 +6,7 @@ input::-webkit-input-placeholder{ color:#b2b2b2;}
 input::-moz-placeholder{color:#b2b2b2;}
 input:-moz-placeholder{color:#b2b2b2;}
 input:-ms-input-placeholder{  color:#b2b2b2;}i{font-style:normal;}
-.fl{float: left;}
+.fl{float: left;} em{ font-style: normal;}
 
 
 .ind_main{background: url(../i/ind_bg.jpg) no-repeat center top; height: 800px;}
@@ -60,7 +60,7 @@ transform:rotate(45deg);-ms-transform:rotate(45deg);-moz-transform:rotate(45deg)
 .dl-info1 { margin:0;font-size: 14px; height: 30px;padding:0; }
 .dl-info1 dt{ float: left;margin: 0 20px 0 42px;font-size: 14px; font-weight: normal; }
 
-.photos{ clear: both;margin-left:15px;margin-bottom: 100px; height: 185px;}
+.photos{ clear: both;margin-left:15px;margin-bottom: 100px; min-height: 185px; overflow: hidden;}
 .photos span{margin-left:20px;}.photos span:last-child{}
 .out-table{margin:0 42px 20px;border:none; }.data-table {width:100%;}
 
@@ -183,7 +183,7 @@ transform:rotate(45deg);-ms-transform:rotate(45deg);-moz-transform:rotate(45deg)
 .company-info .s-tit{font-size: 18px;color:#888;margin-left: 25px;}
 .company-info .s-tit .em-icon{margin:5px 5px 0 0;width:16px; height: 17px; float: left; background: url(../i/submit_bg.png) no-repeat 0 -70px;}
 
-.company-info .dl-form{margin: 0 0 10px 55px; overflow: hidden;}.agent-info .dl-form{margin: 0 0 10px 15px;overflow: hidden;}
+.company-info .dl-form{margin: 0 0 10px 55px; }.agent-info .dl-form{margin: 0 0 10px 15px;overflow: hidden;}
 .company-info .dl-form dt{padding:8px 0 2px;font-size: 14px; color: #888;}
 .company-info .dl-form .input-txt-1{width:290px;height: 32px; border:1px solid
 #aaa; padding:5px; line-height: 22px; background:#fff;border-radius: 3px;}
@@ -281,3 +281,36 @@ transform:rotate(45deg);-ms-transform:rotate(45deg);-moz-transform:rotate(45deg)
 .sxjl-table td {border:1px solid #e5e5e5;}
 .credit-menu{background: #fafafa ;width:150px; float: left;}
 .credit-menu li{ margin-bottom:1px; cursor: pointer;}
+
+
+
+.logining{position: relative;}
+.login-list{position: absolute;top:36px; right: 0;width:150px;height: 120px;background: #fff;box-shadow:2px 2px 5px #d6dde7; }
+.login-list li{text-align: left;margin:0 10px;border-bottom: 1px solid #ccc; line-height: 30px;}
+.login-list li:last-child{border:none;}
+.login-list li a{color: #666;padding:0 15px; display: inline-block; font-size: 14px;}
+.login-list li em{margin:8px 5px 0 0;width: 15px; height: 15px; float: left; }
+.login-list li .xx{background: url(../i/xx_icon.png) no-repeat;}
+.login-list li  .nums{width: 20px; float: right; height: 15px; line-height: 15px; background: #cc0000; text-align: center;
+    border-radius: 5px; color: #fff;font-size: 10px;margin: 8px 0 0 2px;}
+.login-list li .jbxx{background: url(../images/jbxx.png) no-repeat;}
+.login-list li .xgmm{background: url(../i/xgmm.png) no-repeat;}
+.login-list li .out{background: url(../i/out.png) no-repeat;}
+.login-list li .cxjl{background: url(../i/cxjl.png) no-repeat;}
+.afer-login{padding-top:12px; line-height: 18px; float: right; cursor: pointer;}
+.afer-login .login-user{display:inline-block; padding:0 5px 0 10px;color: #fff;}
+.afer-login .triangle{width:10px;height: 5px; display: inline-block; color: #fff;
+    background: url(../i/triangle.png) no-repeat; float: left;margin-top: 8px;}
+
+.pwd-box{width:562px; margin: 0 auto;border: 1px solid #88cdbb; overflow: hidden;}
+.pwd-th{ width:562px; height: 34px; line-height: 34px; background:#88cdbb;padding-left: 20px; font-size: 16px; color:#fff; }
+.pwd-ul{padding:20px 110px 30px;} .pwd-ul li{margin-top: 15px;}.pwd-ul li .pwd-txt{padding:3px 10px;width:200px; height: 26px; line-height: 26px;}
+.pwd-ul span{width: 85px;font-size: 14px; float: left; line-height: 32px; text-align: right; padding-right: 15px;}
+.pwd-ul .tips{padding:5px 0 0 80px; color: #ff5b5b; font-size: 12px; height: 20px;}
+.pwd-ul .tips em{margin: 3px 5px 0 0;width:14px; height: 14px; float:left;background: url(../images/submit_bg.png) no-repeat 0 -88px;}
+.pwd-box .submit-btn{margin-left:80px;width: 225px; background: #b4d09a; height: 32px; line-height: 32px; text-align: center; color:#fff;}
+.pwd-box .submit-btn:hover{text-decoration: none;}
+
+.before-login{ float: right; color:#fff;margin-top: 15px;}
+
+.before-login a{color: #fff;}

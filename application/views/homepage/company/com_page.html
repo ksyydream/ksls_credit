@@ -2,238 +2,206 @@
 <html class="no-js">
 <head>
  {{include file='homepage/public/head.html'}}
+ <link rel="stylesheet" href="/manager_statics/app/lightbox.min.css?v3"/>
 </head>
 <body class="page">
-   <div class="page-hd">
-      <div class="main1200">
-           <a href="index.html" class="logo"></a>
-            <a href="" class="login-btn">登录</a>
-      </div>
-   </div> 
+   {{include file='homepage/public/logo.html'}} 
    <div class="page-bd">
     <div class="main1200">
       <div class="search_box">
-          <form action="">
+          <form id="search_company_form" method="get" action="/home/company_list">
            <div class="s-ipt">
-            <input type="search" placeholder="请输入公司名/税号/法定代表人姓名进行查询" class="search_ipt" />
-            <a href="javascript:" class="search-btn"></a>
+            <input type="search" placeholder="请输入公司名/税号/法定代表人姓名进行查询" value="{{$data.c_k|default:''}}" name="c_k" id="c_k" class="search_ipt" />
+            <a href="javascript:" id="search_btn" class="search-btn"></a>
           </div>
         </form>
       </div>
       <div class="company-info">
           <dl class="dl-info">
-            <dt>昆山市我爱我家房地产信息咨询有限公司</dt>
-            <dd><span>统一社会信用代码/注册号：</span><span>9541269871526158X</span></dd>
-            <dd><span>法人代表人姓名：</span>陈大江</dd>
+            <dt>{{$data.company_name}}</dt>
+            <dd><span>统一社会信用代码/注册号：</span><span>{{$data.business_no}}</span></dd>
+            <dd><span>法人代表人姓名：</span>{{$data.legal_name}}</dd>
             <dd><span>公司成立时间：</span><span>2019年11月13号</span> </dd>
           </dl> 
       </div>
     
          <div class="company-info"> 
           <div class="company-info-tab"><a href="" class="current">企业信息<i class="am-icon-angle-down"></i></a>
-            <a href="" >企业年审记录<i class="am-icon-angle-down"></i></a>
-           <a href="" >企业诚信记录<i class="am-icon-angle-down"></i></a>
-           <a href="" >企业旗下经纪人<i class="am-icon-angle-down"></i></a> </div>
+            <a href="#ns_div" >企业年审记录<i class="am-icon-angle-down"></i></a>
+           <a href="#cx_div" >企业诚信记录<i class="am-icon-angle-down"></i></a>
+           <a href="#agent_div" >企业旗下经纪人<i class="am-icon-angle-down"></i></a> </div>
           <div class="com-tit"><span></span>基本信息</div>
           <div class="flwid558">
             <dl class="dl-info1">
               <dt>公司名称：</dt>
-              <dd>昆山市我爱我家房地产信息咨询有限公司</dd>
+              <dd>{{$data.company_name}}</dd>
             </dl>
             <dl class="dl-info1">
-              <dt>工商注册号：</dt>
-              <dd>42975385245684618</dd>
+              <dt>社会统一信用代码：</dt>
+              <dd>{{$data.business_no}}</dd>
             </dl>
             <dl class="dl-info1">
               <dt>法人代表人:</dt>
-              <dd>陈大江</dd>
+              <dd>{{$data.legal_name}}</dd>
             </dl>
             <dl class="dl-info1">
-              <dt>法人证件号码:</dt>
-              <dd>320148197214082416</dd>
-            </dl>
-            <dl class="dl-info1">
-              <dt>登记机关:</dt>
-              <dd>昆山市市场监督管理局</dd>
+              <dt>法人电话:</dt>
+              <dd>{{$data.legal_phone}}</dd>
             </dl>
             <dl class="dl-info1">
               <dt>备案编号:</dt>
-              <dd>174658947516219</dd>
+              <dd>{{$data.record_num}}</dd>
             </dl>
             <dl class="dl-info1">
               <dt>企业地址:</dt>
-              <dd>江苏省苏州市昆山市玉山镇萧林西路1992号</dd>
+              <dd>{{$data.register_path}}</dd>
             </dl>
             <dl class="dl-info1">
               <dt>经营地址:</dt>
-              <dd>江苏省苏州市昆山市玉山镇城北路189号</dd>
+              <dd>{{$data.business_path}}</dd>
             </dl>
         </div>
         <div class="flwid558">
             <dl class="dl-info1">
-              <dt>社会统一信用代码：   </dt>
-              <dd>12345678945678913X</dd>
-            </dl>
-            <dl class="dl-info1">
               <dt>信用分值： </dt>
-              <dd>95分</dd>
+              <dd>{{$data.total_score|default:'-'}}分</dd>
             </dl>
             <dl class="dl-info1">
               <dt>信用等级：</dt>
-              <dd>A级</dd>
+              <dd>{{$data.b_grade_name_}}</dd>
             </dl>
             <dl class="dl-info1">
               <dt>最后年审年度：</dt>
-              <dd>2019</dd>
+              <dd>{{$data.annual_date}}</dd>
+            </dl>
+            <dl class="dl-info1">
+              <dt>负责人姓名:</dt>
+              <dd>{{$data.director_name}}</dd>
             </dl>
             <dl class="dl-info1">
               <dt>负责人电话:</dt>
-              <dd>15812741148</dd>
+              <dd>{{$data.director_phone}}</dd>
             </dl>
             <dl class="dl-info1">
               <dt>公司电话:</dt>
-              <dd>0215-74281683</dd>
+              <dd>{{$data.company_phone}}</dd>
             </dl>
-            <dl class="dl-info1">
-              <dt>注册资本:</dt>
-              <dd>1000万人民币</dd>
-            </dl>
+            
         </div>
         <div class="photos">
-          <span><img src="assets/i/img.jpg" /></span>
-          <span><img src="assets/i/img.jpg" /></span>
-          <span><img src="assets/i/img.jpg" /></span>
-          <span><img src="assets/i/img.jpg" /></span>
+           {{if !empty($data.img) }}
+             {{foreach from=$data.img key=k item=item}}
+              <span>
+<a class="example-image-link" href="{{$item.img_path}}" data-lightbox="example-set example_num1" data-title="图片资料">
+                <img src="{{$item.img_path}}?imageView2/0/w/200/h/200/q/75|imageslim" />
+</a>
+              </span>
+          {{/foreach}}
+        {{/if}}
+      
         </div>
-       <div class="com-tit"><span></span>企业年审记录</div>
+       <div class="com-tit" id="ns_div"><span></span>企业年审记录</div>
 
-       
-
-
+       {{if !empty($ns_list_1) }}
         <div class="out-table">
           <table class="data-table">
            <tr>
-              <th width="20%">日期</th>
+              <th width="20%">年份</th>
               <th width="80%">事实</th>
            </tr>
            <tr>
-              <td>2019年12月10号</td>
-              <td>年审缺席</td>
+              <td>{{$ns_list_1.annual_year}}年</td>
+              <td>
+                  {{if $ns_list_1.status == 1}}年审失败{{/if}}
+                  {{if $ns_list_1.status == 2}}年审成功{{/if}}
+                  {{if $ns_list_1.status == -1}}缺席{{/if}}
+              </td>
            </tr>  
          </table>
        </div>
-         <div class="out-table">
+       {{/if}}
+        {{if !empty($ns_list_2) }}
+        <div class="out-table">
           <table class="data-table">
-             <tr>
-                <th width="20%">日期</th>
-                <th width="80%">事实</th>
-             </tr>
-             <tr>
-                <td>2019年12月10号</td>
-                <td>年审失败</td>
-             </tr>  
-           </table>
-         </div>
+           <tr>
+              <th width="20%">年份</th>
+              <th width="80%">事实</th>
+           </tr>
+           <tr>
+              <td>{{$ns_list_2.annual_year}}年</td>
+              <td>
+                  {{if $ns_list_2.status == 1}}年审失败{{/if}}
+                  {{if $ns_list_2.status == 2}}年审成功{{/if}}
+                  {{if $ns_list_2.status == -1}}缺席{{/if}}
+              </td>
+           </tr>  
+         </table>
+       </div>
+       {{/if}}
+         
        <div class="am-panel-group" id="accordion">
+        {{if !empty($ns_list_other) }}
   <div class="am-panel am-panel-default com-data">
   
     <div id="do-not-say-1" class="am-panel-collapse am-collapse">
       <div class="am-panel-bd">
+        {{foreach from=$ns_list_other key=k item=v}}
         <div class="out-table">        
            <table class="data-table">
              <tr>
-                <th width="20%">日期</th>
+                <th width="20%">年份</th>
                 <th width="80%">事实</th>
              </tr>
              <tr>
-                <td>2019年12月10号</td>
-                <td>年审通过</td>
+                <td>{{$v.annual_year}}年</td>
+                <td>
+                {{if $v.status == 1}}年审失败{{/if}}
+                {{if $v.status == 2}}年审成功{{/if}}
+                {{if $v.status == -1}}缺席{{/if}}
+                </td>
              </tr>  
 
            </table>
          </div>
-         <div class="out-table">
-           <table class="data-table">
-             <tr>
-                <th width="20%">日期</th>
-                <th width="80%">事实</th>
-             </tr>
-             <tr>
-                <td>2019年12月10号</td>
-                <td>年审失败</td>
-             </tr>  
-           </table>
-        </div>
+         {{/foreach}}
+       
       </div>
     </div>
 
       <div class="am-panel-hd">
         <span class="am-panel-title" data-am-collapse="{parent: '#accordion', target: '#do-not-say-1'}">
-            <img src="assets/i/arrow.png">
+            <img src="/web_assets/i/arrow.png">
         </span>
     </div>
 
   </div>
-
+  {{/if}}
 </div>
 
 
 
-<div class="com-tit"><span></span>企业诚信记录</div>
+<div class="com-tit" id="cx_div"><span></span>企业诚信记录</div>
+
     <div class="out-table">
 
 
 <div class="container">
   <div class="select-box select-city">
-    <div class="select-header"> 选择年份</div>
+    <div data_id="" id="select_year" class="select-header"> 选择年份</div>
     <ul class="select-content">
-      <li>2019年</li>
-      <li>2018年</li>
-      <li>2017年</li>
-      <li>2016年</li>
+      {{foreach from=$year_list key=key item=item}}
+      <li data_id="{{$item}}">{{$item}}年</li>
+      {{/foreach}}
     </ul>
   </div>
 
 </div>
 
+      <div id="ajax_event_div">
+        
 
-      <table class="data-table" width="100%">
-       <tr>
-        <th width="12%">日期</th>
-        <th width="10%">类别</th>
-        <th width="40%">事实</th>
-        <th width="10%">扣/加分标准</th>
-        <th>备注</th>
-       </tr>
-        <tr>
-          <td>2019/11/17</td>
-          <td>信息管理</td>
-          <td>因收费无约定或收费纠纷被查实。违反了《昆山市房地产经纪信用评价管理办法》经纪服务第七条。</td>
-          <td>-2.0</td>
-          <td>已被相关部门查处并处理</td>
-        </tr>
-        <tr>
-          <td>2019/11/17</td>
-          <td>人员管理</td>
-          <td>因收费无约定或收费纠纷被查实。违反了《昆山市房地产经纪信用评价管理办法》经纪服务第七条。</td>
-          <td>-2.0</td>
-          <td>已被相关部门查处并处理</td>
-        </tr>
-        <tr>
-          <td>2019/11/17</td>
-          <td>合同管理</td>
-          <td>因收费无约定或收费纠纷被查实。违反了《昆山市房地产经纪信用评价管理办法》经纪服务第七条。</td>
-          <td>-2.0</td>
-          <td>已被相关部门查处并处理</td>
-        </tr>
-        <tr>
-          <td>2019/11/17</td>
-          <td>经济服务</td>
-          <td>因收费无约定或收费纠纷被查实。违反了《昆山市房地产经纪信用评价管理办法》经纪服务第七条。</td>
-          <td>-2.0</td>
-          <td>已被相关部门查处并处理</td>
-        </tr>
-      </table>
+      </div>
+   
    </div>
 
      </div> 
@@ -241,47 +209,14 @@
 
 
       <div class="company-info"> 
-          <div class="com-tit"><span></span>企业旗下经纪人</div>
-          <div class="out-table">
-          <table class="data-table" width="100%">
-                 <tr>
-                  <th width="15%">姓名</th>
-                  <th width="15%">证书编号</th>
-                  <th>所在机构</th>
-                  <th width="15%"></th>
-                 </tr>
-                <tr>
-                  <td>陈大江</td>
-                  <td>191107154</td>
-                  <td>昆山市我爱我家房地产信息咨询有限公司城北分店</td>
-                  <td>
-                    <a href="" target="_blank" class="agentMore">详情</a>
-                    <a href="" target="_blank" class="agentMore">解绑</a></td>
-                </tr>
-                <tr>
-                  <td>陈二江</td>
-                  <td>191107154</td>
-                  <td>昆山市我爱我家房地产信息咨询有限公司城北分店</td>
-                  <td><a href="" target="_blank" class="agentMore">详情</a></td>
-                </tr>
-                <tr>
-                  <td>陈二江</td>
-                  <td>191107154</td>
-                  <td>昆山市我爱我家房地产信息咨询有限公司城北分店</td>
-                  <td><a href="" target="_blank" class="agentMore">详情</a></td>
-                </tr>
-                <tr>
-                  <td>陈二江</td>
-                  <td>191107154</td>
-                  <td>昆山市我爱我家房地产信息咨询有限公司城北分店</td>
-                  <td><a href="" target="_blank" class="agentMore">详情</a></td>
-                </tr>
-             </table>
+          <form id="agent_form">
+            <input type="hidden" name="c_id" id="c_id" value="{{$data.id}}">
+          </form>
+          <div class="com-tit" id="agent_div"><span></span>企业旗下经纪人</div>
+          <div id="ajax_agent_div">
+            
           </div>
-
-          <div id="company_page" class="page-fy">
-             <a href="" class="current">1</a><a href="/company/index/2">2</a><a href="/company/index/3">3</a><a href="/company/index/4">4</a><a href="/company/index/5">5</a><a href="/company/index/6">6</a><a href="/company/index/2" class="prev">下一页</a><a href="/company/index/33" class="prev">尾页&gt;&gt;</a>
-       </div>
+          
 
       </div>
 
@@ -303,10 +238,8 @@
 
 <!-- 以上页面内容 开发时删除 -->
 
-<script src="assets/js/zepto.min.js?1.1.4"></script>
-<script src="assets/js/amazeui.js"></script>
-<script src="assets/js/jquery.min.js"></script>
-<script src="assets/js/app.js"></script>
+{{include file='homepage/public/foot.html'}}
+<script type="text/javascript" src="/manager_statics/app/lightbox-plus-jquery.min.js?v2"></script>
 <script>
 
 $(function(){
@@ -345,14 +278,50 @@ $(function(){
     $(".select-content li").on("click",function(){
         $(this).parent().siblings(".select-header").removeClass("select-arrow");
         $(this).parent().siblings(".select-header").text($(this).text()).end().slideUp("fast");
+        $(this).parent().siblings(".select-header").attr("data_id", $(this).attr("data_id"));
+        ajax_event_table('event_form', 1);
     });
     $(".select-content li").hover(function(){
         $(this).css("background-color","#cfcfcf");
     },function(){
         $(this).css("background-color","#fff");
     });
-});
 
+ $("#search_btn").click(function(){
+        $("#search_company_form").submit();
+      })
+});
+ var agent_page = 1;
+ var event_page = 1;
+  ajax_agent_table('agent_form', 1);
+  ajax_event_table('event_form', 1);
+    function ajax_agent_table(form, page) {
+        agent_page = page; //当前页面 保存为全局变量
+        $.ajax({
+            type: "POST",
+            url: "/home/show_agent/" + page,//+tab,
+            data: $('#' + form).serialize(),// 你的formid
+            success: function (data) {
+                $("#ajax_agent_div").html('');
+                $("#ajax_agent_div").append(data);
+            }
+        });
+    }
+
+    function ajax_event_table(form, page) {
+        event_page = page; //当前页面 保存为全局变量
+        var year_ = $("#select_year").attr("data_id");
+        var c_id_ = $("#c_id").val();
+        $.ajax({
+            type: "POST",
+            url: "/home/show_company_record/" + page,//+tab,
+            data: {c_id:c_id_, year:year_},// 你的formid
+            success: function (data) {
+                $("#ajax_event_div").html('');
+                $("#ajax_event_div").append(data);
+            }
+        });
+    }
 
 </script>
 </body>

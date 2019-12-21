@@ -550,6 +550,112 @@ class Manager_model extends MY_Model
     }
 
     /**
+     * 执业经纪人人事申请列表
+     * @author yangyang
+     * @date 2019-12-20
+     */
+    public function agent_apply_list($page = 1){
+        $data['limit'] = $this->limit;
+        //搜索条件
+        $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
+        $data['agent_job_code'] = $this->input->get('agent_job_code')?trim($this->input->get('agent_job_code')):null;
+        $data['status'] = $this->input->get('status')?trim($this->input->get('status')):null;
+        //获取总记录数
+        $this->db->select('count(1) num')->from('agent_apply a');
+        $this->db->join('agent b', 'a.agent_id = b.id', 'inner');
+        if($data['keyword']){
+            $this->db->group_start();
+            $this->db->like('b.name', $data['keyword']);
+            $this->db->or_like('b.card', $data['keyword']);
+            $this->db->group_end();
+        }
+        if($data['status']){
+            $this->db->where('a.status', $data['status']);
+        }
+        if($data['agent_job_code']){
+            $this->db->where('b.job_code', $data['agent_job_code']);
+        }
+        $num = $this->db->get()->row();
+        $data['total_rows'] = $num->num;
+
+        //获取详细列
+        $this->db->select('a.*, b.name agent_name_, b.job_code agent_job_code_, c1.company_name c1_name_, c2.company_name c2_name_')->from('agent_apply a');
+        $this->db->join('agent b', 'a.agent_id = b.id', 'inner');
+        $this->db->join('company_pending c1', 'c1.id = a.old_company_id', 'left');
+        $this->db->join('company_pending c2', 'c2.id = a.new_company_id', 'left');
+        if($data['keyword']){
+            $this->db->group_start();
+            $this->db->like('b.name', $data['keyword']);
+            $this->db->or_like('b.card', $data['keyword']);
+            $this->db->group_end();
+        }
+        if($data['status']){
+            $this->db->where('a.status', $data['status']);
+        }
+        if($data['agent_job_code']){
+            $this->db->where('b.job_code', $data['agent_job_code']);
+        }
+        $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
+        $this->db->order_by('a.cdate','desc');
+        $data['res_list'] = $this->db->get()->result_array();
+        return $data;
+    }
+
+    public function agent_apply_view($id){
+        $this->db->select('a.*, b.name agent_name_, b.job_code agent_job_code_, c1.company_name c1_name_, c2.company_name c2_name_')->from('agent_apply a');
+        $this->db->join('agent b', 'a.agent_id = b.id', 'inner');
+        $this->db->join('company_pending c1', 'c1.id = a.old_company_id', 'left');
+        $this->db->join('company_pending c2', 'c2.id = a.new_company_id', 'left');
+        $this->db->where('a.id',$id);
+        $detail =  $this->db->get()->row_array();
+        return $detail;
+    }
+
+    public function agent_apply_handle($status){
+        if(!$id = $this->input->post('id'))
+            return $this->fun_fail('信息缺失!');
+        $apply_info = $this->db->select()->from('agent_apply')->where('id', $id)->get()->row_array();
+        if(!$apply_info)
+            return $this->fun_fail('申请不存在!');
+        if ($apply_info['status'] != 1) 
+            return $this->fun_fail('申请状态变更，不可操作!');
+        if(!in_array($status, array(-1,2)))
+            return $this->fun_fail('操作异常!');
+        switch ($status) {
+            case '2':
+                $agent_info_ = $this->readByID('agent', 'id', $apply_info['agent_id']);
+                if(!$agent_info_ || $agent_info_['flag'] != 2 || $agent_info_['grade_no'] == 1)
+                    return $this->fun_fail('经纪人异常，不可操作!');
+                if($agent_info_['company_id'] != $apply_info['old_company_id'])
+                    return $this->fun_fail('经纪人存在人事变动，不可操作!');
+                if($apply_info['new_company_id'] != -1){
+                    $new_company_info_ = $this->readByID('company_pending', 'id', $apply_info['new_company_id']);
+                    if(!$new_company_info_ || $new_company_info_['flag'] != 2)
+                        return $this->fun_fail('新企业状态异常，不可操作!');
+                }
+                $this->db->where('id', $apply_info['agent_id'])->update('agent', array('company_id' => $apply_info['new_company_id'], 'wq' => -1));
+                $this->save_company_total_score($apply_info['old_company_id']);
+                $this->save_company_total_score($apply_info['new_company_id']);
+                $this->agent_apply_all_cancel($apply_info['agent_id']);
+                break;
+            case '-1':
+                if(!$err_remark = $this->input->post('err_remark'))
+                    return $this->fun_fail('请填写作废备注!');
+                $this->db->where('id', $id)->update('agent_apply', array(
+                    'status' => -1,
+                    'err_remark' => $err_remark,
+                    'sdate' => date('Y-m-d H:i:s', time())
+                ));
+                break;
+            default:
+                return $this->fun_fail('操作异常!');
+                break;
+        }
+
+        return $this->fun_success('操作成功!');
+    }
+
+    /**
      *********************************************************************************************
      * 经纪人事件
      *********************************************************************************************

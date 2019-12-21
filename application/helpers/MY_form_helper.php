@@ -384,7 +384,7 @@ function create_captcha($data = '', $font_path = '')
 
     #直接输出
     //如有必要时添加代码ob_clean();清除缓存保证header前没有任何输出
-    //ob_clean();
+    ob_clean();
     header("Content-Type:image/jpeg");
 
     imagejpeg($im);
@@ -413,4 +413,19 @@ function password($password = '')
     */
     return md5('Q' . $password . 'W');
 
+}
+
+/**
+ * 函数：获取正确的页数 这里处理如何是在删除情况下 最后一页数据不现实的情况
+ * @param 
+ * @return int           返回正确的页数
+ */
+function get_right_page($page, $count, $limit){
+    if($page > 1){
+            $sj_page_count = ceil($count / $limit);
+            if($sj_page_count < $page){
+                $page-=1;
+            }
+    }
+    return $page;
 }

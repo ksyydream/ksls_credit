@@ -1,0 +1,83 @@
+<!doctype html>
+<html class="no-js">
+<head>
+ {{include file='homepage/public/head.html'}}
+</head>
+<body class="page">
+   {{include file='homepage/public/logo.html'}}
+   <div class="page-bd">
+    <div class="main1200">
+   
+<div class="container">
+          <div class="company-info apply-info person-change">
+            <ul class="credit-menu apply-menu">
+              <li><a href="/agent/person_change" class="on"><span><em></em>信息修改</span></a></li>
+              <li><a href="/agent/add_track" class="menu-link"><span><em></em>人事申请</span></a></li>
+              <li><a href="/agent/track_list" class="menu-link"><span><em></em>申请列表</span></a></li>
+            </ul>
+            <div class="credit-txt">
+                <form action="/agent/save_info" method="post" id="save_form">
+              <dl class="dl-form dl-form1">
+                <dt>姓名</dt>
+                <dd><input type="text" value="{{$data.name}}" class="input-txt-1 input-txt-3" readonly style="color:#aaa"></dd>
+              </dl>
+              <dl class="dl-form dl-form1">
+                <dt>执证号</dt>
+                <dd><input type="text" value="{{$data.job_code}}" class="input-txt-1 input-txt-3" readonly style="color:#aaa"></dd>
+              </dl> 
+              <dl class="dl-form dl-form1">
+                <dt>电话号码</dt>
+                <dd><input type="text" name="phone" id="phone" value="{{$data.phone}}" class="input-txt-1 input-txt-3 js4phone"></dd>
+              </dl> 
+              <dl class="dl-form dl-form1">
+                <dt>身份证号</dt>
+                <dd><input type="text" value="{{$data.card}}" class="input-txt-1 input-txt-3" readonly style="color:#aaa"></dd>
+              </dl> 
+              <dl class="dl-form dl-form1">
+                <dt>公司</dt>
+                <dd><input type="text" value="{{$data.company_name|default:''}}" class="input-txt-1 input-txt-3" readonly style="color:#aaa"></dd>
+              </dl> 
+              <div class="clear"></div>
+               <a href="javascript:" id="btn_save" class="submit-btn">确认修改</a>
+                </form>
+              </div> 
+          </div>           
+      </div>
+
+
+    </div>
+   </div>
+
+
+<!-- 以上页面内容 开发时删除 -->
+
+
+{{include file='homepage/public/foot.html'}}
+<script type="text/javascript">
+
+    $("#btn_save").click(function () {
+        var phone = $.trim($("#phone").val());
+        if (phone == "") {
+            layer.msg('电话号码不能为空', { icon: 2 });
+            return false;
+        };
+        $.ajax({
+            type: "POST",
+            url: "/agent/save_info", //+tab,
+            data: $('#save_form').serialize(), // 你的formid
+            success: function (data) {
+                var return_ = JSON.parse(data)
+                if (return_.status == 1) {
+                    layer.alert(return_.msg, { skin: 'layui-layer-molv', closeBtn: 0 }, function () {
+                        layer.closeAll();
+                    });
+                } else {
+                    layer.msg(return_.msg, { icon: 2 });
+                }
+            }
+        });
+    })
+
+</script>
+</body>
+</html>

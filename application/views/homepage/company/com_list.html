@@ -4,12 +4,7 @@
  {{include file='homepage/public/head.html'}}
 </head>
 <body class="page">
-   <div class="page-hd">
-      <div class="main1200">
-           <a href="index.html" class="logo"></a>
-            <a href="" class="login-btn">登录</a>
-      </div>
-   </div> 
+   {{include file='homepage/public/logo.html'}} 
 <div class="page-bd">
     <div class="main1200">
       <div class="search_box">
@@ -23,7 +18,7 @@
     <div class="company-info">
       <p class="result-p">共计搜索到<i class="num">{{$data.total_rows|default:'0'}}</i>家符合条件的公司</p>
        {{foreach from=$data.res_list key=k item=v}}
- <a href="" class="result-alink">
+ <a href="/home/company_detail/{{$v.id}}" class="result-alink">
         <dl class="res-dl">
           <dt>{{$v.company_name}}</dt>
           <dd>
@@ -38,7 +33,7 @@
      
    
      <div class="clear"></div>
-     <div id="company_page">
+     <div id="company_page" class="page-fy">
             {{$pager}}
        </div>
     </div>

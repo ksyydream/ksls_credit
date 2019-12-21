@@ -18,25 +18,25 @@
                 </ul>
                 <div id="slide01" class="tab">
                     <div class="content message" style="display:block">
-                        <form>
+                        <form id="company_form">
                            <ul class="login-ul">
-                              <li class="li-input"><em class="ipt-icon"></em><input type="text"  name="username" class="login-txt" placeholder="请输入企业税号"></li>
-                              <li class="li-input"><em class="ipt-icon icon-lock"></em><input type="text" name="userpwd" class="login-txt" placeholder="请输入登录密码"></li>
-                              <li class="li-input"><em class="ipt-icon icon-confirm"></em><input type="text" name="userconfirm" class="login-txt login-confirm" placeholder="请输入验证码">
-                                <span class="confirm-pic"><img src="/web_assets/i/confirm.jpg"></span></li>
+                              <li class="li-input"><em class="ipt-icon"></em><input type="text" id="c_name"  name="username" class="login-txt" placeholder="请输入企业税号"></li>
+                              <li class="li-input"><em class="ipt-icon icon-lock"></em><input type="text" name="userpwd" id="c_pwd" class="login-txt" placeholder="请输入登录密码"></li>
+                              <li class="li-input"><em class="ipt-icon icon-confirm"></em><input type="text" name="userconfirm" maxlength="4" id="c_cap" class="login-txt login-confirm" placeholder="请输入验证码">
+                                <span class="confirm-pic"><img src="/home/get_company_cap" onclick="this.src = '/home/get_company_cap?'+new Date().getTime()"></span></li>
                            </ul>  
-                            <a href="" class="login-btn">登  录</a>
+                            <a href="javascript:;" id="coampany_btn" class="login-btn">登  录</a>
                         </form>
                     </div>
                     <div class="content">
-                           <form>
+                           <form id="agent_form">
                            <ul class="login-ul">
-                              <li class="li-input"><em class="ipt-icon"></em><input type="text"  name="username" class="login-txt" placeholder="请输入经纪人证书号"></li>
-                              <li class="li-input"><em class="ipt-icon icon-lock"></em><input type="text" name="userpwd" class="login-txt" placeholder="请输入登录密码"></li>
-                              <li class="li-input"><em class="ipt-icon icon-confirm"></em><input type="text" name="userconfirm" class="login-txt login-confirm" placeholder="请输入验证码">
-                                <span class="confirm-pic"><img src="/web_assets/i/confirm.jpg"></span></li>
+                              <li class="li-input"><em class="ipt-icon"></em><input type="text" id="a_name"  name="username" class="login-txt" placeholder="请输入经纪人证书号"></li>
+                              <li class="li-input"><em class="ipt-icon icon-lock"></em><input type="text" id="a_pwd" name="userpwd" class="login-txt" placeholder="请输入登录密码"></li>
+                              <li class="li-input"><em class="ipt-icon icon-confirm"></em><input type="text" name="userconfirm" id="a_cap" class="login-txt login-confirm" placeholder="请输入验证码">
+                                <span class="confirm-pic"><img src="/home/get_agent_cap" id="agent_img" onclick="this.src = '/home/get_agent_cap?'+new Date().getTime()"></span></li>
                            </ul>  
-                            <a href="" class="login-btn">登  录</a>
+                            <a href="javascript:;" id="agent_btn" class="login-btn">登  录</a>
                         </form>
                     </div>
                 </div>
@@ -57,7 +57,39 @@ $(function(){
 
 })
 
-
+$("#agent_btn").click(function(){
+    var a_name = $.trim($("#a_name").val());
+    var a_pwd = $.trim($("#a_pwd").val());
+    var a_cap = $.trim($("#a_cap").val());
+    if (a_name == "") {
+        layer.msg('登录账号不能为空', {icon: 2});
+        return false;
+    };
+    if (a_pwd == "") {
+        layer.msg('登录密码不能为空！', { icon: 2 });
+        return false;
+    };
+    if (a_cap == "") {
+        layer.msg('验证码不能为空！', { icon: 2 });
+        return false;
+    };
+    $.ajax({
+            type: "POST",
+            url: "/home/login_agent",//+tab,
+            data: $('#agent_form').serialize(),// 你的formid
+            success: function (data) {
+                var return_ = JSON.parse(data)
+                if (return_.status == 11) {
+                         window.location.replace("/home/index");
+                }else{
+                  layer.alert(return_.msg, {skin: 'layui-layer-molv',closeBtn: 0}, function(){
+                            layer.closeAll();
+                            $("#agent_img").click();
+                    });
+                }
+            }
+        });
+})
 </script>
 </body>
 </html>

@@ -1182,6 +1182,14 @@ class MY_Model extends CI_Model{
         }
         return true;
     }
+
+    //批量系统作废 人事申请
+    public function agent_apply_all_cancel($agent_id){
+        $this->db->where('agent_id', $agent_id)->where('status', 1)->update('agent_apply',array(
+                    'status' => -2,
+                    'sdate' => date('Y-m-d H:i:s', time())
+                ));
+    }
 }
 
 /* End of file MY_Model.php */

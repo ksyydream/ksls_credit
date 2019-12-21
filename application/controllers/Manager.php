@@ -415,6 +415,43 @@ class Manager extends MY_Controller {
     }
 
     /**
+     * 执业经纪人人事申请列表
+     * @author yangyang
+     * @date 2019-12-20
+     */
+    public function agent_apply_list($page = 1){
+        $data = $this->manager_model->agent_apply_list($page);
+        $base_url = "/manager/agent_apply_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('manager/agent/agent_apply_list.html');
+    }
+
+    //人事申请详情
+    public function agent_apply_view($m_id){
+        $data = $this->manager_model->agent_apply_view($m_id);
+        if(!$data){
+            $this->show_message('未找到人事信息信息!');
+        }
+        $this->assign('data', $data);
+        $this->display('manager/agent/agent_apply_detail.html');
+    }
+
+    //人事申请作废
+    public function agent_apply_cancel(){
+        $res = $this->manager_model->agent_apply_handle(2);
+        $this->ajaxReturn($res);
+    }
+
+    //人事申请通过
+    public function agent_apply_submit(){
+        $res = $this->manager_model->agent_apply_handle(-1);
+        $this->ajaxReturn($res);
+    }
+
+    /**
      *********************************************************************************************
      * 经纪人事件
      *********************************************************************************************
