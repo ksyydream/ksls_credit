@@ -115,7 +115,7 @@ class Agent_model extends MY_Model
         return $this->fun_success('申请成功!');
     }
 
-    public function track_list($page = 1, $agent_id) {
+    public function apply_list($page = 1, $agent_id) {
         $data['limit'] = $this->home_limit;//每页显示多少调数据
 
         $this->db->select('count(1) num');

@@ -44,7 +44,7 @@ class Company_model extends MY_Model
     return $this->fun_success('登录成功!');
    }
 
-   public function get_company4track($flag){
+   public function get_company4apply($flag){
         $this->db->select('company_name, id, business_no');
         $this->db->from('company_pending');
         if($flag && is_array($flag))

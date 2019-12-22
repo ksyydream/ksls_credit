@@ -41,13 +41,13 @@ class Agent extends Home_Controller {
 	}
 
 	//经纪人人事申请页面
-	public function add_track()
+	public function add_apply()
 	{
 		$agent_info = $this->agent_model->get_detail4self($this->agent_id);
-		$company_list = $this->company_model->get_company4track(array(2));
+		$company_list = $this->company_model->get_company4apply(array(2));
 		$this->assign('company_list',$company_list);
 		$this->assign('agent_info',$agent_info);
-    	$this->display('homepage/agent/add_track.html');
+    	$this->display('homepage/agent/add_apply.html');
 	}
 
 	public function save_apply(){
@@ -56,22 +56,22 @@ class Agent extends Home_Controller {
 	}
 
 	//人事申请列表
-	public function track_list($page=1){
-		$data = $this->agent_model->track_list($page, $this->agent_id);
-		$base_url = "/agent/track_list/";
+	public function apply_list($page=1){
+		$data = $this->agent_model->apply_list($page, $this->agent_id);
+		$base_url = "/agent/apply_list/";
 		$pager = $this->pagination->getPageLink($base_url, $data['total_rows'], $data['limit']);
 		$this->assign('pager', $pager);
 		$this->assign('page', $page);
 		$this->assign('data', $data);
-		$this->display('homepage/agent/track_list.html');
+		$this->display('homepage/agent/apply_list.html');
 	}
 
-	public function track_detail($apply_id){
+	public function apply_detail($apply_id){
 		$apply_info = $this->agent_model->get_apply_info($apply_id, $this->agent_id);
 		if(!$apply_info)
-			redirect('/agent/track_list');
+			redirect('/agent/apply_list');
 		$this->assign('apply_info',$apply_info);
-		$this->display('homepage/agent/track_detail.html');
+		$this->display('homepage/agent/apply_detail.html');
 	}
 	
 }
