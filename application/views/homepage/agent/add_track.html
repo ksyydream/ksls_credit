@@ -31,7 +31,7 @@
                   <dt>新公司</dt>
                   <dd>
                       <select id="new_company" name="new_company">
-                          <option value="-1">{{$agent_company_id_f1)}}</option>
+                          <option value="-1">--非执业--</option>
                           {{foreach from=$company_list key=key item=item}}
                           <option value="{{$item.id}}">{{$item.company_name}}</option>
                           {{/foreach}}
@@ -81,7 +81,7 @@
             $.ajax({
                 type: "POST",
                 url: "/agent/save_apply",//+tab,
-                data: $('#agent_form').serialize(),// 你的formid
+                data: $('#save_form').serialize(),// 你的formid
                 success: function (data) {
                     layer.close(index_load);
                     var return_ = JSON.parse(data)
@@ -94,7 +94,11 @@
                             window.location.replace(url);
                         });
                     }else{
-                        layer.msg(return_.msg);
+                        layer.alert(return_.msg, {
+                            skin: 'layui-layer-lan'
+                            ,closeBtn: 0
+                            ,anim: 4 //动画类型
+                        });
                     }
                 },
                 error:function(){

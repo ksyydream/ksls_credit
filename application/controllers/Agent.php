@@ -57,7 +57,7 @@ class Agent extends Home_Controller {
 
 	//人事申请列表
 	public function track_list($page=1){
-		$data = $this->agent_model->track_list($page);
+		$data = $this->agent_model->track_list($page, $this->agent_id);
 		$base_url = "/agent/track_list/";
 		$pager = $this->pagination->getPageLink($base_url, $data['total_rows'], $data['limit']);
 		$this->assign('pager', $pager);

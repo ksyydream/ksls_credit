@@ -84,13 +84,21 @@ class Agent_model extends MY_Model
             return $this->fun_fail('经纪人账号无效！');
         if($agent_info_['grade_no'] == 1)
             return $this->fun_fail('经纪人失信,不可申请！');
+        $check_apply_ = $this->db->select('id')->from('agent_apply')->where('agent_id', $agent_id)->where('status', 1)->get()->row_array();
+        if($check_apply_)
+            return $this->fun_fail('存在未处理的人事申请,不可再申请！');
         $new_company_id = $this->input->post('new_company');
         if(!$new_company_id)
             return $this->fun_fail('新公司选择异常！');
-        if($new_company_id == -1){
-            $new_company_info = array('id' => -1, 'company_name' => '');
-        }else{
+        if($agent_info_['company_id'] == $new_company_id)
+            return $this->fun_fail('新公司与旧公司不可相同！');
+        $new_company_info = array('id' => -1, 'company_name' => '');
+        if($new_company_id != -1){
             $new_company_info = $this->db->select('company_name,flag,id')->from('company_pending')->where('id', $new_company_id)->get()->row_array();
+            if(!$new_company_info)
+                return $this->fun_fail('新公司不存在！');
+            if($new_company_info['flag'] != 2)
+                return $this->fun_fail('新公司不可选择！');
         }
 
         $data = array(
@@ -103,7 +111,8 @@ class Agent_model extends MY_Model
             'cdate'=>date('Y-m-d H:i:s',time()),
             'status'=>1,
         );
-
+        $this->db->insert('agent_apply',$data);
+        return $this->fun_success('申请成功!');
     }
 
     public function track_list($page = 1, $agent_id) {
