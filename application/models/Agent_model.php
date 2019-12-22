@@ -127,7 +127,8 @@ class Agent_model extends MY_Model
         //总记录数
         $total_rows = $rs_total->num;
         $data['total_rows'] = $total_rows;
-
+        //这里处理如何是在删除情况下 最后一页数据不现实的情况
+        $page = get_right_page($page, $data['total_rows'], $data['limit']);
         //list
         $this->db->select('b.*, c1.company_name c1_name_, c2.company_name c2_name_');
         $this->db->from('agent a');

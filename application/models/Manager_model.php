@@ -650,6 +650,7 @@ class Manager_model extends MY_Model
                     'from_company_name'     =>      $agent_info_['company_name'],
                     'agent_id'              =>      $agent_info_['id'],
                     'create_date'           =>      date('Y-m-d H:i:s',time()),
+                    'status'                =>      5
                 );
                 $this->db->insert('agent_track',$data_insert);
                 $this->agent_apply_all_cancel($apply_info['agent_id']);

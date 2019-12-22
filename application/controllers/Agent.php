@@ -32,6 +32,8 @@ class Agent extends Home_Controller {
     //经纪人编辑个人信息页面
 	public function person_change()
 	{
+		$data = $this->agent_model->get_detail($this->agent_id);
+		$this->assign('data', $data);
     	$this->display('homepage/agent/person_change.html');
 	}
 
