@@ -634,6 +634,10 @@ class Manager_model extends MY_Model
                         return $this->fun_fail('新企业状态异常，不可操作!');
                 }
                 $this->db->where('id', $apply_info['agent_id'])->update('agent', array('company_id' => $apply_info['new_company_id'], 'wq' => -1));
+                $this->db->where('id', $id)->update('agent_apply', array(
+                    'status' => 2,
+                    'sdate' => date('Y-m-d H:i:s', time())
+                ));
                 $this->save_company_total_score($apply_info['old_company_id']);
                 $this->save_company_total_score($apply_info['new_company_id']);
                 $this->agent_apply_all_cancel($apply_info['agent_id']);

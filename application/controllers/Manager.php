@@ -441,13 +441,13 @@ class Manager extends MY_Controller {
 
     //人事申请作废
     public function agent_apply_cancel(){
-        $res = $this->manager_model->agent_apply_handle(2);
+        $res = $this->manager_model->agent_apply_handle(-1);
         $this->ajaxReturn($res);
     }
 
     //人事申请通过
     public function agent_apply_submit(){
-        $res = $this->manager_model->agent_apply_handle(-1);
+        $res = $this->manager_model->agent_apply_handle(2);
         $this->ajaxReturn($res);
     }
 

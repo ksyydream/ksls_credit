@@ -1184,9 +1184,10 @@ class MY_Model extends CI_Model{
     }
 
     //批量系统作废 人事申请
-    public function agent_apply_all_cancel($agent_id){
+    public function agent_apply_all_cancel($agent_id, $err_remark = ''){
         $this->db->where('agent_id', $agent_id)->where('status', 1)->update('agent_apply',array(
                     'status' => -2,
+                    'err_remark' => $err_remark,
                     'sdate' => date('Y-m-d H:i:s', time())
                 ));
     }

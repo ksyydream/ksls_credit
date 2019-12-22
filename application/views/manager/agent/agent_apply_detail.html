@@ -155,7 +155,7 @@
             btn: ['确认','取消'], //按钮
             area: ['200px', 'auto']
         }, function(){
-            $.post('/manager/agent_apply_cancel',{id: id, err_remark:err_remark}, function(html){
+            $.post('/manager/agent_apply_cancel',{id: record_id, err_remark:err_remark}, function(html){
                 var data = JSON.parse(html);
                 if(data.status == 1){
                     location.reload()
@@ -169,6 +169,29 @@
 
         });
     })
+
+ $("#save_btn").click(function(){
+     var record_id = $.trim($("#record_id").val());
+
+
+     var layerIndex = layer.confirm('是否确认通过？通过后可能影响公司状态!' , {
+         btn: ['确认','取消'], //按钮
+         area: ['200px', 'auto']
+     }, function(){
+         $.post('/manager/agent_apply_submit',{id: record_id}, function(html){
+             var data = JSON.parse(html);
+             if(data.status == 1){
+                 location.reload()
+             }else{
+                 layer.close(layerIndex);
+                 layer.msg(data.msg, {icon: 2});
+             }
+         });
+
+     }, function(){
+
+     });
+ })
 
 </script>
 </body>
