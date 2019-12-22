@@ -1,0 +1,109 @@
+<!doctype html>
+<html class="no-js">
+<head>
+ {{include file='homepage/public/head.html'}}
+
+</head>
+<body class="page">
+   {{include file='homepage/public/logo.html'}}
+   <div class="page-bd">
+    <div class="main1200">
+   
+<div class="container">
+          <div class="company-info apply-info">
+            <ul class="credit-menu apply-menu">
+              <li><a href="/agent/person_change" class="menu-link"><span><em></em>信息修改</span></a></li>
+              <li><a href="/agent/add_track" class="on"><span><em></em>人事申请</span></a></li>
+              <li><a href="/agent/track_list" class="menu-link"><span><em></em>申请列表</span></a></li>
+            </ul>
+            <div class="credit-txt">
+                <form action="/" method="post" id="save_form">
+              <div class="div-form">
+
+                <dl class="dl-form dl-form1 fl">
+                  <dt>原公司</dt>
+                  <dd><input type="text" value="{{$agent_info.company_name|default:'--非执业--'}}" placeholder="" class="input-txt-1" readonly style="color:#aaa">
+                      <input type="hidden" value="{{$agent_info.company_id}}" name="agent_company_id" id="agent_company_id">
+                  </dd>
+                </dl> 
+                <span class="hx fl">——</span>
+                <dl class="dl-form dl-form1 fl">
+                  <dt>新公司</dt>
+                  <dd>
+                      <select id="new_company" name="new_company">
+                          <option value="-1">{{$agent_company_id_f1)}}</option>
+                          {{foreach from=$company_list key=key item=item}}
+                          <option value="{{$item.id}}">{{$item.company_name}}</option>
+                          {{/foreach}}
+
+                      </select>
+                  </dd>
+                </dl>
+                <div class="clear"></div>
+              </div>
+              <dl class="dl-form" class="clear:both">
+                <dt>表述申请</dt>
+                <dd><textarea name="remark" id="remark" cols="3" rows="3" value="" class="c-content-txt"></textarea></dd>
+              </dl>
+              <div class="clear"></div>
+             <a href="javascript:" id="btn_apply" class="submit-btn">提交申请</a>
+              </form>
+
+              </div> 
+          </div>           
+      </div>
+
+
+    </div>
+   </div>
+
+</body>
+</html>
+{{include file='homepage/public/foot.html'}}
+<link href="/web_assets/js/select_model/jquery.searchableSelect.css" rel="stylesheet" type="text/css">
+<script src="/web_assets/js/select_model/jquery.searchableSelect.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $("#btn_apply").click(function () {
+            var index_load = layer.load(1, {
+                shade: [0.1,'#fff'] //0.1透明度的白色背景
+            });
+            if($("#agent_company_id").val() == $("#new_company").val()){
+                layer.close(index_load);
+                layer.msg('新公司不可与原公司相同!', {icon: 2});
+                return false;
+            }
+            if($.trim($("#remark").val())==""){
+                layer.close(index_load);
+                layer.msg('请输入申请表述!', {icon: 2});
+                return false;
+            }
+            $.ajax({
+                type: "POST",
+                url: "/agent/save_apply",//+tab,
+                data: $('#agent_form').serialize(),// 你的formid
+                success: function (data) {
+                    layer.close(index_load);
+                    var return_ = JSON.parse(data)
+                    if (return_.status == 1) {
+                        var url = '/agent/track_list/';
+                        layer.alert('操作成功!', {
+                            skin: 'layui-layer-molv' //样式类名
+                            ,closeBtn: 0
+                        }, function(){
+                            window.location.replace(url);
+                        });
+                    }else{
+                        layer.msg(return_.msg);
+                    }
+                },
+                error:function(){
+                    layer.close(index_load);
+                    layer.msg('网络异常!');
+                }
+            });
+        })
+
+        $('#new_company').searchableSelect();
+    });
+</script>

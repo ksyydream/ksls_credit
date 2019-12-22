@@ -18,11 +18,11 @@ class Home_model extends MY_Model
     }
 
     public function get_company_flag($company_id){
-        return $this->db->select('flag')->where('id', $company_id)->from('company_pending')->get()->row_array();
+        return $this->db->select('flag,company_name')->where('id', $company_id)->from('company_pending')->get()->row_array();
     }
 
     public function get_agent_flag($agent_id){
-        return $this->db->select('flag')->where('id', $agent_id)->from('agent')->get()->row_array();
+        return $this->db->select('flag,name')->where('id', $agent_id)->from('agent')->get()->row_array();
     }
 
     public function company_list($page = 1) {

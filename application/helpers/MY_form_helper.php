@@ -384,7 +384,7 @@ function create_captcha($data = '', $font_path = '')
 
     #直接输出
     //如有必要时添加代码ob_clean();清除缓存保证header前没有任何输出
-    ob_clean();
+    //ob_clean();
     header("Content-Type:image/jpeg");
 
     imagejpeg($im);
@@ -428,4 +428,15 @@ function get_right_page($page, $count, $limit){
             }
     }
     return $page;
+}
+
+function home_err_return(){
+    if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
+    {
+        $err_ = array('status' => -1, 'msg' => '操作异常！请重新登录！');
+        $this->ajaxReturn($err_);
+    }
+    else {
+        redirect('/home/logout');
+    }
 }

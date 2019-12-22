@@ -10,9 +10,9 @@
         <tr>
             <td style="text-align: left;font-size: small">
                 <span class="label {{$agent_track_status_label[$item.status]}} arrowed-right">{{$agent_track_status[$item.status]}}</span>{{$item.create_date|date_format:'%Y-%m-%d'}}
-                从<span style="font-weight: bold">{{$item.from_company_name|default:'非执业状态'}}</span>{{if $item.from_name!=$item.from_company_name}}{{if $item.from_name}}<span style="font-weight: bold">(现称:{{$item.from_name}})</span>{{/if}}{{/if}}
+                从<span style="font-weight: bold">{{$item.from_company_name|default:'--非执业--'}}</span>{{if $item.from_name!=$item.from_company_name}}{{if $item.from_name}}<span style="font-weight: bold">(现称:{{$item.from_name}})</span>{{/if}}{{/if}}
                 到
-                <span style="font-weight: bold">{{$item.to_company_name|default:'非执业状态'}}</span>{{if $item.to_name!=$item.to_company_name}}{{if $item.to_name}}<span style="font-weight: bold">(现称:{{$item.to_name}})</span>{{/if}}{{/if}}
+                <span style="font-weight: bold">{{$item.to_company_name|default:'--非执业--'}}</span>{{if $item.to_name!=$item.to_company_name}}{{if $item.to_name}}<span style="font-weight: bold">(现称:{{$item.to_name}})</span>{{/if}}{{/if}}
                
             </td>
 

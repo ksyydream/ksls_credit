@@ -145,6 +145,7 @@ class MY_Controller extends CI_Controller
     	);
     	return $signPackage;
     }
+
 }
 
 /**
@@ -164,29 +165,38 @@ class Home_Controller extends MY_Controller{
 		parent::__construct();
 		$this->load->model('home_model');
 		$this->load->model('agent_model');
-		$agent_id = $this->session->userdata('agent_id');
-		if($agent_id){
-			$data = $this->home_model->get_agent_flag($agent_id);
-			if($data && $data['flag'] == 2){
-				$this->assign('user_flag_', 'agent');
-				$this->agent_id = $agent_id;
-				$this->session->unset_userdata('company_id');
-				$this->session->unset_userdata('company_info');
-			}else{
-				redirect('/home/logout');
+		$this->load->model('company_model');
+		$uncheck_action = array('logout', 'login', 'login_agent');
+		$this->assign('user_flag_', '');
+		$action_ = $this->router->fetch_method();
+		if(!in_array($action_, $uncheck_action)){
+			$agent_id = $this->session->userdata('agent_id');
+			if($agent_id){
+				$data = $this->home_model->get_agent_flag($agent_id);
+				if($data && $data['flag'] == 2){
+					$this->assign('user_flag_', 'agent');
+					$this->assign('hear_show_', $data['name']);
+					$this->agent_id = $agent_id;
+					$this->session->unset_userdata('company_id');
+					$this->session->unset_userdata('company_info');
+				}else{
+					home_err_return();
+				}
+			}
+
+			$company_id = $this->session->userdata('company_id');
+			if($company_id){
+				$data = $this->home_model->get_company_flag($company_id);
+				if($data && $data['flag'] == 2){
+					$this->assign('user_flag_', 'company');
+					$this->assign('hear_show_', $data['company_name']);
+					$this->company_id = $company_id;
+				}else{
+					home_err_return();
+				}
 			}
 		}
 
-		$company_id = $this->session->userdata('company_id');
-		if($company_id){
-			$data = $this->home_model->get_company_flag($company_id);
-			if($data && $data['flag'] == 2){
-				$this->assign('user_flag_', 'company');
-				$this->company_id = $company_id;
-			}else{
-				redirect('/home/logout');
-			}
-		}
 
 	}
 }

@@ -79,7 +79,7 @@ $("#agent_btn").click(function(){
             data: $('#agent_form').serialize(),// 你的formid
             success: function (data) {
                 var return_ = JSON.parse(data)
-                if (return_.status == 11) {
+                if (return_.status == 1) {
                          window.location.replace("/home/index");
                 }else{
                   layer.alert(return_.msg, {skin: 'layui-layer-molv',closeBtn: 0}, function(){

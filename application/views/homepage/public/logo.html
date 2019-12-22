@@ -1,9 +1,28 @@
 <div class="page-hd">
-      <div class="main1200">
-           <a href="index.html" class="logo"></a>
-            <a href="/home/login" class="login-btn">登录</a>
-      </div>
-   </div> 
+    <div class="main1200">
+        {{if $user_flag_ == ''}}
+
+        <a href="/" class="logo"></a>
+        <div class="before-login"><a href="/home/login">公司/经纪人登录</a>&nbsp&nbsp|&nbsp&nbsp<a href="/manager_login">管理员登录</a></div>
+
+            {{/if}}
+
+        {{if $user_flag_ == 'agent'}}
+        <div class="logining" id="JloginUser">
+            <div class="afer-login">
+                <span class="fl"><img src="/web_assets/i/user_icon.png" alt=""><em class="login-user">{{$hear_show_|default:''}}</em></span>
+                <span class="triangle"></span>
+            </div>
+            <ul class="login-list" id="JuserMenu" style="display:none;">
+                <li><a href="/agent/add_track" target="_blank"><em class="cxjl"></em>人事申请</a></li>
+                <li><a href="/agent/open" target="_blank"><em class="jbxx"></em>修改信息</a></li>
+                <li><a href="/agent/edit_pwd" target="_blank"><em class="xgmm"></em>修改密码</a></li>
+                <li><a href="/home/logout"><em class="out"></em>退出</a></li>
+            </ul>
+        </div>
+        {{/if}}
+</div>
+</div>
 
 
 

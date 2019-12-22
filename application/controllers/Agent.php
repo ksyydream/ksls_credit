@@ -24,14 +24,7 @@ class Agent extends Home_Controller {
     {
         parent::__construct();
 		if(!$this->agent_id){
-		 if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
-            {
-                $err_ = $this->manager_model->fun_fail('操作异常！请重新登录！');
-                $this->ajaxReturn($err_);
-            }
-            else {
-                 redirect('/home/logout');
-            }
+			home_err_return();
         }
        
     }
@@ -50,7 +43,27 @@ class Agent extends Home_Controller {
 	//经纪人人事申请页面
 	public function add_track()
 	{
+		$agent_info = $this->agent_model->get_detail4self($this->agent_id);
+		$company_list = $this->company_model->get_company4track(array(2));
+		$this->assign('company_list',$company_list);
+		$this->assign('agent_info',$agent_info);
     	$this->display('homepage/agent/add_track.html');
+	}
+
+	public function save_apply(){
+		$res = $this->agent_model->save_apply($this->agent_id);
+		$this->ajaxReturn($res);
+	}
+
+	//人事申请列表
+	public function track_list($page=1){
+		$data = $this->agent_model->track_list($page);
+		$base_url = "/agent/track_list/";
+		$pager = $this->pagination->getPageLink($base_url, $data['total_rows'], $data['limit']);
+		$this->assign('pager', $pager);
+		$this->assign('page', $page);
+		$this->assign('data', $data);
+		$this->display('homepage/agent/track_list.html');
 	}
 	
 }
