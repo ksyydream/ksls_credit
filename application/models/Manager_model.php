@@ -623,7 +623,7 @@ class Manager_model extends MY_Model
             return $this->fun_fail('操作异常!');
         switch ($status) {
             case '2':
-                $agent_info_ = $this->readByID('agent', 'id', $apply_info['agent_id']);
+                $agent_info_ = $this->db->select('a.*,b.company_name')->from('agent a')->join('company_pending b', 'a.company_id = b.id', 'left')->where('a.id', $apply_info['agent_id'])->get()->row_array();
                 if(!$agent_info_ || $agent_info_['flag'] != 2 || $agent_info_['grade_no'] == 1)
                     return $this->fun_fail('经纪人异常，不可操作!');
                 if($agent_info_['company_id'] != $apply_info['old_company_id'])
@@ -632,6 +632,8 @@ class Manager_model extends MY_Model
                     $new_company_info_ = $this->readByID('company_pending', 'id', $apply_info['new_company_id']);
                     if(!$new_company_info_ || $new_company_info_['flag'] != 2)
                         return $this->fun_fail('新企业状态异常，不可操作!');
+                }else{
+                    $new_company_info_ = array('id' => -1, 'company_name' => null);
                 }
                 $this->db->where('id', $apply_info['agent_id'])->update('agent', array('company_id' => $apply_info['new_company_id'], 'wq' => -1));
                 $this->db->where('id', $id)->update('agent_apply', array(
@@ -640,6 +642,16 @@ class Manager_model extends MY_Model
                 ));
                 $this->save_company_total_score($apply_info['old_company_id']);
                 $this->save_company_total_score($apply_info['new_company_id']);
+                //增加轨迹
+                $data_insert = array(
+                    'to_company_id'         =>      $new_company_info_['id'],
+                    'to_company_name'       =>      $new_company_info_['company_name'],
+                    'from_company_id'       =>      $agent_info_['company_id'],
+                    'from_company_name'     =>      $agent_info_['company_name'],
+                    'agent_id'              =>      $agent_info_['id'],
+                    'create_date'           =>      date('Y-m-d H:i:s',time()),
+                );
+                $this->db->insert('agent_track',$data_insert);
                 $this->agent_apply_all_cancel($apply_info['agent_id']);
                 break;
             case '-1':
@@ -2263,7 +2275,7 @@ class Manager_model extends MY_Model
         return $this->fun_success('重置成功!');
     }
 
-    //重置企业密码
+    //企业注销
     public function company_pending_cancel($admin_id){
         $company_id = $this->input->post('id');
         $cancel_remark = trim($this->input->post('cancel_remark'));
@@ -2286,9 +2298,10 @@ class Manager_model extends MY_Model
         if($agent_ids_){
             $data_insert = array();
             foreach($agent_ids_ as $k_ => $v_){
-                //DBY 重要 发生人事变动 ，经纪人所申请的人事申请自动作废
+                //[企业注销] 发生人事变动 ，经纪人所申请的人事申请自动作废
+                $this->agent_apply_all_cancel($v_['id']);
                 $data_insert[] = array(
-                    'to_company_id'         =>      null,
+                    'to_company_id'         =>      -1,
                     'to_company_name'       =>      null,
                     'from_company_id'       =>      $company_id,
                     'from_company_name'     =>      $company_info['company_name'],

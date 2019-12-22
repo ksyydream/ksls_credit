@@ -992,24 +992,28 @@ class MY_Model extends CI_Model{
             }
         }
         foreach($agent_arr_ as $k=>$v){
-            //DBY 重要 发生人事变动 ，经纪人所申请的人事申请自动作废
+
             if($v==1){
+                //[后台添加]发生人事变动 ，经纪人所申请的人事申请自动作废
+                $this->agent_apply_all_cancel($k);
                 $data_insert[] = array(
-                    'to_company_id'=>$company_id,
-                    'to_company_name'=>$company_data['company_name'],
-                    'from_company_id'=>null,
-                    'from_company_name'=>null,
+                    'to_company_id'     =>      $company_id,
+                    'to_company_name'   =>      $company_data['company_name'],
+                    'from_company_id'   =>      -1,
+                    'from_company_name' =>      null,
                     'agent_id'=>$k,
                     'status'=>1,
                     'create_date'=>date('Y-m-d H:i:s',time()),
                 );
             }
             if($v==2){
+                //[后台删除]发生人事变动 ，经纪人所申请的人事申请自动作废
+                $this->agent_apply_all_cancel($k);
                 $data_insert[] = array(
-                    'to_company_id'=>null,
-                    'to_company_name'=>null,
-                    'from_company_id'=>$company_id,
-                    'from_company_name'=>$company_data['company_name'],
+                    'to_company_id'     =>      -1,
+                    'to_company_name'   =>      null,
+                    'from_company_id'   =>      $company_id,
+                    'from_company_name' =>      $company_data['company_name'],
                     'agent_id'=>$k,
                     'status'=>2,
                     'create_date'=>date('Y-m-d H:i:s',time()),
@@ -1132,7 +1136,7 @@ class MY_Model extends CI_Model{
             if ($company_info_) {
                $this->save_company_total_score($agent_info['company_id']);//重新计算企业信用分和异常状态
                $data_insert = array(
-                    'to_company_id'         =>      null,
+                    'to_company_id'         =>      -1,
                     'to_company_name'       =>      null,
                     'from_company_id'       =>      $agent_info['company_id'],
                     'from_company_name'     =>      $company_info_['company_name'],
@@ -1140,9 +1144,10 @@ class MY_Model extends CI_Model{
                     'status'                =>      3,
                     'create_date'           =>      date('Y-m-d H:i:s',time()),
                 );
-               //DBY 重要 发生人事变动 ，经纪人所申请的人事申请自动作废
                $this->db->insert('agent_track',$data_insert);
             }
+            //[经纪人失信]发生人事变动,不管是否真有人事变动 ，经纪人所申请的人事申请自动作废
+            $this->agent_apply_all_cancel($agent_id);
             
         }else{
             $this->db->where('id', $agent_id)->update('agent', array('grade_no' => $grade_no_['grade_no']));
@@ -1158,7 +1163,7 @@ class MY_Model extends CI_Model{
         $company_info_ = $this->db->select('company_name')->from('company_pending')->where('id', $agent_info['company_id'])->get()->row_array();
         if($agent_info['flag'] != 2 && $company_info_){
             $data_insert = array(
-                'to_company_id'         =>      null,
+                'to_company_id'         =>      -1,
                 'to_company_name'       =>      null,
                 'from_company_id'       =>      $agent_info['company_id'],
                 'from_company_name'     =>      $company_info_['company_name'],
@@ -1167,9 +1172,13 @@ class MY_Model extends CI_Model{
             );
             switch($agent_info['flag']){
                 case 1:
+                    //[经纪人离昆]发生人事变动 ，经纪人所申请的人事申请自动作废
+                    $this->agent_apply_all_cancel($agent_id);
                     $data_insert['status'] = 7;
                     break;
                 case -1:
+                    //[经纪人无效]发生人事变动 ，经纪人所申请的人事申请自动作废
+                    $this->agent_apply_all_cancel($agent_id);
                     $data_insert['status'] = 6;
                     break;
                 default:
@@ -1177,7 +1186,6 @@ class MY_Model extends CI_Model{
             }
             $this->db->where('id', $agent_id)->update('agent', array('company_id' => -1, 'wq' => 1));
             $this->save_company_total_score($agent_info['company_id']);//重新计算企业信用分和异常状态
-            //DBY 重要 发生人事变动 ，经纪人所申请的人事申请自动作废
             $this->db->insert('agent_track',$data_insert);
         }
         return true;

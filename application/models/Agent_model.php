@@ -129,14 +129,28 @@ class Agent_model extends MY_Model
         $data['total_rows'] = $total_rows;
 
         //list
-        $this->db->select('b.*');
+        $this->db->select('b.*, c1.company_name c1_name_, c2.company_name c2_name_');
         $this->db->from('agent a');
         $this->db->join('agent_apply b','a.id = b.agent_id','left');
+        $this->db->join('company_pending c1', 'b.old_company_id = c1.id', 'left');
+        $this->db->join('company_pending c2', 'b.new_company_id = c2.id', 'left');
         $this->db->where('a.flag', 2);
         $this->db->where('a.id', $agent_id);
         $this->db->limit($data['limit'], $offset = ($page - 1) * $data['limit']);
         $this->db->order_by('b.id', 'desc');
         $data['res_list'] = $this->db->get()->result_array();
         return $data;
+    }
+
+    public function get_apply_info($apply_id, $agent_id){
+        $this->db->select('b.*, c1.company_name c1_name_, c2.company_name c2_name_');
+        $this->db->from('agent a');
+        $this->db->join('agent_apply b','a.id = b.agent_id','left');
+        $this->db->join('company_pending c1', 'b.old_company_id = c1.id', 'left');
+        $this->db->join('company_pending c2', 'b.new_company_id = c2.id', 'left');
+        $this->db->where('a.flag', 2);
+        $this->db->where('a.id', $agent_id);
+        $this->db->where('b.id', $apply_id);
+        return $this->db->get()->row_array();
     }
 }

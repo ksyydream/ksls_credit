@@ -65,5 +65,13 @@ class Agent extends Home_Controller {
 		$this->assign('data', $data);
 		$this->display('homepage/agent/track_list.html');
 	}
+
+	public function track_detail($apply_id){
+		$apply_info = $this->agent_model->get_apply_info($apply_id, $this->agent_id);
+		if(!$apply_info)
+			redirect('/agent/track_list');
+		$this->assign('apply_info',$apply_info);
+		$this->display('homepage/agent/track_detail.html');
+	}
 	
 }

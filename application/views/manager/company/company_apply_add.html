@@ -75,6 +75,15 @@
                                             </h4>
 
                                             <div class="space-8"></div>
+                                            {{if $data.id|default:'' > 0}}
+                                            <div class="form-group">
+                                                <label class="col-sm-1 control-label no-padding-right" for="company_name"> 当前信用分 </label>
+                                                <div class="col-sm-9 yy_m_7">
+                                                    {{$data.total_score|default:'-'}}
+                                                </div>
+                                            </div>
+                                            <div class="space-4"></div>
+                                            {{/if}}
                                         <div class="form-group">
                                              <label class="col-sm-1 control-label no-padding-right" for="company_name"> 企业名称 </label>
                                         <div class="col-sm-9">

@@ -30,11 +30,11 @@
             {{foreach from=$data.res_list key=key item=item}}
             <tr>
                 <td>{{$item.cdate|date_format:"%Y-%m-%d"}}</td>
-                <td>{{if $item.old_company_name==-1}}--非执业--{{else}}{{$item.old_company_name}}{{/if}}</td>
-                <td>{{if $item.new_company_name==-1}}--非执业--{{else}}{{$item.new_company_name}}{{/if}}</td>
+                <td>{{if $item.old_company_id == -1}}--非执业--{{else}}{{$item.c1_name_}}{{/if}}</td>
+                <td>{{if $item.new_company_id == -1}}--非执业--{{else}}{{$item.c2_name_}}{{/if}}</td>
                 <td>{{if $item.status == 1}}申请中{{/if}}{{if $item.status == 2}}通过{{/if}}{{if $item.status == -2}}系统作废{{/if}}{{if $item.status == -1}}审核作废{{/if}}</td>
                 <td>
-                    <a href="/home/track_detail/{{$item.id}}" target="_blank" class="agentMore">详情</a>
+                    <a href="/agent/track_detail/{{$item.id}}" target="_blank" class="agentMore">详情</a>
                 </td>
             </tr>
             {{/foreach}}
@@ -42,7 +42,7 @@
          </table>
 
          <div class="page">
-             
+             {{$pager}}
          </div>
         </div>
        </div>

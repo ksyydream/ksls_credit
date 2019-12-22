@@ -1,0 +1,62 @@
+<!doctype html>
+<html class="no-js">
+<head>
+ {{include file='homepage/public/head.html'}}
+
+</head>
+<body class="page">
+   {{include file='homepage/public/logo.html'}}
+   <div class="page-bd">
+    <div class="main1200">
+   
+<div class="container">
+          <div class="company-info apply-info">
+            <ul class="credit-menu apply-menu">
+              <li><a href="/agent/person_change" class="menu-link"><span><em></em>信息修改</span></a></li>
+              <li><a href="/agent/add_track" class="menu-link"><span><em></em>人事申请</span></a></li>
+              <li><a href="/agent/track_list" class="on"><span><em></em>申请列表</span></a></li>
+            </ul>
+              <div class="credit-txt">
+                  <div class="div-form">
+                      <dl class="dl-form dl-form1 fl">
+                          <dt>原公司</dt>
+                          <dd>{{if $apply_info.old_company_id == -1}}--非执业--{{else}}{{$apply_info.c1_name_}}{{/if}}</dd>
+                      </dl>
+                  </div>
+                  <div class="div-form">
+                      <dl class="dl-form dl-form1 fl">
+                          <dt>新公司</dt>
+                          <dd>{{if $apply_info.new_company_id == -1}}--非执业--{{else}}{{$apply_info.c2_name_}}{{/if}}</dd>
+                      </dl>
+                  </div>
+                  <dl class="dl-form" class="clear:both">
+                      <dt>表述申请</dt>
+                      <dd>{{$apply_info.remark|default:''}}<dd>
+                  </dl>
+                  <dl class="dl-form" class="clear:both">
+                      <dt>表述状态</dt>
+                      <dd>{{if $apply_info.status==1}}申请中{{/if}}
+                          {{if $apply_info.status==2}}通过{{/if}}
+                          {{if $apply_info.status==-1}}审核作废{{/if}}
+                          {{if $apply_info.status==-2}}系统作废{{/if}}
+                      <dd>
+                  </dl>
+
+              </div>
+          </div>           
+      </div>
+
+
+    </div>
+   </div>
+
+</body>
+</html>
+{{include file='homepage/public/foot.html'}}
+<link href="/web_assets/js/select_model/jquery.searchableSelect.css" rel="stylesheet" type="text/css">
+<script src="/web_assets/js/select_model/jquery.searchableSelect.js"></script>
+<script type="text/javascript">
+    $(function(){
+
+    });
+</script>
