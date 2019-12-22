@@ -13,9 +13,9 @@
   
      <div class="credit-result">
         <ul class="credit-menu apply-menu">
-            <li><a href="person-change.html" class="menu-link"><span><em></em>信息修改</span></a></li>
-            <li><a href="add_track.html" class="menu-link"><span><em></em>人事申请</span></a></li>
-            <li><a href="person-change-list.html" class="on"><span><em></em>申请列表</span></a></li>
+            <li><a href="/agent/person_change" class="menu-link"><span><em></em>信息修改</span></a></li>
+            <li><a href="/agent/add_track" class="menu-link"><span><em></em>人事申请</span></a></li>
+            <li><a href="/agent/track_list" class="on"><span><em></em>申请列表</span></a></li>
         </ul>
         <div class="credit-txt">
          <table  cellpadding="0" cellspacing="0" class="credit-table" id="JsxTable">
@@ -27,7 +27,17 @@
                 <th width="8%">其他</th>
             </thead>
             <tbody>
-            
+            {{foreach from=$data.res_list key=key item=item}}
+            <tr>
+                <td>{{$item.cdate|date_format:"%Y-%m-%d"}}</td>
+                <td>{{if $item.old_company_name==-1}}--非执业--{{else}}{{$item.old_company_name}}{{/if}}</td>
+                <td>{{if $item.new_company_name==-1}}--非执业--{{else}}{{$item.new_company_name}}{{/if}}</td>
+                <td>{{if $item.status == 1}}申请中{{/if}}{{if $item.status == 2}}通过{{/if}}{{if $item.status == -2}}系统作废{{/if}}{{if $item.status == -1}}审核作废{{/if}}</td>
+                <td>
+                    <a href="/home/track_detail/{{$item.id}}" target="_blank" class="agentMore">详情</a>
+                </td>
+            </tr>
+            {{/foreach}}
             </tbody>
          </table>
 
