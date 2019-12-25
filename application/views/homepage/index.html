@@ -10,8 +10,7 @@
 <div class="ind_main">
   <div class="ind_main_inner ">
        <div class="ind_head">
-         <a href="/home" class="logo"></a>
-         <a href="/home/login" class="login-btn">登录</a>
+        {{include file='homepage/public/logo.html'}} 
        </div>
        <div class="search_box">
 
@@ -31,10 +30,10 @@
                         </form>
                     </div>
                     <div class="content">
-                          <form action="">
+                          <form action="/home/agent_list" method="get" id="search_agent_form">
                            <div class="s-ipt">
-                            <input type="search" placeholder="请输入经纪人证号/身份证查询" class="search_ipt" />
-                            <a href="javascript:" class="search-btn"></a>
+                            <input type="search" name="a_k" placeholder="请输入经纪人证号/经纪人姓名" class="search_ipt" />
+                            <a href="javascript:" id="agent_btn" class="search-btn"></a>
                           </div>
                         </form>
                     </div>
@@ -88,6 +87,10 @@ $(function(){
 
       $("#company_btn").click(function(){
         $("#search_company_form").submit();
+      })
+
+      $("#agent_btn").click(function(){
+        $("#search_agent_form").submit();
       })
 })
 </script>

@@ -23,7 +23,7 @@
                               <li class="li-input"><em class="ipt-icon"></em><input type="text" id="c_name"  name="username" class="login-txt" placeholder="请输入企业税号"></li>
                               <li class="li-input"><em class="ipt-icon icon-lock"></em><input type="text" name="userpwd" id="c_pwd" class="login-txt" placeholder="请输入登录密码"></li>
                               <li class="li-input"><em class="ipt-icon icon-confirm"></em><input type="text" name="userconfirm" maxlength="4" id="c_cap" class="login-txt login-confirm js4phone" placeholder="请输入验证码">
-                                <span class="confirm-pic"><img src="/home/get_company_cap" onclick="this.src = '/home/get_company_cap?'+new Date().getTime()"></span></li>
+                                <span class="confirm-pic"><img src="/home/get_company_cap" id="company_img" onclick="this.src = '/home/get_company_cap?'+new Date().getTime()"></span></li>
                            </ul>  
                             <a href="javascript:;" id="company_btn" class="login-btn">登  录</a>
                         </form>
@@ -85,6 +85,40 @@ $("#agent_btn").click(function(){
                   layer.alert(return_.msg, {skin: 'layui-layer-molv',closeBtn: 0}, function(){
                             layer.closeAll();
                             $("#agent_img").click();
+                    });
+                }
+            }
+        });
+})
+
+$("#company_btn").click(function(){
+    var c_name = $.trim($("#c_name").val());
+    var c_pwd = $.trim($("#c_pwd").val());
+    var c_cap = $.trim($("#c_cap").val());
+    if (c_name == "") {
+        layer.msg('登录账号不能为空', {icon: 2});
+        return false;
+    };
+    if (c_pwd == "") {
+        layer.msg('登录密码不能为空！', { icon: 2 });
+        return false;
+    };
+    if (c_cap == "") {
+        layer.msg('验证码不能为空！', { icon: 2 });
+        return false;
+    };
+    $.ajax({
+            type: "POST",
+            url: "/home/login_company",//+tab,
+            data: $('#company_form').serialize(),// 你的formid
+            success: function (data) {
+                var return_ = JSON.parse(data)
+                if (return_.status == 1) {
+                         window.location.replace("/home/index");
+                }else{
+                  layer.alert(return_.msg, {skin: 'layui-layer-molv',closeBtn: 0}, function(){
+                            layer.closeAll();
+                            $("#company_img").click();
                     });
                 }
             }
