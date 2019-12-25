@@ -5,7 +5,9 @@
 
 </head>
 <body class="page">
-   {{include file='homepage/public/logo.html'}}
+ <div class="page-hd">
+        {{include file='homepage/public/logo.html'}} 
+       </div>
    <div class="page-bd">
     <div class="main1200">
    
@@ -16,31 +18,44 @@
               <li><a href="/agent/add_apply" class="menu-link"><span><em></em>人事申请</span></a></li>
               <li><a href="/agent/apply_list" class="on"><span><em></em>申请列表</span></a></li>
             </ul>
-              <div class="credit-txt">
-                  <div class="div-form">
-                      <dl class="dl-form dl-form1 fl">
-                          <dt>原公司</dt>
-                          <dd>{{if $apply_info.old_company_id == -1}}--非执业--{{else}}{{$apply_info.c1_name_}}{{/if}}</dd>
-                      </dl>
-                  </div>
-                  <div class="div-form">
-                      <dl class="dl-form dl-form1 fl">
-                          <dt>新公司</dt>
-                          <dd>{{if $apply_info.new_company_id == -1}}--非执业--{{else}}{{$apply_info.c2_name_}}{{/if}}</dd>
-                      </dl>
-                  </div>
-                  <dl class="dl-form" class="clear:both">
-                      <dt>表述申请</dt>
-                      <dd>{{$apply_info.remark|default:''}}<dd>
-                  </dl>
-                  <dl class="dl-form" class="clear:both">
-                      <dt>表述状态</dt>
-                      <dd>{{if $apply_info.status==1}}申请中{{/if}}
+               <div class="credit-txt">
+               
+              <div class="div-form">
+
+                <dl class="dl-form dl-form1 fl">
+                  <dt>原公司</dt>
+                  <dd>
+                    {{if $apply_info.old_company_id == -1}}--非执业--{{else}}{{$apply_info.c1_name_}}{{/if}}
+                  </dd>
+                </dl> 
+                <span class="hx fl">——</span>
+                <dl class="dl-form dl-form1 fl">
+                  <dt>新公司</dt>
+                  <dd>
+                     {{if $apply_info.new_company_id == -1}}--非执业--{{else}}{{$apply_info.c2_name_}}{{/if}}
+                  </dd>
+                </dl>
+                <div class="clear"></div>
+              </div>
+              <dl class="dl-form" class="clear:both">
+                <dt>表述申请</dt>
+                <dd><textarea readonly="readonly" name="remark" id="remark" cols="3" rows="3" value="" class="c-content-txt">{{$apply_info.remark|default:''}}</textarea></dd>
+              </dl>
+              <div class="clear"></div>
+              <dl class="dl-form" class="clear:both">
+                <dt>表述状态</dt>
+                 <dd>{{if $apply_info.status==1}}申请中{{/if}}
                           {{if $apply_info.status==2}}通过{{/if}}
                           {{if $apply_info.status==-1}}审核作废{{/if}}
                           {{if $apply_info.status==-2}}系统作废{{/if}}
                       <dd>
-                  </dl>
+              </dl>
+              <div class="clear"></div>
+          
+             
+
+              </div> 
+             
 
               </div>
           </div>           

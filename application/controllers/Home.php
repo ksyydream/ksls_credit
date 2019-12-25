@@ -25,6 +25,12 @@ class Home extends Home_Controller {
 
     }
 
+    public function test_cap(){
+        $company_cap_ = $this->session->userdata('company_cap');
+        $agent_cap_ = $this->session->userdata('agent_cap');
+        die(var_dump( $company_cap_ . '||' . $agent_cap_));
+    }
+
     //前台首页
 	public function index()
 	{
@@ -36,11 +42,82 @@ class Home extends Home_Controller {
         redirect('/home');
     }
 
+    public function login()
+    {
+        $this->display('homepage/login.html');
+    }
+
+    public function get_company_cap(){
+        $vals = array(
+            //'word'      => 'Random word',
+            'img_path'  => './upload/captcha/',
+            'img_url'   => '/upload/captcha/',
+            'img_width' => '120',
+            'img_height'    => 30,
+            'expiration'    => 7200,
+            'word_length'   => 4,
+            'font_size' => 18,
+            'img_id'    => 'Imageid',
+            'pool'      => '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+
+            // White background and border, black text and red grid
+            'colors'    => array(
+                'background' => array(255, 255, 255),
+                'border' => array(255, 255, 255),
+                'text' => array(0, 0, 0),
+                'grid' => array(255, 40, 40)
+            )
+        );
+
+        $rs = create_captcha($vals);
+        $this->session->set_userdata(array('company_cap' => $rs['word']));
+        
+    }
+
+    public function get_agent_cap(){
+        $vals = array(
+            //'word'      => 'Random word',
+            'img_path'  => './upload/captcha/',
+            'img_url'   => '/upload/captcha/',
+            'img_width' => '120',
+            'img_height'    => 30,
+            'expiration'    => 7200,
+            'word_length'   => 4,
+            'font_size' => 18,
+            'img_id'    => 'Imageid',
+            'pool'      => '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+
+            // White background and border, black text and red grid
+            'colors'    => array(
+                'background' => array(255, 255, 255),
+                'border' => array(255, 255, 255),
+                'text' => array(0, 0, 0),
+                'grid' => array(255, 40, 40)
+            )
+        );
+
+        $rs = create_captcha($vals);
+        $this->session->set_userdata(array('agent_cap' => $rs['word']));
+        
+    }
+
+    //企业登录
+    public function login_company(){
+        $res = $this->company_model->login();
+        $this->ajaxReturn($res);
+    }
+
+    //经纪人登录
+    public function login_agent(){
+        $res = $this->agent_model->login();
+        $this->ajaxReturn($res);
+    }
+
 	//企业列表
 	public function company_list($page=1){
         $data = $this->home_model->company_list($page);
         $base_url = "/home/company_list/";
-        $pager = $this->pagination->getPageLink($base_url, $data['total_rows'], $data['limit']);
+        $pager = $this->pagination->getPageLink4home($base_url, $data['total_rows'], $data['limit']);
         $this->assign('pager', $pager);
         $this->assign('page', $page);
         $this->assign('data', $data);
@@ -104,73 +181,40 @@ class Home extends Home_Controller {
         $this->display('homepage/company/show_event.html');
     }
 
+    //经纪人列表
+    public function agent_list($page=1){
+        $data = $this->home_model->agent_list($page);
+        $base_url = "/home/agent_list/";
+        $pager = $this->pagination->getPageLink($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('homepage/agent/person_list.html');
+    }
+
     public function agent_detail($a_id){
-    	//$data = $this->home_model->agent_detail($a_id);
-    	//$this->assign('data', $data);
+    	$data = $this->home_model->get_agent_detail($a_id);
+        $year_ = date('Y');
+    	$year_list = array();
+        while ($year_ >= 2017) {
+            $year_list[] = $year_;
+            $year_--;
+        }
+        $this->assign('data', $data);
+        $this->assign('year_list', $year_list);
     	$this->display('homepage/agent/person_page.html');
     }
 
-
-	public function login()
-	{
-		$this->display('homepage/login.html');
-	}
-
-	public function get_company_cap(){
-        $vals = array(
-            //'word'      => 'Random word',
-            'img_path'  => './upload/captcha/',
-            'img_url'   => '/upload/captcha/',
-            'img_width' => '120',
-            'img_height'    => 30,
-            'expiration'    => 7200,
-            'word_length'   => 4,
-            'font_size' => 18,
-            'img_id'    => 'Imageid',
-            'pool'      => '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-
-            // White background and border, black text and red grid
-            'colors'    => array(
-                'background' => array(255, 255, 255),
-                'border' => array(255, 255, 255),
-                'text' => array(0, 0, 0),
-                'grid' => array(255, 40, 40)
-            )
-        );
-
-        $rs = create_captcha($vals);
-        $this->session->set_flashdata('company_cap', $rs['word']);
+    //企业详情中的 企业事件列表
+    public function show_agent_record($page = 1){
+        $data = $this->home_model->show_agent_record($page);
+        $base_url = "/home/show_agent_record/";
+        $pager = $this->pagination->getPageLink($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('homepage/agent/show_event.html');
     }
 
-    public function get_agent_cap(){
-        $vals = array(
-            //'word'      => 'Random word',
-            'img_path'  => './upload/captcha/',
-            'img_url'   => '/upload/captcha/',
-            'img_width' => '120',
-            'img_height'    => 30,
-            'expiration'    => 7200,
-            'word_length'   => 4,
-            'font_size' => 18,
-            'img_id'    => 'Imageid',
-            'pool'      => '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-
-            // White background and border, black text and red grid
-            'colors'    => array(
-                'background' => array(255, 255, 255),
-                'border' => array(255, 255, 255),
-                'text' => array(0, 0, 0),
-                'grid' => array(255, 40, 40)
-            )
-        );
-
-        $rs = create_captcha($vals);
-        $this->session->set_flashdata('agent_cap', $rs['word']);
-    }
-
-    //经纪人登录
-    public function login_agent(){
-        $res = $this->agent_model->login();
-        $this->ajaxReturn($res);
-    }
+	
 }

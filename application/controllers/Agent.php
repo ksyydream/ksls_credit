@@ -75,5 +75,18 @@ class Agent extends Home_Controller {
 		$this->assign('apply_info',$apply_info);
 		$this->display('homepage/agent/apply_detail.html');
 	}
+
+	public function change_pwd(){
+		$this->display('homepage/agent/change_pwd.html');
+	}
+
+	public function save_pwd(){
+		$res = $this->agent_model->save_pwd($this->agent_id);
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/home/logout'));
+        }else{
+            $this->show_message($res['msg']);
+        }
+	}
 	
 }

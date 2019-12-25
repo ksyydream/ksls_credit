@@ -163,6 +163,8 @@ class Home_Controller extends MY_Controller{
 	public function __construct ()
 	{
 		parent::__construct();
+		$this->agent_id = null;
+		$this->company_id = null;
 		$this->load->model('home_model');
 		$this->load->model('agent_model');
 		$this->load->model('company_model');
@@ -196,7 +198,8 @@ class Home_Controller extends MY_Controller{
 				}
 			}
 		}
-
+		$this->assign('a_id_', $this->agent_id);
+		$this->assign('c_id_', $this->company_id);
 
 	}
 }

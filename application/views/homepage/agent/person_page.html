@@ -1,0 +1,235 @@
+<!doctype html>
+<html class="no-js">
+<head>
+  {{include file='homepage/public/head.html'}}
+</head>
+<body class="page">
+   <div class="page-hd">
+   {{include file='homepage/public/logo.html'}} 
+ </div>
+   <div class="page-bd">
+    <div class="main1200">
+      <div class="search_box">
+          <form action="">
+           <div class="s-ipt">
+            <input type="search" placeholder="请输入公司名/税号/法定代表人姓名进行查询" class="search_ipt" />
+            <a href="javascript:" class="search-btn"></a>
+          </div>
+        </form>
+      </div>
+      <div class="company-info">
+          <dl class="dl-info">
+            <dt>{{$data.name}}</dt>
+            <dd><span>经纪人证书编号：</span><span>{{$data.job_code}}</span></dd>
+            <dd><span>从业机构：</span>{{$data.company_name|default:'-'}}</dd>
+            {{if $data.company_id == $c_id_}}<dd><a href="javascript:;" onclick="cancel_agent('{{$data.id}}')" class="jb-btn">解绑</a></dd>{{/if}}
+          </dl> 
+      </div>
+    
+         <div class="company-info"> 
+          <div class="company-info-tab"><a href="" class="current">经纪人基本信息<i class="am-icon-angle-down"></i></a>
+            <!--<a href="" >经纪人再教育记录<i class="am-icon-angle-down"></i></a>-->
+           <a href="" >经纪人诚信记录<i class="am-icon-angle-down"></i></a> </div>
+          <div class="com-tit"><span></span>基本信息</div>
+          <div class="flwid558">
+            <dl class="dl-info1">
+              <dt>姓名：</dt>
+              <dd>{{$data.name}}</dd>
+            </dl>
+            <dl class="dl-info1">
+              <dt>证书编号：</dt>
+              <dd>{{$data.job_code}}</dd>
+            </dl>
+            <dl class="dl-info1">
+              <dt>从业机构：</dt>
+              <dd>{{$data.company_name|default:'-'}}</dd>
+            </dl>
+            <dl class="dl-info1">
+              <dt>联系电话：</dt>
+              <dd>{{$data.phone}}</dd>
+            </dl>
+       
+          
+        </div>
+      
+        <div class="photos" style="min-height: 10px;margin-bottom: 10px">
+
+        </div>
+
+     <!--<div class="com-tit"><span></span>经纪人再教育记录</div>
+     <div class="continue-edu-list">
+       <div class="continue-edu">
+             <p class="p-center">XXXX</p><p class="p-center">XXXX年再教育</p>
+             <p>已完成再教育考试并考试合格，已
+            领取本年度的再教育考试合格证书</p>
+       </div>
+       
+     </div> -->
+
+
+<div class="com-tit"><span></span>企业诚信记录</div>
+    <div class="out-table">
+<input type="hidden" name="a_id" id="a_id" value="{{$data.id}}">
+
+<div class="container">
+  <div class="select-box select-city">
+    <div  data_id="" id="select_year"  class="select-header"> 选择年份</div>
+    <ul class="select-content">
+      {{foreach from=$year_list key=key item=item}}
+      <li data_id="{{$item}}">{{$item}}年</li>
+      {{/foreach}}
+    </ul>
+  </div>
+
+</div>
+
+
+       <div id="ajax_event_div">
+        
+
+      </div>
+   </div>
+
+     </div> 
+      
+
+
+
+
+
+
+
+
+
+
+
+      </div>
+   </div>
+
+       </div>
+  </div>
+</div>
+
+
+
+<!-- 以上页面内容 开发时删除 -->
+
+{{include file='homepage/public/foot.html'}}
+<script>
+
+$(function(){
+  /**
+     * 模拟select
+     **/
+    $(".select-header").click(function(){
+        $(this).parent().siblings(".select-box").find(".select-content").slideUp("fast");
+        if($(this).siblings(".select-content").is(":hidden")){
+            $(this).addClass("select-arrow");
+            $(this).siblings(".select-content").slideDown("fast");
+            var evt =  new Object;
+            if ( typeof(window.event) == "undefined" ){//如果是火狐浏览器
+                evt = arguments.callee.caller.arguments[0];
+            }else{
+                evt = event || window.event;
+            }
+            evt.cancelBubble = true;
+        }else{
+            $(this).removeClass("select-arrow");
+            $(this).siblings(".select-content").slideUp("fast");
+      //去除事件冒泡
+            var evt =  new Object;
+            if ( typeof(window.event) == "undefined" ){//如果是火狐浏览器
+                evt = arguments.callee.caller.arguments[0];
+            }else{
+                evt = event || window.event;
+            }
+            evt.cancelBubble = true;
+        }
+    });
+  $(document).click(function(){
+        $(".select-header").removeClass("select-arrow");
+        $(".select-content").slideUp("fast");
+    });
+    $(".select-content li").on("click",function(){
+        $(this).parent().siblings(".select-header").removeClass("select-arrow");
+        $(this).parent().siblings(".select-header").text($(this).text()).end().slideUp("fast");
+        $(this).parent().siblings(".select-header").attr("data_id", $(this).attr("data_id"));
+        ajax_event_table('event_form', 1);
+    });
+    $(".select-content li").hover(function(){
+        $(this).css("background-color","#cfcfcf");
+    },function(){
+        $(this).css("background-color","#fff");
+    });
+});
+var event_page = 1;
+  ajax_event_table('event_form', 1);
+function ajax_event_table(form, page) {
+        event_page = page; //当前页面 保存为全局变量
+        var year_ = $("#select_year").attr("data_id");
+        var a_id_ = $("#a_id").val();
+        $.ajax({
+            type: "POST",
+            url: "/home/show_agent_record/" + page,//+tab,
+            data: {a_id:a_id_, year:year_},// 你的formid
+            success: function (data) {
+                $("#ajax_event_div").html('');
+                $("#ajax_event_div").append(data);
+            }
+        });
+    }
+
+    function cancel_agent(a_id){
+      if(!a_id){
+            layer.msg('操作异常!', {icon: 2});
+            return false;
+      }
+
+      var layerIndex = layer.confirm('是否确认解绑？<br/>确认解绑后立即生效！' , {
+            btn: ['确认','取消'], //按钮
+            area: ['200px', 'auto'],
+            icon: 7
+
+        }, function(){
+          var index_load = layer.load(0, {
+            shade: [0.1,'#fff'] //0.1透明度的白色背景
+            });
+             $.ajax({
+                type: "POST",
+                url: "/company/company_cancel_agent",//+tab,
+                data: {a_id:a_id},
+                success: function (data) {
+                   layer.close(index_load);
+                    var return_ = JSON.parse(data)
+                    if (return_.status == 1) {
+                       
+                        layer.alert('操作成功!', {
+                            skin: 'layui-layer-molv' //样式类名
+                            ,closeBtn: 0
+                        }, function(){
+                            layer.closeAll();
+                            window.location.reload(); 
+                        });
+                    }else{
+                        layer.alert(return_.msg, {
+                            skin: 'layui-layer-lan'
+                            ,closeBtn: 0
+                            ,anim: 4 //动画类型
+                        });
+                        window.location.reload(); 
+                    }
+                },
+                error:function(){
+                   layer.close(index_load);
+                    layer.msg('网络异常!');
+                }
+            });
+
+        }, function(){
+
+        });
+      
+    }
+</script>
+</body>
+</html>

@@ -170,4 +170,101 @@ class Home_model extends MY_Model
         return $data;
     }
 
+    public function agent_list($page = 1) {
+        $data['limit'] = $this->home_limit;//每页显示多少调数据
+        $data['a_k'] = $this->input->get('a_k')?trim($this->input->get('a_k')):null;
+        $this->db->select('count(1) num');
+        $this->db->from('agent a');
+        $this->db->join('agent_grade b','a.grade_no = b.grade_no','left');
+        $this->db->join('company_pending c','a.company_id = c.id and c.flag = 2','left');
+        if ($data['a_k']) {
+            $this->db->group_start();
+            $this->db->like('a.name', $data['a_k']);
+            $this->db->or_like('a.job_code', $data['a_k']);
+            $this->db->group_end();
+        }
+        $this->db->where('a.flag', 2);
+        $rs_total = $this->db->get()->row();
+        //总记录数
+        $total_rows = $rs_total->num;
+        $data['total_rows'] = $total_rows;
+
+        //list
+        $this->db->select('a.*,c.company_name company_name_,b.grade_name b_grade_name_');
+        $this->db->from('agent a');
+        $this->db->join('agent_grade b','a.grade_no = b.grade_no','left');
+        $this->db->join('company_pending c','a.company_id = c.id and c.flag = 2','left');
+        if ($data['a_k']) {
+            $this->db->group_start();
+            $this->db->like('a.name', $data['a_k']);
+            $this->db->or_like('a.job_code', $data['a_k']);
+            $this->db->group_end();
+        }
+        $this->db->where('a.flag', 2);
+        $this->db->limit($data['limit'], $offset = ($page - 1) * $data['limit']);
+        $this->db->order_by('a.grade_no', 'desc');
+        $this->db->order_by('a.id', 'desc');
+        $data['res_list'] = $this->db->get()->result_array();
+        return $data;
+    }
+
+    //给游客展示的经纪人信息
+   public function get_agent_detail($id){
+    $this->db->select('a.*, b.company_name');
+    $this->db->from('agent a');
+    $this->db->join('company_pending b', 'a.company_id = b.id and b.flag = 2', 'left');
+    $this->db->where('a.id', $id);
+    $data = $this->db->get()->row_array();
+    return $data;
+   }
+
+   //企业详情中的 企业事件列表
+    public function show_agent_record($page = 1){
+        $data['limit'] = 6;//每页显示多少调数据
+        $data['a_id'] = $this->input->post('a_id') ? trim($this->input->post('a_id')) : null;
+        $data['year'] = $this->input->post('year') ? trim($this->input->post('year')) : null;
+        $this->db->select('count(1) num');
+        $this->db->from('event4agent_record a');
+        $this->db->join('agent b','a.agent_id = b.id', 'left');
+        if ($data['a_id']) {
+            $this->db->where('a.agent_id', $data['a_id']);
+        }else{
+            //如果没有企业ID，就故意不显示数据
+            $this->db->where('a.record_id <', 0);
+        }
+        if($data['year'] && is_numeric($data['year'])){
+            $this->db->where('a.event_date <=', $data['year'] . '-12-31');
+            $this->db->where('a.event_date >=', $data['year'] . '-01-01');
+        }
+        $this->db->where('a.status', 1);
+        $this->db->where('b.flag', 2);
+        $rs_total = $this->db->get()->row();
+        //总记录数
+        $total_rows = $rs_total->num;
+        $data['total_rows'] = $total_rows;
+        //这里处理如何是在删除情况下 最后一页数据不现实的情况
+        $page = get_right_page($page, $data['total_rows'], $data['limit']);
+        //list
+        $this->db->select('a.*');
+       $this->db->from('event4agent_record a');
+        $this->db->join('agent b','a.agent_id = b.id', 'left');
+        if ($data['a_id']) {
+            $this->db->where('a.agent_id', $data['a_id']);
+        }else{
+            //如果没有企业ID，就故意不显示数据
+            $this->db->where('a.record_id <', 0);
+        }
+        if($data['year'] && is_numeric($data['year'])){
+            $this->db->where('a.event_date <=', $data['year'] . '-12-31');
+            $this->db->where('a.event_date >=', $data['year'] . '-01-01');
+        }
+        $this->db->where('a.status', 1);
+        $this->db->where('b.flag', 2);
+        $this->db->limit($data['limit'], $offset = ($page - 1) * $data['limit']);
+        $this->db->order_by('a.event_date', 'desc');
+        $this->db->order_by('a.record_id', 'desc');
+        $data['res_list'] = $this->db->get()->result_array();
+        return $data;
+    }
+
 }

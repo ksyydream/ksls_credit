@@ -1028,6 +1028,39 @@ class MY_Model extends CI_Model{
 
     }
 
+    /**
+    *经纪人就业轨迹 公共存储方法
+     * @param $agent_id             经纪人ID
+     * @param $old_company_id       原公司
+     * @param $new_company_id       新公司
+     * @param $status               轨迹种类
+     * @return bool
+     * 因为企业存在多种分值，在计算结束后，无论结果如何都要相加计算，以方便之后排名和查看分数线
+     */
+    public function save_agent_track4common($agent_id, $old_company_id, $new_company_id, $status){
+        $old_company = $this->db->select('company_name')->from('company_pending')->where('id',$old_company_id)->get()->row_array();
+        $old_company_name = null;
+        if ($old_company) 
+            $old_company_name = $old_company['company_name'];
+
+        $new_company = $this->db->select('company_name')->from('company_pending')->where('id',$new_company_id)->get()->row_array();
+        $new_company_name = null;
+        if ($new_company) 
+            $new_company_name = $new_company['company_name'];
+
+        $data_insert = array(
+                    'to_company_id'     =>      $new_company_id,
+                    'to_company_name'   =>      $new_company_name,
+                    'from_company_id'   =>      $old_company_id,
+                    'from_company_name' =>      $old_company_name,
+                    'agent_id'  =>  $agent_id,
+                    'status'    =>  $status,
+                    'create_date'=>date('Y-m-d H:i:s',time()),
+                );
+        $this->db->insert('agent_track',$data_insert);
+        return false;
+    }
+
     //保存企业修改记录
     //第一 指记录保存成功的数据
     //第二 尽可能的保存多的数据，比如分数，备案号，审核状态，报备状态等信息

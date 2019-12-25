@@ -76,15 +76,21 @@ transform:rotate(45deg);-ms-transform:rotate(45deg);-moz-transform:rotate(45deg)
 .com-data .am-panel-hd{background: none; text-align: center;border:none;}
 
 /*翻页*/
-#company_page {text-align: center;margin: 30px 0;}
-#company_page .count{ display: inline;margin-right: 10px;}
+#company_page {text-align: center;margin: 30px 40px 0;}
+.am-pagination{float: left;}
+.pages-counts{ margin: 20px 10px 0 0;}
+#company_page li{ margin:0 2px;width:34px; height: 30px; line-height: 30px; text-align: center;  float: left;   }
+#company_page .count{ display: inline; color: #fff;}
 #company_page .count em{font-weight: bold;padding:0 2px;}
-#company_page .prev,#company_page .next{width:64px; height: 30px; text-align: center; line-height: 30px;
-    border:1px solid #ededed; display: inline-block;}
+#company_page .prev,#company_page .next{width:80px; height: 30px; line-height: 30px;
+ display: inline-block;}
+#company_page .prev a,#company_page .next a{width:80px; height: 30px; 
+ display: inline-block;}
+
 #company_page span.prev{color:#ededed;}
-#company_page  a{color: #666;width:32px; height: 28px; border:1px solid #ededed; text-align: center; line-height: 28px;
-    display:inline-block; margin:0 2px;}
-#company_page a:hover,#company_page a.current{background: #2dd7cc; color:#fff;}
+#company_page  a{color: #666;width:32px; height: 28px; border:1px solid #ededed; text-align: center; 
+    display:inline-block;}
+#company_page  a:hover,#company_page  .am-active a{background: #2dd7cc; color:#fff;}
 
 .agentMore{color: #2dd7cc;}
 
@@ -187,7 +193,7 @@ transform:rotate(45deg);-ms-transform:rotate(45deg);-moz-transform:rotate(45deg)
 .company-info .dl-form dt{padding:8px 0 2px;font-size: 14px; color: #888;}
 .company-info .dl-form .input-txt-1{width:290px;height: 32px; border:1px solid
 #aaa; padding:5px; line-height: 22px; background:#fff;border-radius: 3px;}
-.company-info .dl-form .input-txt-3{width:200px;}.company-info .dl-form .n-tit{margin-left: 210px;}
+.company-info .dl-form .input-txt-3{width:280px;}.company-info .dl-form .n-tit{margin-left: 210px;}
 .company-info .dl-form .input-txt-2{width:200px;}
 .company-info .dl-form .input-wid155{width: 155px;}
 .company-info .sel-year,.company-info .sel-month,.company-info .sel-date{width:80px; height: 30px;border:1px solid #aaa;border-radius: 3px; font-size: 14px; color: #888; }
@@ -268,7 +274,7 @@ transform:rotate(45deg);-ms-transform:rotate(45deg);-moz-transform:rotate(45deg)
 #aaa; padding:5px; line-height: 22px; background:#fff;border-radius: 3px;}
 
 
-.credit-txt{width:750px; float: left;padding:10px 0 80px;}
+.credit-txt{width:850px; float: left;padding:10px 0 80px;}
 .credit-result{margin: 0 20px;}
 .credit-table{width:100%;border-collapse: collapse;}
 .credit-table th{font-size: 14px;}
@@ -314,3 +320,5 @@ transform:rotate(45deg);-ms-transform:rotate(45deg);-moz-transform:rotate(45deg)
 .before-login{ float: right; color:#fff;margin-top: 15px;}
 
 .before-login a{color: #fff;}
+
+.searchable-select{min-width: 500px;}

@@ -4,30 +4,30 @@
  {{include file='homepage/public/head.html'}}
 </head>
 <body class="page">
-  <div class="page-hd">
+   <div class="page-hd">
    {{include file='homepage/public/logo.html'}} 
  </div>
 <div class="page-bd">
     <div class="main1200">
       <div class="search_box">
-          <form id="search_company_form" method="get" action="/home/company_list">
-           <div class="s-ipt">
-            <input type="search" placeholder="请输入公司名/税号/法定代表人姓名进行查询" value="{{$data.c_k|default:''}}" name="c_k" id="c_k" class="search_ipt" />
-            <a href="javascript:" id="search_btn" class="search-btn"></a>
-          </div>
-        </form>
+          <form action="/home/agent_list" method="get" id="search_agent_form">
+                           <div class="s-ipt">
+                            <input type="search" name="a_k" placeholder="请输入经纪人证号/经纪人姓名" value="{{$data.a_k|default:''}}" class="search_ipt" />
+                            <a href="javascript:" id="agent_btn" class="search-btn"></a>
+                          </div>
+                        </form>
       </div>
     <div class="company-info">
-      <p class="result-p">共计搜索到<i class="num">{{$data.total_rows|default:'0'}}</i>家符合条件的公司</p>
+      <p class="result-p">共计搜索到<i class="num">{{$data.total_rows|default:'0'}}</i>位符合条件的经纪人</p>
        {{foreach from=$data.res_list key=k item=v}}
- <a href="/home/company_detail/{{$v.id}}" class="result-alink">
+ <a href="/home/agent_detail/{{$v.id}}" class="result-alink">
         <dl class="res-dl">
-          <dt>{{$v.company_name}}</dt>
+          <dt>{{$v.name}}</dt>
           <dd>
-            <p>社会统一信用代码：{{$v.business_no}}</p>
-            <p>法定代表人：{{$v.legal_name}}</p>
-            <p>备案号：{{$v.record_num}}</p>
+            <p>执业证号：{{$v.job_code}}</p>
+            <p>电话号码：{{$v.phone}}</p>
             <p>信用等级：{{$v.b_grade_name_}}</p>
+            <p>所属企业：{{$v.company_name_|default:'-'}}</p>
           </dd>
       </dl>  
      </a>
@@ -35,7 +35,6 @@
      
    
      <div class="clear"></div>
-     
      <div id="company_page" class="page-fy">
             {{$pager}}
        </div>
@@ -101,8 +100,8 @@ $(function(){
         $(this).css("background-color","#fff");
     });
 
-    $("#search_btn").click(function(){
-        $("#search_company_form").submit();
+    $("#agent_btn").click(function(){
+        $("#search_agent_form").submit();
       })
 
 });

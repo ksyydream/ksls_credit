@@ -140,22 +140,22 @@ class MY_Pagination extends CI_Pagination {
 		$config['cur_tag_close'] = '</a></li>';
 		$config['num_tag_open'] = '<li>';
 		$config['num_tag_close'] = '</li>';
-		$config['prev_link'] = '«';
-		$config['prev_tag_open'] = '<li>';
+		$config['prev_link'] = '上一页';
+		$config['prev_tag_open'] = '<li class="prev">';
 		$config['prev_tag_close'] = '</li>';
-		$config['next_link'] = '»';
-		$config['next_tag_open'] = '<li>';
+		$config['next_link'] = '下一页';
+		$config['next_tag_open'] = '<li class="prev">';
 		$config['next_tag_close'] = '</li>';
 		
 		$config['first_link'] = '首页';
-		$config['first_tag_open'] = '<li>';
+		$config['first_tag_open'] = '<li class="prev">';
 		$config['first_tag_close'] = '</li>';
 		$config['last_link'] = '尾页';
-		$config['last_tag_open'] = '<li>';
+		$config['last_tag_open'] = '<li class="prev">';
 		$config['last_tag_close'] = '</li>';
 		
 		$this->initialize($config);
 		
-		return '<div class="am-fr"><ul class="am-pagination">' . $this->create_links() . '</ul></div>';
+		return '<div class="am-fr"><span class="am-fl pages-counts">共 ' . $total_rows . ' 条记录</span> <ul class="am-pagination">' . $this->create_links() . '</ul></div>';
 	}
 }

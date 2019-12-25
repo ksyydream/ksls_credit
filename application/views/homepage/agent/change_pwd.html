@@ -1,0 +1,79 @@
+<!doctype html>
+<html class="no-js">
+<head>
+  {{include file='homepage/public/head.html'}}
+</head>
+<body class="page">
+ <div class="page-hd">
+        {{include file='homepage/public/logo.html'}} 
+       </div>
+   <div class="page-bd">
+    <div class="main1200">
+   
+<div class="container">
+             <div class="company-info apply-info person-change"> 
+   <div class="pwd-box">
+            <div class="pwd-th">修改密码</div>
+            <form action="/agent/save_pwd" method="post" id="save_form">
+                <ul class="pwd-ul">
+                    <li class="li-input"><span>旧密码</span><input  id="pwd" name="password" type="password" class="pwd-txt" placeholder="请输入旧密码"></li>
+                    <li class="li-input"><span>新密码</span><input  id="new_1" name="new_password" type="password" class="pwd-txt" placeholder="请输入新密码"></li>
+                    <li class="li-input"><span>再次输入</span><input  id="new_2" name="new_password2" type="password" class="pwd-txt" placeholder="请再次输入密码"><p id="p_err" style="display: none;" class="tips"><em></em>两次密码输入不一致</p>
+                    </li>
+                    <li><a href="javascript:" id="save_btn" class="submit-btn">确定</a></li>
+                </ul>
+            </form>
+            </div>
+    </div>
+</div>
+
+
+
+
+      </div>
+
+
+    </div>
+   </div>
+
+       </div>
+  </div>
+</div>
+
+
+
+{{include file='homepage/public/foot.html'}}
+<script type="text/javascript">
+    $("#save_btn").click(function () {
+            var index_load = layer.load(1, {
+                shade: [0.1,'#fff'] //0.1透明度的白色背景
+            });
+            var pwd = $("#pwd").val();
+            var new_1 = $("#new_1").val();
+            var new_2 = $("#new_2").val();
+            if(pwd == ""){
+                layer.close(index_load);
+                layer.msg('请输入原密码!', {icon: 2});
+                return false;
+            }
+            if(new_1 == ""){
+                layer.close(index_load);
+                layer.msg('请输入新密码!', {icon: 2});
+                return false;
+            }
+            if(new_1.length < 6){
+                layer.close(index_load);
+                layer.msg('新密码长度不能小于6位!', {icon: 2});
+                return false;
+            }
+            if(new_1 != new_2){
+                layer.close(index_load);
+                layer.msg('新密码与确认密码不一致!', {icon: 2});
+                return false;
+            }
+            layer.close(index_load);
+            $("#save_form").submit();
+        })
+</script>
+</body>
+</html>

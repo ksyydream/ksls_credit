@@ -18,10 +18,11 @@ class Agent_model extends MY_Model
     }
 
    public function login(){
-       //die(var_dump($this->session->flashdata('agent_cap')));
-       $agent_cap_ = $this->session->flashdata('agent_cap');
+       $agent_cap_ = $this->session->userdata('agent_cap');
+        $this->session->unset_userdata('agent_cap');
+       
     if (strtolower($this->input->post('userconfirm')) != strtolower($agent_cap_)){
-        return $this->fun_fail('验证码错误!' . $agent_cap_);
+        return $this->fun_fail('验证码错误!');
     }
     if(!$job_code = trim($this->input->post('username'))){
         return $this->fun_fail('登录名不能为空!');
@@ -45,16 +46,6 @@ class Agent_model extends MY_Model
     $this->session->set_userdata($data);
     $this->session->set_userdata(array('agent_id'=>$res['id']));
     return $this->fun_success('登录成功!');
-   }
-
-    //给游客展示
-   public function get_detail($id){
-    $this->db->select('a.*, b.company_name');
-    $this->db->from('agent a');
-	$this->db->join('company_pending b', 'a.company_id = b.id and b.flag = 2', 'left');
-	$this->db->where('a.id', $id);
-	$data = $this->db->get()->row_array();
-	return $data;
    }
 
     //给自己展示,因为存在 还没有完成一次年审的企业,前台不给与显示.但自己是需要看到的
@@ -119,8 +110,8 @@ class Agent_model extends MY_Model
         $data['limit'] = $this->home_limit;//每页显示多少调数据
 
         $this->db->select('count(1) num');
-        $this->db->from('agent a');
-        $this->db->join('agent_apply b','a.id = b.agent_id','left');
+        $this->db->from('agent_apply b');
+        $this->db->join('agent a','a.id = b.agent_id','left');
         $this->db->where('a.flag', 2);
         $this->db->where('a.id', $agent_id);
         $rs_total = $this->db->get()->row();
@@ -131,8 +122,8 @@ class Agent_model extends MY_Model
         $page = get_right_page($page, $data['total_rows'], $data['limit']);
         //list
         $this->db->select('b.*, c1.company_name c1_name_, c2.company_name c2_name_');
-        $this->db->from('agent a');
-        $this->db->join('agent_apply b','a.id = b.agent_id','left');
+        $this->db->from('agent_apply b');
+        $this->db->join('agent a','a.id = b.agent_id','left');
         $this->db->join('company_pending c1', 'b.old_company_id = c1.id', 'left');
         $this->db->join('company_pending c2', 'b.new_company_id = c2.id', 'left');
         $this->db->where('a.flag', 2);
@@ -145,13 +136,35 @@ class Agent_model extends MY_Model
 
     public function get_apply_info($apply_id, $agent_id){
         $this->db->select('b.*, c1.company_name c1_name_, c2.company_name c2_name_');
-        $this->db->from('agent a');
-        $this->db->join('agent_apply b','a.id = b.agent_id','left');
+        $this->db->from('agent_apply b');
+        $this->db->join('agent a','a.id = b.agent_id','left');
         $this->db->join('company_pending c1', 'b.old_company_id = c1.id', 'left');
         $this->db->join('company_pending c2', 'b.new_company_id = c2.id', 'left');
         $this->db->where('a.flag', 2);
         $this->db->where('a.id', $agent_id);
         $this->db->where('b.id', $apply_id);
         return $this->db->get()->row_array();
+    }
+
+    public function save_pwd($agent_id){
+        $password = $this->input->post('password');
+        $new_password = $this->input->post('new_password');
+        $new_password2 = $this->input->post('new_password2');
+        if(!$password)
+            return $this->fun_fail('请输入原密码');
+        if(!$new_password)
+            return $this->fun_fail('请输入新密码');
+        if($new_password == $password)
+            return $this->fun_fail('所设置的新密码不可与原密码一致');
+        if($new_password != $new_password2)
+            return $this->fun_fail('确认密码与新密码不一致');
+        if (strlen($new_password) < 6) {
+                return $this->fun_fail('密码长度不可小于6位!');
+        }
+        $check_pwd = $this->db->select('id')->from('agent')->where(array('id' => $agent_id, 'pwd' => sha1($password)))->get()->row_array();
+        if(!$check_pwd)
+            return $this->fun_fail('原密码不正确');
+        $this->db->where(array('id' => $agent_id))->update('agent', array('pwd' => sha1($new_password)));
+        return $this->fun_success('修改成功，请重新登录!');
     }
 }

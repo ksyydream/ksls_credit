@@ -2136,8 +2136,10 @@ class Manager_model extends MY_Model
                 $this->db->insert_batch('company_pass_icon',$pass_icon);
         }
         $temp_update_data = array('status'=>$status);
-        if($status == 3 || $status == -1)
+        if($status == 3 || $status == -1){
             $temp_update_data['qx_num'] = 0;
+            $this->db->where('id', $company_id)->where('flag', 1)->update('company_pending', array('flag' => 2));
+        }
         //每次审核后都同步一下company_pending 的status 栏位，没有实际意义，只做暂存，
         $this->db->where('id', $company_id)->update('company_pending', $temp_update_data);
         
