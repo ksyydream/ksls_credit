@@ -346,14 +346,14 @@ class MY_Model extends CI_Model{
     }
 
     //返回失败的信息
-    public function fun_fail($msg, $result = []){
+    public function fun_fail($msg, $result = array()){
         $this->model_fail['msg'] = $msg;
         $this->model_fail['result'] = $result;
         return $this->model_fail;
     }
 
     //返回成功的信息
-    public function fun_success($msg = '操作成功', $result = []){
+    public function fun_success($msg = '操作成功', $result = array()){
         $this->model_success['msg'] = $msg;
         $this->model_success['result'] = $result;
         return $this->model_success;
