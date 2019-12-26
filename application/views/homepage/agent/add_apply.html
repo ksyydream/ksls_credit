@@ -6,8 +6,9 @@
 </head>
 <body class="page">
 <div class="page-hd">
+  <div class="main1200">
         {{include file='homepage/public/logo.html'}} 
-       </div>
+       </div></div>
    <div class="page-bd">
     <div class="main1200">
    
@@ -90,9 +91,11 @@
                     var return_ = JSON.parse(data)
                     if (return_.status == 1) {
                         var url = '/agent/apply_list/';
-                        layer.alert('操作成功!', {
+                        layer.alert(return_.msg, {
+                            title:'申请成功提醒',
                             skin: 'layui-layer-molv' //样式类名
-                            ,closeBtn: 0
+                            ,closeBtn: 0,
+                            area: ['600px', 'auto']
                         }, function(){
                             window.location.replace(url);
                         });

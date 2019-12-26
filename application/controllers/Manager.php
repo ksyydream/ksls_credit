@@ -5,7 +5,7 @@ class Manager extends MY_Controller {
     /**
      * 管理员操作控制器
      * @version 2.0
-     * @author yangyang <yang.yang@thmarket.cn>
+     * @author yangyang 
      * @date 2018-03-30
      * @Copyright (C) 2018, Tianhuan Co., Ltd.
     */
@@ -81,7 +81,7 @@ class Manager extends MY_Controller {
 
     /**
      * 看板
-     * @author yangyang <yang.yang@thmarket.cn>
+     * @author yangyang 
      * @date 2018-03-30
      */
     public function index()
@@ -98,7 +98,7 @@ class Manager extends MY_Controller {
 
     /**
      * 后台菜单列表
-     * @author yangyang <yang.yang@thmarket.cn>
+     * @author yangyang 
      * @date 2018-04-01
      */
     public function menu_list(){
@@ -110,7 +110,7 @@ class Manager extends MY_Controller {
 
     /**
      * 新增后台菜单页面
-     * @author yangyang <yang.yang@thmarket.cn>
+     * @author yangyang 
      * @date 2018-04-01
      */
     public function menu_add(){
@@ -122,7 +122,7 @@ class Manager extends MY_Controller {
 
     /**
      * 编辑后台菜单
-     * @author yangyang <yang.yang@thmarket.cn>
+     * @author yangyang 
      * @date 2018-04-01
      */
     public function menu_edit($id){
@@ -138,7 +138,7 @@ class Manager extends MY_Controller {
 
     /**
      * 保存后台菜单
-     * @author yangyang <yang.yang@thmarket.cn>
+     * @author yangyang 
      * @date 2018-04-01
      */
     public function menu_save(){
@@ -154,11 +154,28 @@ class Manager extends MY_Controller {
 
     /**
      * 删除后台菜单
-     * @author yangyang <yang.yang@thmarket.cn>
+     * @author yangyang 
      * @date 2018-04-01
      */
     public function menu_del($id){
         $res = $this->manager_model->menu_del($id);
+        $this->ajaxReturn($res);
+    }
+
+    /**
+     * 编辑 人事申请提交提示
+     * @author yangyang
+     * @date 2018-04-01
+     */
+    public function apply_msg(){
+        $data = $this->manager_model->config_detail('apply_msg');
+        $this->assign('data', $data);
+        $this->display('manager/config/apply_msg.html');
+    }
+
+    //保存 人事申请提醒
+    public function apply_msg_save(){
+        $res = $this->manager_model->config_save('apply_msg');
         $this->ajaxReturn($res);
     }
 
@@ -170,7 +187,7 @@ class Manager extends MY_Controller {
 
     /**
      * 管理员管理
-     * @author yangyang <yang.yang@thmarket.cn>
+     * @author yangyang 
      * @date 2018-03-31
      */
     public function admin_list($page=1){
@@ -185,7 +202,7 @@ class Manager extends MY_Controller {
 
     /**
      * 新增管理员管理
-     * @author yangyang <yang.yang@thmarket.cn>
+     * @author yangyang 
      * @date 2018-03-31
      */
     public function admin_add(){
@@ -197,7 +214,7 @@ class Manager extends MY_Controller {
 
     /**
      * 编辑管理员管理
-     * @author yangyang <yang.yang@thmarket.cn>
+     * @author yangyang 
      * @date 2018-03-31
      */
     public function admin_edit($id){
@@ -213,7 +230,7 @@ class Manager extends MY_Controller {
 
     /**
      * 保存管理员管理
-     * @author yangyang <yang.yang@thmarket.cn>
+     * @author yangyang 
      * @date 2018-03-31
      */
     public function admin_save(){
@@ -227,7 +244,7 @@ class Manager extends MY_Controller {
 
     /**
      * 删除管理员
-     * @author yangyang <yang.yang@thmarket.cn>
+     * @author yangyang 
      * @date 2018-04-01
      */
     public function admin_del($id){
@@ -237,7 +254,7 @@ class Manager extends MY_Controller {
 
     /**
      * 新增用户组
-     * @author yangyang <yang.yang@thmarket.cn>
+     * @author yangyang 
      * @date 2018-03-31
      */
     public function group_add(){
@@ -252,7 +269,7 @@ class Manager extends MY_Controller {
 
     /**
      * 编辑用户组
-     * @author yangyang <yang.yang@thmarket.cn>
+     * @author yangyang 
      * @date 2018-03-31
      */
     public function group_edit($id){
@@ -269,7 +286,7 @@ class Manager extends MY_Controller {
 
     /**
      * 保存用户组
-     * @author yangyang <yang.yang@thmarket.cn>
+     * @author yangyang 
      * @date 2018-03-31
      */
     public function group_save(){
@@ -283,7 +300,7 @@ class Manager extends MY_Controller {
 
     /**
      * 用户组列表
-     * @author yangyang <yang.yang@thmarket.cn>
+     * @author yangyang 
      * @date 2018-03-31
      */
     public function group_list($page=1){
@@ -298,7 +315,7 @@ class Manager extends MY_Controller {
 
     /**
      * 删除用户组
-     * @author yangyang <yang.yang@thmarket.cn>
+     * @author yangyang 
      * @date 2018-03-31
      */
     public function group_del($id){
@@ -308,7 +325,7 @@ class Manager extends MY_Controller {
 
     /**
      * 个人资料页面
-     * @author yangyang <yang.yang@thmarket.cn>
+     * @author yangyang 
      * @date 2018-04-01
      */
     public function personal_info(){
@@ -322,7 +339,7 @@ class Manager extends MY_Controller {
 
     /**
      * 保存管理员管理
-     * @author yangyang <yang.yang@thmarket.cn>
+     * @author yangyang 
      * @date 2018-04-01
      */
     public function personal_save(){
@@ -336,7 +353,7 @@ class Manager extends MY_Controller {
 
     /**
      * 退出
-     * @author yangyang <yang.yang@thmarket.cn>
+     * @author yangyang 
      * @date 2018-03-30
      */
     public function logout(){

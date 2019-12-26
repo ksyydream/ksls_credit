@@ -157,6 +157,27 @@ class Manager_model extends MY_Model
     }
 
     /**
+     * 编辑 人事申请提交提示
+     * @author yangyang
+     * @date 2018-04-01
+     */
+    public function config_detail($type_name){
+        return $this->readByID('sys_config', 'type_name', $type_name);
+    }
+
+    //保存 人事申请提醒
+    public function config_save($type_name){
+        $remark = $this->input->post('remark');
+        if(!$remark)
+            $this->fun_fail('请输入内容');
+        if(!$type_name)
+            $this->fun_fail('请求异常');
+        $this->db->where('type_name', $type_name)->delete('sys_config');
+        $this->db->insert('sys_config', array('type_name' => $type_name, 'cdate' => date('Y-m-d H:i:s', time()), 'remark' => $remark));
+        return $this->fun_success('操作成功');
+    }
+
+    /**
      *********************************************************************************************
      * 以下代码为个人中心模块
      *********************************************************************************************

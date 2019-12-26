@@ -103,6 +103,10 @@ class Agent_model extends MY_Model
             'status'=>1,
         );
         $this->db->insert('agent_apply',$data);
+        $sys_config_ =  $this->readByID('sys_config', 'type_name', 'apply_msg');
+        if($sys_config_){
+            return $this->fun_success($sys_config_['remark']);
+        }
         return $this->fun_success('申请成功!');
     }
 
