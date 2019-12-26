@@ -940,7 +940,7 @@ class MY_Model extends CI_Model{
                     $insert_annual_year_['grade_name'] = $grade_no_['grade_name'];
                 }else{
                     $insert_annual_year_['grade_no'] = 1;
-                    $insert_annual_year_['grade_name'] = '失信';
+                    $insert_annual_year_['grade_name'] = 'D级';
                 }
                 $this->db->insert('company_ns_list', $insert_annual_year_);
 
