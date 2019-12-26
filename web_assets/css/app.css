@@ -299,7 +299,7 @@ transform:rotate(45deg);-ms-transform:rotate(45deg);-moz-transform:rotate(45deg)
 .login-list li .xx{background: url(../i/xx_icon.png) no-repeat;}
 .login-list li  .nums{width: 20px; float: right; height: 15px; line-height: 15px; background: #cc0000; text-align: center;
     border-radius: 5px; color: #fff;font-size: 10px;margin: 8px 0 0 2px;}
-.login-list li .jbxx{background: url(../images/jbxx.png) no-repeat;}
+.login-list li .jbxx{background: url(../i/jbxx.png) no-repeat;}
 .login-list li .xgmm{background: url(../i/xgmm.png) no-repeat;}
 .login-list li .out{background: url(../i/out.png) no-repeat;}
 .login-list li .cxjl{background: url(../i/cxjl.png) no-repeat;}
