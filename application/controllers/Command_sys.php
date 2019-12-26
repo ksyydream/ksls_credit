@@ -25,8 +25,8 @@ class Command_sys extends MY_Controller {
         $this->load->model('manager_model');
         $this->load->model('common4manager_model', 'c4m_model');
         $this->load->model('command_model');
-        //if(!is_cli())
-        	//die('asd');
+        if(!is_cli())
+        	die('服务暂停...');
     }
 
     public function index(){
