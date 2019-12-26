@@ -1,0 +1,134 @@
+{{include file='manager/public/head.html'}}
+<body class="no-skin">
+{{include file='manager/public/header.html'}}
+<div class="main-container" id="main-container">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('main-container', 'fixed')
+        } catch (e) {
+        }
+    </script>
+    <style>
+        pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+        .string { color: green; }
+        .number { color: darkorange; }
+        .boolean { color: blue; }
+        .null { color: magenta; }
+        .key { color: red; }
+    </style>
+    {{include file='manager/public/sidebar.html'}}
+    <div class="main-content">
+        <div class="main-content-inner">
+            <!-- #section:basics/content.breadcrumbs -->
+            {{include file='manager/public/breadcrumbs.html'}}
+
+            <!-- /section:basics/content.breadcrumbs -->
+            <div class="page-content">
+                {{include file='manager/public/set.html'}}
+
+                <!-- /section:settings.box -->
+                <div class="row">
+                    <div class="col-xs-12">
+                    <div class="alert alert-info">以下信息会在经纪人提交人事申请成功后 提示</div>
+                        <!-- PAGE CONTENT BEGINS -->
+                        <form id="save_form" class="form-horizontal" role="form" action="" method="post">
+
+                              <div class="space-4"></div>
+                                 <div class="form-group">
+                                <label class="col-sm-1 control-label no-padding-right" for="remark"> 提示信息 </label>
+                                <div class="col-sm-9">
+                                 <textarea id="editor2" name="content" style="width:700px;height:400px;">{{$data.remark}}</textarea>
+                                   
+                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                </div>
+                            </div>
+
+
+                             <div class="space-4"></div>
+                            <div class="col-md-offset-2 col-md-9">
+                                 <button id="save_btn" class="btn btn-info" type="button">
+
+                                    <i class="icon-ok bigger-110"></i>
+
+                                    保 存
+
+                                </button>
+                                &nbsp; &nbsp; &nbsp;
+                                <a href="javascript:history.go(-1)" class="btn" type="reset">
+
+                                    <i class="icon-undo bigger-110"></i>
+
+                                    返 回
+
+                                </a>
+                            </div>
+                        </form>
+                        <!-- PAGE CONTENT ENDS -->
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.page-content -->
+        </div>
+    </div><!-- /.main-content -->
+    {{include file='manager/public/footer.html'}}
+
+</div><!-- /.main-container -->
+
+{{include file='manager/public/footerjs.html'}}
+<!-- inline scripts related to this page -->
+
+   
+<script type="text/javascript">
+
+
+var editor;
+
+
+var editor;
+      KindEditor.ready(function(K) {
+        editor = K.create('textarea[name="content"]', {
+          resizeType : 1,
+          allowPreviewEmoticons : false,
+          allowImageUpload : false,
+          items : [
+            'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline',
+            'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist',
+            'insertunorderedlist', '|', 'emoticons', 'image', 'link']
+        });
+      });
+
+ $("#save_btn").click(function(){
+     var record_id = $.trim($("#record_id").val());
+     editor.sync();
+     var remark = $.trim($("#editor2").val());
+        if(remark == '') {
+            layer.msg('请填写信息', {icon: 2});
+            return false;
+        }
+
+     var layerIndex = layer.confirm('是否确认通过？通过后经纪人申请通过将可见!' , {
+         btn: ['确认','取消'], //按钮
+         area: ['200px', 'auto']
+     }, function(){
+         $.post('/manager/apply_msg_save',{remark:remark}, function(html){
+             var data = JSON.parse(html);
+             if(data.status == 1){
+                layer.alert('操作成功!', {
+                            skin: 'layui-layer-molv' //样式类名
+                            , closeBtn: 0
+                        }, function () {
+                            location.reload()
+                        });
+                
+             }else{
+                
+                 layer.msg(data.msg, {icon: 2});
+             }
+         });
+
+     }, function(){
+
+     });
+ })
+</script>
+</body>
+</html>
