@@ -1231,6 +1231,60 @@ class Manager extends MY_Controller {
         $this->ajaxReturn($res);
     }
 
+    public function company_pending_down_excel(){
+        $data_res = $this->manager_model->company_pending_list_all(array(1,2));
+        if($data_res['total_rows'] == 0){
+            $this->show_message('没有信息可以导出');
+        }
+        require_once (APPPATH . 'libraries/PHPExcel/PHPExcel.php');
+        $excel  = new \PHPExcel ();
+
+        $excel->getActiveSheet()->setCellValue("A1","诚信系统企业信息导出");
+        $excel->getActiveSheet()->mergeCells('A1:T2');
+        $excel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(26);
+        $letter = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N');
+        $tableheader = array('企业名称','工商注册号','注册地址','经营地址','备案号','发证日期','企业电话','负责人姓名','负责人电话', '法人姓名','法人电话','分支机构数量','当前信用分','信用等级');
+        for($i = 0;$i < count($tableheader);$i++) {
+            $excel->getActiveSheet()->setCellValue("$letter[$i]3","$tableheader[$i]");
+            $excel->getActiveSheet()->getColumnDimension("$letter[$i]")->setWidth(18);
+            $excel->getActiveSheet()->getStyle("$letter[$i]3")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        }
+        $data = array();
+
+        foreach ($data_res['res_list'] as $k=>$v){
+            $data[] = array($v['company_name'],$v['business_no'],$v['register_path'],$v['business_path'],$v['record_num'],$v['issuing_date'],$v['company_phone']
+            ,$v['director_name'],$v['director_phone'],$v['legal_name'],$v['legal_phone'],$v['fz_num']);
+        }
+
+        for ($i = 4;$i <= count($data) + 3;$i++) {
+            $j = 0;
+            foreach ($data[$i - 4] as $key=>$value) {
+                if($key==1){
+                    $excel->getActiveSheet()->setCellValue("$letter[$j]$i"," $value");
+                    $excel->getActiveSheet()->getStyle("$letter[$j]$i")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
+                }else{
+                    $excel->getActiveSheet()->setCellValue("$letter[$j]$i","$value",PHPExcel_Cell_DataType::TYPE_STRING);
+                }
+                $j++;
+            }
+        }
+
+        $excel->getActiveSheet()->setTitle('企业信息列表');
+        $excel->setactivesheetindex(0);
+        $write = new \PHPExcel_Writer_Excel5 ($excel);
+        header("Pragma: public");
+        header("Expires: 0");
+        header("Cache-Control:must-revalidate, post-check=0, pre-check=0");
+        header("Content-Type:application/force-download");
+        header("Content-Type:application/vnd.ms-execl");
+        header("Content-Type:application/octet-stream");
+        header("Content-Type:application/download");;
+        header('Content-Disposition:attachment;filename="'.'企业信息列表'.date('Y-m-d H:i:s',time()).'.xls"');
+        header("Content-Transfer-Encoding:binary");
+        $write->save('php://output');
+    }
+
     /**
      * 注销企业列表
      * @author yangyang

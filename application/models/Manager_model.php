@@ -1780,6 +1780,53 @@ class Manager_model extends MY_Model
         return $data;
     }
 
+    //打印所使用
+    public function company_pending_list_all($flag = array(), $status = array()){
+        //获取详细列
+        $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
+        $data['flag'] = $this->input->get('flag')?trim($this->input->get('flag')):null;
+
+
+        $this->db->select('count(1) num')->from('company_pending a');
+        if($data['keyword']){
+            $this->db->group_start();
+            $this->db->like('a.company_name', $data['keyword']);
+            $this->db->or_like('a.record_num', $data['keyword']);
+            $this->db->group_end();
+        }
+        if($flag)
+            $this->db->where_in('a.flag',$flag);
+        if($data['flag'])
+            $this->db->where('a.flag', $data['flag']);
+        if($status){
+            $this->db->where_in('a.status',$status);
+        }
+
+        $num = $this->db->get()->row();
+        $data['total_rows'] = $num->num;
+
+        $this->db->select('a.*, b.grade_name')->from('company_pending a');
+        $this->db->join('company_grade b', 'a.grade_no = b.grade_no', 'left');
+        if($data['keyword']){
+            $this->db->group_start();
+            $this->db->like('a.company_name', $data['keyword']);
+            $this->db->or_like('a.record_num', $data['keyword']);
+            $this->db->group_end();
+        }
+        if($flag)
+            $this->db->where_in('a.flag',$flag);
+        if($data['flag'])
+            $this->db->where('a.flag', $data['flag']);
+        if($status){
+            $this->db->where_in('a.status',$status);
+        }
+        if(in_array(-1, $flag))
+            $this->db->order_by('a.cancel_date','desc');
+        $this->db->order_by('a.cdate','desc');
+        $data['res_list'] = $this->db->get()->result_array();
+        return $data;
+    }
+
     public function company_pending_edit($id){
         $this->db->select('a.*')->from('company_pending a');
         $this->db->where('a.id', $id);
