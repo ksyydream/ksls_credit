@@ -1240,7 +1240,7 @@ class Manager extends MY_Controller {
         $excel  = new \PHPExcel ();
 
         $excel->getActiveSheet()->setCellValue("A1","诚信系统企业信息导出");
-        $excel->getActiveSheet()->mergeCells('A1:T2');
+        $excel->getActiveSheet()->mergeCells('A1:N2');
         $excel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(26);
         $letter = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N');
