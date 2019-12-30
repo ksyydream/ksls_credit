@@ -26,6 +26,8 @@ class Home extends Home_Controller {
     }
 
     public function test_cap(){
+        //phpinfo();
+        die();
         $company_cap_ = $this->session->userdata('company_cap');
         $agent_cap_ = $this->session->userdata('agent_cap');
         die(var_dump( $company_cap_ . '||' . $agent_cap_));
