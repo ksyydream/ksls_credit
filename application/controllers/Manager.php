@@ -1247,14 +1247,27 @@ class Manager extends MY_Controller {
         $tableheader = array('企业名称','工商注册号','注册地址','经营地址','备案号','发证日期','企业电话','负责人姓名','负责人电话', '法人姓名','法人电话','分支机构数量','当前信用分','信用等级');
         for($i = 0;$i < count($tableheader);$i++) {
             $excel->getActiveSheet()->setCellValue("$letter[$i]3","$tableheader[$i]");
-            $excel->getActiveSheet()->getColumnDimension("$letter[$i]")->setWidth(18);
             $excel->getActiveSheet()->getStyle("$letter[$i]3")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         }
+        $excel->getActiveSheet()->getColumnDimension("A")->setWidth(30);
+        $excel->getActiveSheet()->getColumnDimension("B")->setWidth(30);
+        $excel->getActiveSheet()->getColumnDimension("C")->setWidth(30);
+        $excel->getActiveSheet()->getColumnDimension("D")->setWidth(30);
+        $excel->getActiveSheet()->getColumnDimension("E")->setWidth(18);
+        $excel->getActiveSheet()->getColumnDimension("F")->setWidth(18);
+        $excel->getActiveSheet()->getColumnDimension("G")->setWidth(18);
+        $excel->getActiveSheet()->getColumnDimension("H")->setWidth(18);
+        $excel->getActiveSheet()->getColumnDimension("I")->setWidth(18);
+        $excel->getActiveSheet()->getColumnDimension("J")->setWidth(18);
+        $excel->getActiveSheet()->getColumnDimension("K")->setWidth(18);
+        $excel->getActiveSheet()->getColumnDimension("L")->setWidth(18);
+        $excel->getActiveSheet()->getColumnDimension("M")->setWidth(18);
+        $excel->getActiveSheet()->getColumnDimension("N")->setWidth(18);
         $data = array();
 
         foreach ($data_res['res_list'] as $k=>$v){
             $data[] = array($v['company_name'],$v['business_no'],$v['register_path'],$v['business_path'],$v['record_num'],$v['issuing_date'],$v['company_phone']
-            ,$v['director_name'],$v['director_phone'],$v['legal_name'],$v['legal_phone'],$v['fz_num']);
+            ,$v['director_name'],$v['director_phone'],$v['legal_name'],$v['legal_phone'],$v['fz_num'],$v['total_score'],$v['grade_name']);
         }
 
         for ($i = 4;$i <= count($data) + 3;$i++) {
