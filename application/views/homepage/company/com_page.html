@@ -27,7 +27,7 @@
             <dd><span>法人代表人姓名：</span>{{$data.legal_name}}</dd>
             <dd><span>公司成立时间：</span><span>2019年11月13号</span> </dd>
           </dl>
-          <span class="s-label">异常状态</span>
+          {{if $data.zz_status == -1}}<span class="s-label">异常状态</span>{{/if}}
       </div>
     
          <div class="company-info"> 
