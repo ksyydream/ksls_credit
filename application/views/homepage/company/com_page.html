@@ -21,12 +21,13 @@
         </form>
       </div>
       <div class="company-info">
-          <dl class="dl-info">
+          <dl class="dl-info dl-info-fl">
             <dt>{{$data.company_name}}</dt>
             <dd><span>统一社会信用代码/注册号：</span><span>{{$data.business_no}}</span></dd>
             <dd><span>法人代表人姓名：</span>{{$data.legal_name}}</dd>
             <dd><span>公司成立时间：</span><span>2019年11月13号</span> </dd>
-          </dl> 
+          </dl>
+          <span class="s-label">异常状态</span>
       </div>
     
          <div class="company-info"> 
@@ -240,7 +241,7 @@
 
 
 
-<!-- 以上页面内容 开发时删除 -->
+
 
 {{include file='homepage/public/foot.html'}}
 <script type="text/javascript" src="/manager_statics/app/lightbox-plus-jquery.min.js?v2"></script>

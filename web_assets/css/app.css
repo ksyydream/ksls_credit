@@ -37,8 +37,8 @@ input:-ms-input-placeholder{  color:#b2b2b2;}i{font-style:normal;}
 .slide02-control{height: 40px;}
 .slide02-control li{float: left;width: 96px; height: 28px; background: #2dd7cc; text-align: center; line-height: 28px; margin-right: 10px; border-radius: 3px;}
 .slide02-control li a{width: 96px; height: 28px; color: #fff; position: relative;  display: block;}
-.slide02-control li  .am-icon-angle{position: absolute; top:22px; left: 48px; font-size: 20px; width: 12px; height: 12px; background:none; content: " "; 
-transform:rotate(45deg);-ms-transform:rotate(45deg);-moz-transform:rotate(45deg); -webkit-transform:rotate(45deg); -o-transform:rotate(45deg);z-index: 1; }
+.slide02-control li  .am-icon-angle{position: absolute; top:22px; left: 48px; font-size: 20px; width: 12px; height: 12px; background:none; content: " ";
+    transform:rotate(45deg);-ms-transform:rotate(45deg);-moz-transform:rotate(45deg); -webkit-transform:rotate(45deg); -o-transform:rotate(45deg);z-index: 1; }
 
 .slide02-control li.current .am-icon-angle{background: #2dd7cc;}
 
@@ -83,12 +83,12 @@ transform:rotate(45deg);-ms-transform:rotate(45deg);-moz-transform:rotate(45deg)
 #company_page .count{ display: inline; color: #fff;}
 #company_page .count em{font-weight: bold;padding:0 2px;}
 #company_page .prev,#company_page .next{width:80px; height: 30px; line-height: 30px;
- display: inline-block;}
-#company_page .prev a,#company_page .next a{width:80px; height: 30px; 
- display: inline-block;}
+    display: inline-block;}
+#company_page .prev a,#company_page .next a{width:80px; height: 30px;
+    display: inline-block;}
 
 #company_page span.prev{color:#ededed;}
-#company_page  a{color: #666;width:32px; height: 28px; border:1px solid #ededed; text-align: center; 
+#company_page  a{color: #666;width:32px; height: 28px; border:1px solid #ededed; text-align: center;
     display:inline-block;}
 #company_page  a:hover,#company_page  .am-active a{background: #2dd7cc; color:#fff;}
 
@@ -299,12 +299,12 @@ transform:rotate(45deg);-ms-transform:rotate(45deg);-moz-transform:rotate(45deg)
 .login-list li .xx{background: url(../i/xx_icon.png) no-repeat;}
 .login-list li  .nums{width: 20px; float: right; height: 15px; line-height: 15px; background: #cc0000; text-align: center;
     border-radius: 5px; color: #fff;font-size: 10px;margin: 8px 0 0 2px;}
-.login-list li .jbxx{background: url(../i/jbxx.png) no-repeat;}
+.login-list li .jbxx{background: url(../images/jbxx.png) no-repeat;}
 .login-list li .xgmm{background: url(../i/xgmm.png) no-repeat;}
 .login-list li .out{background: url(../i/out.png) no-repeat;}
 .login-list li .cxjl{background: url(../i/cxjl.png) no-repeat;}
 .afer-login{padding-top:12px; line-height: 18px; float: right; cursor: pointer;}
-.afer-login .login-user{display:inline-block; padding:0 5px 0 10px;color: #fff;}
+.afer-login .login-user{display:inline-block; padding:0 5px 0 20px;color: #fff; background: url(../i/user_icon.png) no-repeat;}
 .afer-login .triangle{width:10px;height: 5px; display: inline-block; color: #fff;
     background: url(../i/triangle.png) no-repeat; float: left;margin-top: 8px;}
 
@@ -322,3 +322,7 @@ transform:rotate(45deg);-ms-transform:rotate(45deg);-moz-transform:rotate(45deg)
 .before-login a{color: #fff;}
 
 .searchable-select{min-width: 500px;}
+
+.s-label{width:105px; height: 45px; display: block; background: #cc0000; text-align: center; line-height: 45px; color: #fff; float: right;  font-size: 16px;}
+
+.dl-info-fl{width:890px; float: left;}
