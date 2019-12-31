@@ -165,7 +165,8 @@ class Home extends Home_Controller {
     public function show_agent($page = 1){
         $data = $this->home_model->show_agent($page);
         $base_url = "/home/show_agent/";
-        $pager = $this->pagination->getPageLink($base_url, $data['total_rows'], $data['limit']);
+        //getPageLink
+        $pager = $this->pagination->getPageLink4home($base_url, $data['total_rows'], $data['limit']);
         $this->assign('pager', $pager);
         $this->assign('page', $page);
         $this->assign('data', $data);
@@ -176,7 +177,7 @@ class Home extends Home_Controller {
     public function show_company_record($page = 1){
         $data = $this->home_model->show_company_record($page);
         $base_url = "/home/show_company_record/";
-        $pager = $this->pagination->getPageLink($base_url, $data['total_rows'], $data['limit']);
+        $pager = $this->pagination->getPageLink4home($base_url, $data['total_rows'], $data['limit']);
         $this->assign('pager', $pager);
         $this->assign('page', $page);
         $this->assign('data', $data);
