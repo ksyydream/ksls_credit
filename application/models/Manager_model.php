@@ -1969,9 +1969,12 @@ class Manager_model extends MY_Model
         }
         //处理基本信用标签
         $this->db->delete('company_pending_icon', array('company_id' => $company_id));
-        $icon_insert_data = $this->db->select("{$company_id} company_id, icon_no")->from('sys_score_icon')->where('status', 1)->where_in('icon_no', $post_icon_list)->get()->result_array();
-        if ($icon_insert_data)
-            $this->db->insert_batch('company_pending_icon', $icon_insert_data);
+        if($post_icon_list){
+            $icon_insert_data = $this->db->select("{$company_id} company_id, icon_no")->from('sys_score_icon')->where('status', 1)->where_in('icon_no', $post_icon_list)->get()->result_array();
+            if ($icon_insert_data)
+                $this->db->insert_batch('company_pending_icon', $icon_insert_data);
+        }
+
 
         //判断如果是新增的 就自动提报年审
         if(!$this->input->post('company_id'))
