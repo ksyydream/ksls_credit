@@ -9,7 +9,7 @@ input:-ms-input-placeholder{  color:#b2b2b2;}i{font-style:normal;}
 .fl{float: left;} em{ font-style: normal;}
 
 
-.ind_main{background: url(../i/ind_bg.jpg) no-repeat center top; height: 800px;}
+.ind_main{background: url(../i/ind_bg.jpg) no-repeat center top;height:930px;min-height: 800px; position: relative;}
 
 .ind_main_inner{margin:0 auto; width: 1200px;padding-top:53px;}
 
@@ -326,3 +326,6 @@ input:-ms-input-placeholder{  color:#b2b2b2;}i{font-style:normal;}
 .s-label{width:105px; height: 45px; display: block; background: #cc0000; text-align: center; line-height: 45px; color: #fff; float: right;  font-size: 16px;}
 
 .dl-info-fl{width:890px; float: left;}
+
+.f-tr{ color: #fff; position: absolute; bottom: 15px; width: 100%;}
+.f-tr p{text-align: center; font-size: 12px;}
