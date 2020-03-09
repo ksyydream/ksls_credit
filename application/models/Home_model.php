@@ -218,6 +218,19 @@ class Home_model extends MY_Model
     return $data;
    }
 
+    //通过职业证号获取经纪人信息
+    public function mobile_get_agent_detail(){
+        $job_code = trim($this->input->get('job_code'));
+        if(!$job_code)
+            return null;
+        $this->db->select('a.*, b.company_name');
+        $this->db->from('agent a');
+        $this->db->join('company_pending b', 'a.company_id = b.id and b.flag = 2', 'left');
+        $this->db->where('a.job_code', $job_code);
+        $data = $this->db->get()->row_array();
+        return $data;
+    }
+
    //企业详情中的 企业事件列表
     public function show_agent_record($page = 1){
         $data['limit'] = 6;//每页显示多少调数据
