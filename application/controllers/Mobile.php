@@ -28,9 +28,10 @@ class Mobile extends MY_Controller {
 
     //扫描二维码获取信息
     public function mobile_get_agent_detail(){
-        $data = $this->home_model->mobile_get_agent_detail();
-        $this->assign('data', $data);
-        $this->display('mobile/html/person_page.html');
+		$this->display('mobile/html/waiting.html');
+        //$data = $this->home_model->mobile_get_agent_detail();
+        //$this->assign('data', $data);
+        //$this->display('mobile/html/person_page.html');
     }
 
 	
