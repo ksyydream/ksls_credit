@@ -515,6 +515,8 @@ class Manager_model extends MY_Model
         $detail =  $this->db->get()->row_array();
         if(!$detail)
             return $detail;
+        $detail['code_img_list'] = $this->db->select()->from('agent_code_img')->where('agent_id', $id)->get()->result_array();
+        $detail['job_img_list'] = $this->db->select()->from('agent_job_img')->where('agent_id', $id)->get()->result_array();
         return $detail;
     }
 
@@ -556,6 +558,33 @@ class Manager_model extends MY_Model
             $this->db->insert('agent', $data);
             $id = $this->db->insert_id();
         }
+        //保存 身份证照片和执业证照片
+        $this->db->delete('agent_code_img', array('agent_id' => $id));
+        $pic_short_code = $this->input->post('pic_short1');
+        if($pic_short_code){
+            foreach($pic_short_code as $idx => $pic) {
+                $code_pic = array(
+                    'agent_id' => $id,
+                    'img' => $pic,
+                    'm_img' => $pic . '?imageView2/0/w/200/h/200/q/75|imageslim'
+                );
+                $this->db->insert('agent_code_img', $code_pic);
+            }
+        }
+
+        $this->db->delete('agent_job_img', array('agent_id' => $id));
+        $pic_short_job = $this->input->post('pic_short2');
+        if($pic_short_job){
+            foreach($pic_short_job as $idx => $pic) {
+                $job_pic = array(
+                    'agent_id' => $id,
+                    'img' => $pic,
+                    'm_img' => $pic . '?imageView2/0/w/200/h/200/q/75|imageslim'
+                );
+                $this->db->insert('agent_job_img', $job_pic);
+            }
+        }
+
         $this->handle_agent_flag($id);
         return $this->fun_success('保存成功!');
     }

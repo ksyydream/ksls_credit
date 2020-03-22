@@ -389,7 +389,8 @@ class Manager extends MY_Controller {
      * @date 2019-11-09
      */
     public function agent_add(){
-
+        $this->assign('f_user_id', $this->admin_id);
+        $this->assign('time', time());
         $this->display('manager/agent/agent_detail.html');
     }
 
@@ -398,6 +399,8 @@ class Manager extends MY_Controller {
         if(!$data){
             $this->show_message('未找到执业经纪人信息!');
         }
+        $this->assign('f_user_id', $this->admin_id);
+        $this->assign('time', time());
         $this->assign('data', $data);
         $this->display('manager/agent/agent_detail.html');
     }
