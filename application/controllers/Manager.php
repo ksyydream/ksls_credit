@@ -1246,8 +1246,8 @@ class Manager extends MY_Controller {
         $excel->getActiveSheet()->mergeCells('A1:N2');
         $excel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(26);
-        $letter = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N');
-        $tableheader = array('企业名称','工商注册号','注册地址','经营地址','备案号','发证日期','企业电话','负责人姓名','负责人电话', '法人姓名','法人电话','分支机构数量','当前信用分','信用等级');
+        $letter = array('A','B','C','D','E','F','G','H','I','J','K','L');
+        $tableheader = array('企业名称','统一社会信用代码','注册地址','经营地址','企业电话','负责人姓名','负责人电话', '法人姓名','法人电话','分支机构数量','当前信用分','信用等级');
         for($i = 0;$i < count($tableheader);$i++) {
             $excel->getActiveSheet()->setCellValue("$letter[$i]3","$tableheader[$i]");
             $excel->getActiveSheet()->getStyle("$letter[$i]3")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
@@ -1264,8 +1264,6 @@ class Manager extends MY_Controller {
         $excel->getActiveSheet()->getColumnDimension("J")->setWidth(18);
         $excel->getActiveSheet()->getColumnDimension("K")->setWidth(18);
         $excel->getActiveSheet()->getColumnDimension("L")->setWidth(18);
-        $excel->getActiveSheet()->getColumnDimension("M")->setWidth(18);
-        $excel->getActiveSheet()->getColumnDimension("N")->setWidth(18);
         $data = array();
 
         foreach ($data_res['res_list'] as $k=>$v){

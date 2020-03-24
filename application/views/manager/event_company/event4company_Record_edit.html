@@ -75,9 +75,9 @@
 
                             <div class="space-4"></div>
                             <div class="form-group">
-                                <label class="col-sm-1 control-label no-padding-right"> 备案号 </label>
+                                <label class="col-sm-1 control-label no-padding-right" style="font-size:smaller"> 统一社会信用代码 </label>
                                 <div class="col-sm-9">
-                                   <input type="text" readonly="readonly" class="rcol-xs-10 col-sm-6" value="{{$data.record_num_}}">
+                                   <input type="text" readonly="readonly" class="rcol-xs-10 col-sm-6" value="{{$data.business_no_}}">
                                     <span class="help-inline col-xs-12 col-sm-7"></span>
                                 </div>
                             </div>
@@ -104,7 +104,7 @@
                              <div class="space-4"></div>
                           
                             <div class="form-group">
-                                <label class="col-sm-1 control-label no-padding-right" for="event_id"> 调整的信用等级 </label>
+                                <label class="col-sm-1 control-label no-padding-right" style="font-size:smaller" for="event_id"> 调整的信用等级 </label>
                                 <div class="col-sm-9">
                                    <input type="text" readonly="readonly" required="required" class="rcol-xs-10 col-sm-6" value="{{$data.grade_name}}">
                                     <span class="help-inline col-xs-12 col-sm-7"></span>

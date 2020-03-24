@@ -169,6 +169,8 @@ class Common4manager_model extends MY_Model
 
     //检查备案号是否存在
     public function check_record_num($record_num,$without_id=null){
+        //不再判断备案号 20200324
+        return $this->fun_success('可以使用!');
         $this->db->select()->from('company_pending')->where('record_num',trim($record_num));
         //$this->db->where_in('status',array(1,2,3,4));
         if($without_id)
@@ -181,7 +183,7 @@ class Common4manager_model extends MY_Model
         }
     }
 
-    //检查商业注册号是否存在 如果不用判断，可以直接改这个函数
+    //检查 统一社会信用代码 是否存在 如果不用判断，可以直接改这个函数
     public function check_business_no($business_no,$without_id=null){
         $this->db->select()->from('company_pending')->where('business_no',trim($business_no));
         //$this->db->where_in('status',array(1,2,3,4));
@@ -189,7 +191,7 @@ class Common4manager_model extends MY_Model
             $this->db->where('id <>',$without_id);
         $data_pending = $this->db->get()->row_array();
         if($data_pending){
-             return $this->fun_fail('商业注册号存在!');
+             return $this->fun_fail('统一社会信用代码 存在!');
         }else{
             return $this->fun_success('可以使用!');
         }

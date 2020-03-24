@@ -72,7 +72,7 @@
                                         </div>
                                          <div class="space-4"></div>
                                         <div class="form-group">
-                                             <label class="col-sm-1 control-label no-padding-right" for="business_no"> 工商注册号 </label>
+                                             <label class="col-sm-1 control-label no-padding-right" style="font-size:smaller" for="business_no"> 统一社会信用代码 </label>
                                         <div class="col-sm-9">
                                         <input type="text" id="business_no" name="business_no" class="rcol-xs-10 col-sm-5 js4ABC_num" value="{{$data.business_no|default:''}}">
                                             <span class="help-inline col-xs-12 col-sm-7"></span>
@@ -94,7 +94,7 @@
                                             <span class="help-inline col-xs-12 col-sm-7"></span>
                                             </div>
                                         </div>
-                                         <div class="space-4"></div>
+                                         <!--<div class="space-4"></div>
                                          <div class="form-group">
                                              <label class="col-sm-1 control-label no-padding-right"> 备案号 </label>
                                         <div class="col-sm-9 yy_m_7">
@@ -109,7 +109,7 @@
                                         <input type="text" onfocus="WdatePicker({isShowClear:true,readOnly:true,dateFmt:'yyyy-MM-dd'})"  id="issuing_date" name="issuing_date" class="rcol-xs-10 col-sm-5" value="{{$data.issuing_date|default:''}}">
                                             <span class="help-inline col-xs-12 col-sm-7"></span>
                                             </div>
-                                        </div>
+                                        </div>-->
                                         <div class="space-4"></div>
 
                                          <div class="form-group">
@@ -345,7 +345,7 @@
         }
         var business_no = $.trim($("#business_no").val());
         if(business_no == "" ) {
-            layer.msg('工商注册号不能为空', {icon: 2});
+            layer.msg('统一社会信用代码不能为空', {icon: 2});
             return false;
         }
         var register_path = $.trim($("#register_path").val());
@@ -360,8 +360,8 @@
         }
         var issuing_date = $.trim($("#issuing_date").val());
         if(issuing_date == "" ) {
-            layer.msg('发证日期不能为空', {icon: 2});
-            return false;
+            //layer.msg('发证日期不能为空', {icon: 2});
+            //return false;
         }
 
          var company_phone = $.trim($("#company_phone").val());

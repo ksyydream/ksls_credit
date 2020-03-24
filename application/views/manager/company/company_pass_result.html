@@ -41,7 +41,7 @@
                 <!-- /section:settings.box -->
                 <div class="row">
                     <div class="col-xs-12">
-                        <div class="alert alert-info">以下信息除'备案号'外，均为审核结束时的历史信息</div>
+                        <div class="alert alert-info">以下信息均为审核结束时的历史信息</div>
                         
                 
                         <!-- PAGE CONTENT BEGINS -->
@@ -90,7 +90,7 @@
                                                                             </div>
                                                                         </div>
                                                                         <div class="profile-info-row">
-                                                                            <div class="profile-info-name"> 商业注册号 </div>
+                                                                            <div class="profile-info-name"  style="font-size:smaller"> 统一社会信用代码 </div>
 
                                                                             <div class="profile-info-value">
                                                             
@@ -111,22 +111,6 @@
 
                                                                             <div class="profile-info-value">
                                                                                 <span>{{$data.business_path|default:''}}</span>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div class="profile-info-row">
-                                                                            <div class="profile-info-name"> 备案号 </div>
-
-                                                                            <div class="profile-info-value">
-                                                                                <span>{{$pending_data.record_num|default:''}}</span>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div class="profile-info-row">
-                                                                            <div class="profile-info-name"> 发证日期 </div>
-
-                                                                            <div class="profile-info-value">
-                                                                                <span>{{$data.issuing_date|default:''}}</span>
                                                                             </div>
                                                                         </div>
 

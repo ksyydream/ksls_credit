@@ -1408,15 +1408,15 @@ class Manager_model extends MY_Model
     public function event4company_record_list($page = 1, $type_type = null){
         $data['limit'] = $this->limit;
         //搜索条件
-        $data['record_num'] = $this->input->get('record_num')?trim($this->input->get('record_num')):null;
+        $data['business_no'] = $this->input->get('business_no')?trim($this->input->get('business_no')):null;
         $data['company_keyword'] = $this->input->get('company_keyword')?trim($this->input->get('company_keyword')):null;
         $data['event_keyword'] = $this->input->get('event_keyword')?trim($this->input->get('event_keyword')):null;
         $data['status'] = $this->input->get('status')?trim($this->input->get('status')):null;
         //获取总记录数
         $this->db->select('count(1) num')->from('event4company_record a');
         $this->db->join('company_pending b', 'a.company_id = b.id', 'left');
-        if ($data['record_num']) {
-            $this->db->where('b.record_num', $data['record_num']);
+        if ($data['business_no']) {
+            $this->db->where('b.business_no', $data['business_no']);
         }
         if($data['company_keyword']){
             $this->db->group_start();
@@ -1440,10 +1440,10 @@ class Manager_model extends MY_Model
         $data['total_rows'] = $num->num;
 
         //获取详细列
-        $this->db->select('a.*, b.company_name new_company_name_, b.record_num record_num_')->from('event4company_record a');
+        $this->db->select('a.*, b.company_name new_company_name_, b.business_no business_no_')->from('event4company_record a');
         $this->db->join('company_pending b', 'a.company_id = b.id', 'left');
-        if ($data['record_num']) {
-            $this->db->where('b.record_num', $data['record_num']);
+        if ($data['business_no']) {
+            $this->db->where('b.business_no', $data['business_no']);
         }
         if($data['company_keyword']){
             $this->db->group_start();
@@ -1563,7 +1563,7 @@ class Manager_model extends MY_Model
     }
 
      public function event4company_Record_edit($id){
-        $this->db->select('a.*, b.company_name new_company_name_, b.record_num record_num_')->from('event4company_record a');
+        $this->db->select('a.*, b.company_name new_company_name_, b.business_no business_no_')->from('event4company_record a');
         $this->db->join('company_pending b', 'b.id = a.company_id', 'left');
         $this->db->where('a.record_id',$id);
         $detail =  $this->db->get()->row_array();
@@ -1771,7 +1771,7 @@ class Manager_model extends MY_Model
         if($data['keyword']){
             $this->db->group_start();
             $this->db->like('a.company_name', $data['keyword']);
-            $this->db->or_like('a.record_num', $data['keyword']);
+            $this->db->or_like('a.business_no', $data['keyword']);
             $this->db->group_end();
         }
         if($flag)
@@ -1791,7 +1791,7 @@ class Manager_model extends MY_Model
         if($data['keyword']){
             $this->db->group_start();
             $this->db->like('a.company_name', $data['keyword']);
-            $this->db->or_like('a.record_num', $data['keyword']);
+            $this->db->or_like('a.business_no', $data['keyword']);
             $this->db->group_end();
         }
         if($flag)
@@ -1820,7 +1820,7 @@ class Manager_model extends MY_Model
         if($data['keyword']){
             $this->db->group_start();
             $this->db->like('a.company_name', $data['keyword']);
-            $this->db->or_like('a.record_num', $data['keyword']);
+            $this->db->or_like('a.business_no', $data['keyword']);
             $this->db->group_end();
         }
         if($flag)
@@ -1839,7 +1839,7 @@ class Manager_model extends MY_Model
         if($data['keyword']){
             $this->db->group_start();
             $this->db->like('a.company_name', $data['keyword']);
-            $this->db->or_like('a.record_num', $data['keyword']);
+            $this->db->or_like('a.business_no', $data['keyword']);
             $this->db->group_end();
         }
         if($flag)
@@ -1903,9 +1903,10 @@ class Manager_model extends MY_Model
         );
 
         $company_id = $this->input->post('company_id');
-        if(!$data['company_name'] || !$data['register_path'] || !$data['business_path'] ||  !$data['business_no'] || 
-            !$data['issuing_date'] || !$data['company_phone'] || !$data['director_name'] || 
-            !$data['director_phone'] || !$data['legal_name'] || !$data['legal_phone'] || !$data['record_num']){
+        if(!$data['company_name'] || !$data['register_path'] || !$data['business_path'] ||  !$data['business_no']
+            //|| !$data['issuing_date']  || !$data['record_num']
+            || !$data['company_phone'] || !$data['director_name'] ||
+            !$data['director_phone'] || !$data['legal_name'] || !$data['legal_phone']){
             return $this->fun_fail('缺少必要信息!');
         }
         $this->load->model('common4manager_model', 'c4m_model');
@@ -1913,13 +1914,14 @@ class Manager_model extends MY_Model
         $check_company_name_ = $this->c4m_model->check_company_name($data['company_name'], $company_id);
         if($check_company_name_['status'] != 1)
             return $this->fun_fail($check_company_name_['msg']);
-        //检查工商注册号是否唯一
+        //检查 统一社会信用代码 是否唯一
         $check_business_no_ = $this->c4m_model->check_business_no($data['business_no'], $company_id);
         if($check_business_no_['status'] != 1)
             return $this->fun_fail($check_business_no_['msg']);
-        $check_num_ = $this->c4m_model->check_record_num($data['record_num'], $company_id);
-        if($check_num_['status'] != 1)
-            return $this->fun_fail('备案号已占用!');
+        //20200324不再判断备案号
+        //$check_num_ = $this->c4m_model->check_record_num($data['record_num'], $company_id);
+        //if($check_num_['status'] != 1)
+            //return $this->fun_fail('备案号已占用!');
         //检查执业证号是否可用或者重复
         $code_ = $this->input->post('agent_job_code');
         $check_repeat_agent_ = $this->c4m_model->check_repeat_agent($company_id, $code_);
@@ -2061,8 +2063,9 @@ class Manager_model extends MY_Model
         unset($company_data['cancel_date']);
         unset($company_data['cancel_user']);
         unset($company_data['cancel_remark']);
-        if(!$company_data['company_name'] || !$company_data['register_path'] || !$company_data['business_path'] || !$company_data['business_no'] || 
-            !$company_data['issuing_date'] || !$company_data['company_phone'] || !$company_data['director_name'] ||
+        if(!$company_data['company_name'] || !$company_data['register_path'] || !$company_data['business_path'] || !$company_data['business_no']
+            //|| !$company_data['issuing_date']
+            || !$company_data['company_phone'] || !$company_data['director_name'] ||
             !$company_data['director_phone'] || !$company_data['legal_name'] || !$company_data['legal_phone']){
             return $this->fun_fail('缺少必要信息!');
         }
@@ -2257,7 +2260,7 @@ class Manager_model extends MY_Model
         $data['limit'] = $this->limit;
         //搜索条件
         $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
-        $data['record_num'] = $this->input->get('record_num')?trim($this->input->get('record_num')):null;
+        $data['business_no'] = $this->input->get('business_no')?trim($this->input->get('business_no')):null;
         $this->db->select('count(1) num')->from('company_pass a');
         $this->db->join('company_pending b','b.id = a.company_id','left');
         if($data['keyword']){
@@ -2265,23 +2268,23 @@ class Manager_model extends MY_Model
             $this->db->like('a.company_name', $data['keyword']);
             $this->db->group_end();
         }
-        if($data['record_num'])
-            $this->db->where('b.flag', $data['record_num']);
+        if($data['business_no'])
+            $this->db->where('b.business_no', $data['business_no']);
         if($status)
             $this->db->where_in('a.status',$status);
         $num = $this->db->get()->row();
         $data['total_rows'] = $num->num;
 
         //获取详细列
-        $this->db->select('a.id,a.annual_date,a.company_name,a.legal_name,a.tj_date,a.director_name,b.record_num,cs_date,s_date')->from('company_pass a');
+        $this->db->select('a.id,a.annual_date,a.company_name,a.legal_name,a.tj_date,a.director_name,b.business_no,cs_date,s_date')->from('company_pass a');
         $this->db->join('company_pending b','b.id = a.company_id','left');
         if($data['keyword']){
             $this->db->group_start();
             $this->db->like('a.company_name', $data['keyword']);
             $this->db->group_end();
         }
-        if($data['record_num'])
-            $this->db->where('b.flag', $data['record_num']);
+        if($data['business_no'])
+            $this->db->where('b.business_no', $data['business_no']);
         if($status){
             $this->db->where_in('a.status',$status);
             if (in_array(3, $status))
@@ -2331,8 +2334,9 @@ class Manager_model extends MY_Model
             'legal_phone'=>trim($this->input->post('legal_phone')),
             'mdate'=>date('Y-m-d H:i:s',time()),
         );
-        if(!$company_data['company_name'] || !$company_data['register_path'] || !$company_data['business_path'] || !$company_data['business_no'] ||
-            !$company_data['issuing_date'] || !$company_data['company_phone'] || !$company_data['director_name'] ||
+        if(!$company_data['company_name'] || !$company_data['register_path'] || !$company_data['business_path'] || !$company_data['business_no']
+            //|| !$company_data['issuing_date']
+            || !$company_data['company_phone'] || !$company_data['director_name'] ||
             !$company_data['director_phone'] || !$company_data['legal_name'] || !$company_data['legal_phone']){
             return $this->fun_fail('缺少必要信息!');
         }
