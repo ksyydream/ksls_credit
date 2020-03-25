@@ -13,7 +13,7 @@ input:-ms-input-placeholder{  color:#b2b2b2;}i{font-style:normal;}
 
 .ind_main_inner{margin:0 auto; width: 1200px;padding-top:53px;}
 
-.logo{background: url(../i/logo.png) no-repeat; display: block;  width:316px; height: 52px;  float: left;}
+.logo{background: url(../i/logo.png) no-repeat; display: block;  width:600px; height: 52px;  float: left;}
 
 .search_box{margin:225px 0 0 150px;}
 .search_ipt{padding:15px;width:739px; height:66px;  border:none;  float: left;  border-radius:5px 0 0 5px; }
@@ -30,7 +30,7 @@ input:-ms-input-placeholder{  color:#b2b2b2;}i{font-style:normal;}
 
 .main1200{width:1200px; margin: 0 auto;}
 .page-hd{ padding-top: 15px;background: #2dd7cc; height: 80px;}
-.page-hd .logo{width:312px; height: 45px; display: block; background: url(../i/page_logo.png) no-repeat; float: left;}
+.page-hd .logo{width:600px; height: 60px; display: block; background: url(../i/page_logo.png) no-repeat; float: left;}
 .login-btn{display: block; width: 65px; height: 35px; background: #2dd7cc; color: #fff; text-align: center; line-height: 35px; float: right;}
 .page .login-btn{padding-top:5px;}
 
