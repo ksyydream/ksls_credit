@@ -34,7 +34,7 @@ class Home_model extends MY_Model
         if ($data['c_k']) {
             $this->db->group_start();
             $this->db->like('a.company_name', $data['c_k']);
-            $this->db->or_like('a.record_num', $data['c_k']);
+            $this->db->or_like('a.legal_name', $data['c_k']);
             $this->db->or_like('a.business_no', $data['c_k']);
             $this->db->group_end();
         }
@@ -51,7 +51,7 @@ class Home_model extends MY_Model
         if($data['c_k']){
             $this->db->group_start();
             $this->db->like('a.company_name', $data['c_k']);
-            $this->db->or_like('a.record_num', $data['c_k']);
+            $this->db->or_like('a.legal_name', $data['c_k']);
             $this->db->or_like('a.business_no', $data['c_k']);
             $this->db->group_end();
         }

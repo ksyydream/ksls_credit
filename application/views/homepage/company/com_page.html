@@ -114,7 +114,9 @@
               <td>{{$ns_list_1.annual_year}}年</td>
               <td>
                   {{if $ns_list_1.status == 1}}年审失败{{/if}}
-                  {{if $ns_list_1.status == 2}}年审成功<a href="">点击下载备案电子证书</a> {{/if}}
+                  {{if $ns_list_1.status == 2}}年审成功
+                  {{if $data.id == $c_id_}}<a href="/company/get_cert/{{$ns_list_1.id}}">点击下载备案电子证书</a>{{/if}}
+                  {{/if}}
                   {{if $ns_list_1.status == -1}}缺席{{/if}}
               </td>
            </tr>  
@@ -132,7 +134,9 @@
               <td>{{$ns_list_2.annual_year}}年</td>
               <td>
                   {{if $ns_list_2.status == 1}}年审失败{{/if}}
-                  {{if $ns_list_2.status == 2}}年审成功{{/if}}
+                  {{if $ns_list_2.status == 2}}年审成功
+                  {{if $data.id == $c_id_}}<a href="/company/get_cert/{{$ns_list_2.id}}">点击下载备案电子证书</a>{{/if}}
+                  {{/if}}
                   {{if $ns_list_2.status == -1}}缺席{{/if}}
               </td>
            </tr>  
@@ -157,7 +161,9 @@
                 <td>{{$v.annual_year}}年</td>
                 <td>
                 {{if $v.status == 1}}年审失败{{/if}}
-                {{if $v.status == 2}}年审成功{{/if}}
+                {{if $v.status == 2}}年审成功
+                    {{if $data.id == $c_id_}}<a href="/company/get_cert/{{$v.id}}">点击下载备案电子证书</a>{{/if}}
+                    {{/if}}
                 {{if $v.status == -1}}缺席{{/if}}
                 </td>
              </tr>  

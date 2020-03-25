@@ -969,6 +969,57 @@ class MY_Model extends CI_Model{
         return true;
     }
 
+    /**
+     * 生成证书
+     * @param $pass_id      年审申请ID,通过年审申请来生成证书,因为证书包含企业名称,所以只能等年审结束,信息覆盖后生成
+     */
+    public function create_cert($pass_id){
+        $cert_insert_ = array('status' => 1);
+        //先找到年审审核信息,主要查找 年审年份,企业ID
+        //DBY 20200325 以后需要根据社区生成证件编号,这里需要在年审信息中查看
+        $pass_info = $this->db->select('company_id, status, annual_date')->from('company_pass')->where(array('id' => $pass_id))->get()->row_array();
+        if(!$pass_info)
+            return false;
+        $title_ = 'KS';
+        //通过企业ID查找到当前的名称,企业pass内也有,但还是直接获取company_pending 内的
+        $pending_info = $this->db->select('company_name, legal_name')->from('company_pending')->where(array('id' => $pass_info['company_id']))->get()->row_array();
+        if(!$pending_info)
+            return false;
+        $cert_insert_['company_name']   = $pending_info['company_name'];
+        $cert_insert_['legal_name']     = $pending_info['legal_name'];
+        $cert_insert_['company_id']     = $pass_info['company_id'];
+        //通过年审时间 获取年审记录信息,如果年审记录是失败 只删除可能存在的证书,如果年审记录是成功,就再继续操作
+        $annual_info_ = $this->db->select('*')->from('company_ns_list')->where(array('annual_year' => $pass_info['annual_date'], 'company_id' => $pass_info['company_id']))->get()->row_array();
+        if(!$annual_info_)
+            return false;
+        $cert_insert_['ns_id'] = $annual_info_['id'];
+        $this->db->where(array('company_id' => $pass_info['company_id'], 'ns_id' => $annual_info_['id']))->update('company_ns_cert', array('status' => -1));
+        if($annual_info_['status'] == 2){
+            $cert_insert_['company_name'] = $pending_info['company_name'];
+            $cert_insert_['num'] = $this->get_cert_num($title_);
+            //获取年审窗口期, 生成证件的 授权起止日期
+            $term_info_ = $this->db->select('*')->from('term')->where(array('annual_year' => $pass_info['annual_date'], 'flag' => 1))->get()->row_array();
+            if(!$term_info_)
+                return false;
+            $cert_insert_['start_date'] = $term_info_['begin_date'];
+            $date_                      =  strtotime('+1year', strtotime($term_info_['end_date']));
+            $cert_insert_['end_date']   = date("Y-m-d",$date_);
+            $this->db->insert('company_ns_cert', $cert_insert_);
+        }
+
+        return true;
+    }
+
+    //获取证书编号
+    public function get_cert_num($title){
+        $title_ = $title;
+        $num = $title_ . sprintf('%04s', $this->get_sys_num_auto($title_));
+        $check = $this->db->select('id')->from('company_ns_cert')->where('num',$num)->order_by('id','desc')->get()->row_array();
+        if($check)
+            $num = $this->get_username();
+        return $num;
+    }
+
 
     public function save_company_ns_info($status, $company_id, $pass_id = null){
 

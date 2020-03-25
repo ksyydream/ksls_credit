@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>备案电子证书下载</title>
+	<link rel="stylesheet" href="">
+</head>
+<style type="text/css" media="screen">
+html,body,div,p,span,input,a{margin:0;padding:0;}i{font-style: normal;}
+@font-face{font-family: myFirstFont; src:url(/assets/dzzs/i/HYRunYuan-55W.ttf);}
+    body{color:#282828;} a{color:#282828;text-decoration: none;}
+    .wrap{width:750px;margin:0 auto;}
+	.congratulate-div{margin:30px auto 0;width:750px; height:1123px; text-align: left; background: url(/assets/dzzs/i/zhengshu.jpg) no-repeat;}
+    .dl-div{padding: 500px 126px 0;}
+	.dl-txt{padding-left: 14px; line-height: 24px;}
+    .dl-txt dt{float:left; font-size: 24px;}
+    .dl-txt dd{margin-left:20px;font-size: 20px; overflow: hidden;zoom:1;}
+    .dl-txt dd span{ padding-bottom:3px;background: url(/assets/dzzs/i/line.png) repeat-x left bottom; display: inline-block;}
+    .p-txt1{margin-bottom:90px;padding-left: 14px; font-size: 20px; font-weight: bold; padding-top: 10px;}
+    .sec-div{position: relative;}
+    .ewm{float: left;}.sq-div{margin-left: 38px; float: right; font-size: 16px; line-height: 30px;margin-top:20px; }
+    .gaizhang{ position: absolute; top:-5px;left:290px;}
+
+    .okBtn,.downBtn{width:200px; height: 50px; background: #cc0000; display: block; color:#fff; border-radius: 5px; line-height: 50px; text-align: center; text-decoration: none; margin:30px auto;}
+    .input_time{font-size:17px;color:#58595b;min-width: 15px;text-align:center;}
+    .fl{float: left;}.sel-txt{display: inline-block; position:relative;}.sel-option{display:block; cursor: pointer;} .sel-hd{cursor: pointer;}
+    .sel-bd{ position:absolute; background: #ddd;width:140px;top:60px;left:-5px; font-size: 14px; line-height: 30px; display: none; z-index:999; }
+     .sel-bd .sel-option:hover{background: #ccc; display: inline-block;width: 140px;}
+
+    .pop-div{ position: absolute;  width: 100%; height: 1050px;top:0; display: none;}
+    .pop-div .pop-bg{ position: fixed; background: #000; opacity: 0.8; width: 100%;height: 1050px;}
+    .pop-div .pop-bd{position: absolute;top:30px;left:50%; margin-left:-375px;}
+</style>
+<script src="/assets/dzzs/js/jquery-1.9.0.js"></script>
+<script src="/assets/dzzs/js/html2canvas.min.js"></script>
+<script src="/assets/dzzs/js/canvas2image.js"></script>
+<script src="/assets/dzzs/js/base64.js"></script>
+<script>
+ $(function(){
+//把职位添加到节点中去
+
+var _html,choosepeo,_peohtml;
+
+       var myDate = new Date();
+
+    $("#curMon").val( myDate.getMonth()+1);
+    $("#curDate").val(myDate.getDate());
+
+
+
+		$(".okBtn").click(function () {
+            html2canvas($(".congratulate-div"),{
+            	onrendered:function(canvas){
+            		canvas.setAttribute('id','thecanvas');
+            		$("#images").html(canvas);
+            	},
+            	width:750,
+            	height:1123
+            });$(".pop-div").show();
+        })
+        $(".pop-bg").click(function(event) {
+           $(".pop-div").hide();
+        });
+       var Download = document.getElementById("downBtn");
+        Download.onclick = function(){
+            var oCanvas = document.getElementById("thecanvas");
+
+            /*自动保存为png*/
+            // 获取图片资源
+            var img_data1 = Canvas2Image.saveAsPNG(oCanvas, true).getAttribute('src');
+           // alert(img_data1);
+            saveFile(img_data1, 'dianzizhengshu.png');
+
+
+            /*下面的为原生的保存，不带格式名*/
+            // 这将会提示用户保存PNG图片
+            // Canvas2Image.saveAsPNG(oCanvas);
+        }
+        // 保存文件函数
+        var saveFile = function(data, filename){
+            var save_link = document.createElementNS('http://www.w3.org/1999/xhtml', 'a');
+            save_link.href = data;
+            save_link.download = filename;
+           
+            var event = document.createEvent('MouseEvents');
+            event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+            save_link.dispatchEvent(event);
+            //alert(filename);
+        };
+       
+	})
+
+
+</script>
+<body>
+<div class="wrap">
+ <div class="congratulate-div">
+    <div class="dl-div">
+        <dl class="dl-txt">
+            <dt>证书编号：</dt>
+            <dd><span>{{$data.num}}</span></dd>
+        </dl>
+        <dl class="dl-txt">
+            <dt>公司名称：</dt>
+            <dd><span>{{$data.company_name}}</span></dd>
+        </dl>
+        <dl class="dl-txt">
+            <dt>公司法人：</dt>
+            <dd><span>{{$data.legal_name}}</span></dd>
+        </dl>
+        <p class="p-txt1">特此授权！</p>
+        <div class="sec-div">
+            <span class="ewm"><img src="/assets/dzzs/i/erweima.jpg" alt="" width="130" height="130"></span>
+            <div class="sq-div">
+                <p class="p-txt2">授权单位：昆山市住房和城乡建设局</p>
+                <p class="p-txt2">授权日期：{{$data.start_date}} ~ {{$data.end_date}}</p>
+            </div>
+            <div class="gaizhang"><img src="/assets/dzzs/i/gaizhang.png" alt="" width="120" height="120" /></div>
+        </div>
+    </div>
+ </div> 
+   
+ <a href="javascript:" class="okBtn">生成图片</a>
+</div>
+<!-- 图片预览区域 -->
+<!-- 图片弹框 -->
+<div class="pop-div">
+    <div class="pop-bg"></div>
+    <div class="pop-bd">
+        <div id="images" style="width:750px;height:1123px;text-align:center;"></div>
+        <a href="javascript:" class="downBtn" id="downBtn">下载</a>
+    </div>
+</div>
+<!--   -->
+</body>
+</html>

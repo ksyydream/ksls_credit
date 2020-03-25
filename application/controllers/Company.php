@@ -46,5 +46,13 @@ class Company extends Home_Controller {
             $this->show_message($res['msg']);
         }
 	}
+
+	public function get_cert($ns_id){
+		$data = $this->company_model->get_cert($ns_id, $this->company_id);
+		if(!$data)
+			redirect('/home/index');
+		$this->assign('data', $data);
+		$this->display('homepage/company/dianzizhengshu.html');
+	}
 	
 }
