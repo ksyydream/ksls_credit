@@ -330,7 +330,7 @@
                                                     <tr>
                                                          <th>年审年份</th>
                                                         <th>年审结果</th>
-                                                        <th>信用等级(历史数据)</th>
+                                                        <th style="width: 20%">信用等级(历史数据)</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -341,7 +341,9 @@
                                                                 </td>
                                                                 <td>
                                                             {{if $v.status == 1}}年审失败{{/if}}
-                                                            {{if $v.status == 2}}年审成功{{/if}}
+                                                            {{if $v.status == 2}}年审成功
+                                                                    <a target="_blank" href="/manager/get_cert/{{$v.id}}/{{$data.id|default:''}}">点击下载备案电子证书</a>
+                                                                    {{/if}}
                                                             {{if $v.status == -1}}缺席{{/if}}
                                                                 </td>
                                                                     <td>

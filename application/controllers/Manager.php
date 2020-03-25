@@ -1198,6 +1198,16 @@ class Manager extends MY_Controller {
         $this->display('manager/company/company_apply_add.html');
     }
 
+    //查看企业证书
+    public function get_cert($ns_id, $company_id){
+        $this->load->model('company_model');
+        $data = $this->company_model->get_cert($ns_id, $company_id);
+        if(!$data)
+            redirect('/home/index');
+        $this->assign('data', $data);
+        $this->display('homepage/company/dianzizhengshu.html');
+    }
+
 
     //年审提报 编辑页面
     public function company_pending_audit($m_id){
