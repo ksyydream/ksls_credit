@@ -72,7 +72,7 @@
                                                   </div>
                                               </div>
                                               <div class="profile-info-row">
-                                                  <div class="profile-info-name"> 职业证号 </div>
+                                                  <div class="profile-info-name"> 执业证号 </div>
 
                                                   <div class="profile-info-value">
                                                       <span>{{$data.job_code|default:''}}</span>
@@ -165,13 +165,13 @@
 
                                           <h4 class="blue">
                                               <i class="green ace-icon fa fa-list bigger-110"></i>
-                                              职业证图片
+                                              执业证图片
                                           </h4>
                                           <ul class="ace-thumbnails clearfix">
                                               {{if !empty($data.job_img_list) }}
                                               {{foreach from=$data.job_img_list key=k item=item}}
                                               <li>
-                                                  <a class="example-image-link" href="{{$item.img}}" data-lightbox="example_num1" data-title="经纪人职业证图片">
+                                                  <a class="example-image-link" href="{{$item.img}}" data-lightbox="example_num1" data-title="经纪人执业证图片">
                                                       <img width="150" height="150" alt="150x150" src="{{$item.img}}?imageView2/0/w/200/h/200/q/75|imageslim" />
                                                   </a>
                                               </li>
