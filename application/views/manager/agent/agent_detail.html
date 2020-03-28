@@ -52,7 +52,7 @@
                             <input type="hidden" name="folder" value="{{$time}}" id="folder">
                             <h4 class="blue">
                                 <i class="green ace-icon fa fa-list bigger-110"></i>
-                                企业信息
+                                经纪人基本信息
                             </h4>
                             <div class="form-group">
                                 <label class="col-sm-2 control-label no-padding-right" for="name"> 姓名 </label>
@@ -63,7 +63,7 @@
                             </div>
                             <div class="space-4"></div>
                             <div class="form-group">
-                                <label class="col-sm-2 control-label no-padding-right" for="job_code"> 职业证号 </label>
+                                <label class="col-sm-2 control-label no-padding-right" for="job_code"> 执业证号 </label>
                                 <div class="col-sm-9">
                                     <input type="text" id="job_code" name="job_code" required="required" class="rcol-xs-10 col-sm-5" value="{{$data.job_code|default:''}}">
                                     <span class="help-inline col-xs-12 col-sm-7"></span>
@@ -99,7 +99,7 @@
                             {{/if}}
                             <div class="space-4"></div>
                             <div class="form-group">
-                                <label class="col-sm-2 control-label no-padding-right" for="old_job_code"> 原职业证号 </label>
+                                <label class="col-sm-2 control-label no-padding-right" for="old_job_code"> 原执业证号 </label>
                                 <div class="col-sm-9">
                                     <input type="text" name="old_job_code" id="old_job_code" class="col-xs-10 col-sm-5" value="{{$data.old_job_code|default:''}}">
                                     <span class="help-inline col-xs-12 col-sm-7"></span>
@@ -156,7 +156,7 @@
 
                             <h4 class="blue">
                                 <i class="green ace-icon fa fa-list bigger-110"></i>
-                                上传职业证图片
+                                上传执业证图片
                             </h4>
                             <div class="space-8"></div>
                             <div class="form-group">
@@ -344,7 +344,7 @@
         }
         var job_code = $.trim($("#job_code").val());
         if(job_code == "" ) {
-            layer.msg('职业证号不能为空', {icon: 2});
+            layer.msg('执业证号不能为空', {icon: 2});
             return false;
         }
         var card = $.trim($("#card").val());
