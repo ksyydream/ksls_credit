@@ -30,7 +30,7 @@ input:-ms-input-placeholder{  color:#b2b2b2;}i{font-style:normal;}
 
 .main1200{width:1200px; margin: 0 auto;}
 .page-hd{ padding-top: 15px;background: #2dd7cc; height: 80px;}
-.page-hd .logo{width:600px; height: 60px; display: block; background: url(../i/page_logo.png) no-repeat; float: left;}
+.page-hd .logo{width:600px; height: 60px; display: block; background: url(../i/page_logo.png?time=1) no-repeat; float: left;}
 .login-btn{display: block; width: 65px; height: 35px; background: #2dd7cc; color: #fff; text-align: center; line-height: 35px; float: right;}
 .page .login-btn{padding-top:5px;}
 
