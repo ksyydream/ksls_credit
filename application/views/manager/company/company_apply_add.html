@@ -279,12 +279,12 @@
                                 <tr>
 
                                     <th style="width:15%;">姓名</th>
-                                    <th style="width:25%;">执业证号</th>
+                                    <th style="width:20%;">执业证号</th>
 
                                     <th style="width:25%;">身份证号</th>
                                     <th style="width:15%;">联系电话</th>
                                     <th style="width:10%;">网签</th>
-                                     <th style="width:10%;">操作</th>
+                                     <th style="width:15%;">操作</th>
                                 </tr>
 
                                 </thead>
@@ -305,6 +305,7 @@
                                             <input type="hidden" name="agent_job_code[]" value="{{$item.job_code}}">
                                             <input type="hidden" name="new_agent_id[]" value="{{$item.id}}">
                                             <a href="javascript:void(0);" dataid="" class="delete_yy_"><i class="ace-icon fa fa-trash bigger-100 red"></i>删除</a>
+                                            <a href="/manager/agent_view/{{$item.id}}" target="_blank" class=""><i class="ace-icon fa fa-book bigger-100 blue"></i>详情</a>
                                         </td>
                                     </tr>
                             {{/foreach}}
@@ -663,7 +664,17 @@
     })
 
 $("#tbody_id").on("click",".delete_yy_",function(){
-     $(this).parent().parent().remove();
+    var tbody_ = $(this);
+    var layerIndex = layer.confirm('是否删除此经纪人,经纪人操作只在保存后生效', {
+        btn: ['确定','取消'], //按钮
+        area: ['300px', 'auto']
+    }, function(){
+        tbody_.parent().parent().remove();
+        layer.close(layerIndex);
+    },function(){
+
+    });
+
   });
 
  $("#tbody_id").on('click',"[name='ckwq[]']",function(){

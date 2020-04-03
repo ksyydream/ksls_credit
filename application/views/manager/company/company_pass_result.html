@@ -224,12 +224,13 @@
 
                                 <tr>
 
-                                    <th style="width:15%;">姓名</th>
-                                    <th style="width:25%;">执业证号</th>
+                                    <th style="width:10%;">姓名</th>
+                                    <th style="width:22%;">执业证号</th>
 
-                                    <th style="width:25%;">身份证号</th>
+                                    <th style="width:23%;">身份证号</th>
                                     <th style="width:15%;">联系电话</th>
                                     <th style="width:10%;">网签</th>
+                                    <th style="width:10%;">操作</th>
                                 </tr>
 
                                 </thead>
@@ -246,6 +247,9 @@
                                                 <input type="hidden" name="setwq[]" value="{{if $item.wq == 2}}2{{else}}1{{/if}}">
                                                 <input readonly="readonly" disabled="disabled" name="ckwq[]" {{if $item.wq == 2}} checked{{/if}} type="checkbox" />
                                             </td>
+                                <td>
+                                    <a href="/manager/agent_view/{{$item.agent_id}}" target="_blank" class=""><i class="ace-icon fa fa-book bigger-100 blue"></i>详情</a>
+                                </td>
                                     </tr>
                             {{/foreach}}
                             {{/if}}
