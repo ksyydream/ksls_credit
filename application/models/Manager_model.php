@@ -2252,11 +2252,11 @@ class Manager_model extends MY_Model
         $this->db->where('flag',2); //如果是离昆的就不要进行保存 //有什么信息就保存什么信息，真正是否显示，还是要看实际的状态
         $this->db->where('company_id', $company_id);
         $pass_agent = $this->db->get()->result_array();
-        $this->db->where('company_id', $company_id)->delete('company_pass_agent');
+        $this->db->where('pass_id', $pass_id)->delete('company_pass_agent');
         if($pass_agent)
             $this->db->insert_batch('company_pass_agent',$pass_agent);
 
-        $this->db->where('company_id', $company_id)->delete('company_pass_icon');
+        $this->db->where('pass_id', $pass_id)->delete('company_pass_icon');
         $this->db->select("a.icon_no,a.icon_class,a.`name`,a.short_name,b.company_id,a.type,(a.score * a.type) score,a.status,{$pass_id} pass_id")->from('fm_sys_score_icon a');
         $this->db->join('company_pending_icon b','a.icon_no = b.icon_no ','left');
         $this->db->where('company_id',$company_id);
