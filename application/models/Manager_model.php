@@ -324,6 +324,17 @@ class Manager_model extends MY_Model
         }
         $this->db->where('admin_id', $admin_id)->delete('auth_group_access');
         $this->db->insert('auth_group_access', array('admin_id' => $admin_id, 'group_id' => $group_id));
+
+        $town_ids = $this->input->post('town_ids');
+        $this->db->where('admin_id', $admin_id)->delete('admin_town');
+        if ($town_ids) {
+            if (is_array($town_ids)) {
+                foreach ($town_ids as $item) {
+                    $this->db->insert('admin_town', array('admin_id' => $admin_id, 't_id' => $item));
+                }
+            }
+        }
+
         return $this->fun_success('保存成功');
     }
 

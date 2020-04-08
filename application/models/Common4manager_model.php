@@ -122,6 +122,16 @@ class Common4manager_model extends MY_Model
 
     }
 
+    //获取区镇列表
+    public function get_town($status = null){
+        $this->db->select()->from('town');
+        if($status){
+            $this->db->where('status', $status);
+        }
+        $res = $this->db->get()->result_array();
+        return $res;
+    }
+
     /** check fun */
 
     //检查公司名称是否存在

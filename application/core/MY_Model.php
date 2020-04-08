@@ -769,6 +769,11 @@ class MY_Model extends CI_Model{
         */
     }
 
+    //获取管理员所管辖的 区镇数组,因为可能经常会被判断使用 放在主模块中
+    public function get_admin_t_list($id = -1) {
+        $t_list = $this->db->select('group_concat(distinct t_id ORDER BY t_id) t_list')->from('admin_town')->where(array('admin_id' => $id))->get()->row_array();
+        return explode(",", $t_list['t_list']);
+    }
     /**
      *********************************************************************************************
      * 通用逻辑类函数

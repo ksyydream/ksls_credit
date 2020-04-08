@@ -207,7 +207,10 @@ class Manager extends MY_Controller {
      */
     public function admin_add(){
         $groups = $this->manager_model->get_group_all();
+        $town_list = $this->c4m_model->get_town(1);
         $this->assign('data', array());
+        $this->assign('town_list', $town_list);
+        $this->assign('t_list', array());
         $this->assign('groups', $groups);
         $this->display('manager/admin/form.html');
     }
@@ -223,6 +226,10 @@ class Manager extends MY_Controller {
             $this->show_message('未找到管理员信息!');
         }
         $groups = $this->manager_model->get_group_all();
+        $town_list = $this->c4m_model->get_town(1);
+        $this->assign('town_list', $town_list);
+        $t_list = $this->manager_model->get_admin_t_list($data['admin_id']);
+        $this->assign('t_list', $t_list);
         $this->assign('data', $data);
         $this->assign('groups', $groups);
         $this->display('manager/admin/form.html');
