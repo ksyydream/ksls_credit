@@ -22,5 +22,6 @@ class Welcome extends CI_Controller {
 	{
 		die('');
 		$this->load->view('welcome_message');
+		//加入DEV分支
 	}
 }
