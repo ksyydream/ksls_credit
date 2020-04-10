@@ -92,6 +92,21 @@
                                             </div>
                                         </div>
                                         <div class="space-4"></div>
+                                            <div class="form-group">
+                                                <label class="col-sm-1 control-label no-padding-right" for="company_name"> 区镇 </label>
+                                                <div class="col-sm-4">
+                                                    <select class="form-control" id="town_id" name="town_id">
+                                                        <option>-请选择-</option>
+                                                        {{foreach from=$town_list key=k1 item=v1}}
+                                                        {{if $v1.id|in_array:$allow_t || $group_id ==1}}
+                                                        <option value="{{$v1.id}}" {{if $data.town_id == $v1.id}}selected{{/if}}>{{$v1.name}}</option>
+                                                        {{/if}}
+                                                        {{/foreach}}
+                                                    </select>
+                                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                                </div>
+                                            </div>
+                                            <div class="space-4"></div>
                                         <div class="form-group">
                                              <label class="col-sm-1 control-label no-padding-right" style="font-size:smaller" for="business_no"> 统一社会信用代码 </label>
                                         <div class="col-sm-9">

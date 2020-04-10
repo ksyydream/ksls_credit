@@ -41,6 +41,9 @@ class Manager extends MY_Controller {
         $menu = $this->getMenu($menu);
         $this->assign('menu', $menu);
         $this->assign('self_url',$_SERVER['PHP_SELF']);
+        $this->assign('group_id', $admin['group_id']);
+        $allow_t = $this->manager_model->get_admin_t_list($this->admin_id);
+        $this->assign('allow_t', $allow_t);
     }
 
     protected function getMenu($items, $id = 'id', $pid = 'pid', $son = 'children')
@@ -1175,6 +1178,8 @@ class Manager extends MY_Controller {
     public function company_pending_add(){
         $icon_list = $this->c4m_model->get_company_sys_icon();
         $this->assign('icon_list', $icon_list);
+        $town_list = $this->c4m_model->get_town(1);
+        $this->assign('town_list', $town_list);
         $this->assign('f_user_id', $this->admin_id);
         $this->assign('time', time());
         $this->assign('m_id', -1);
@@ -1198,6 +1203,8 @@ class Manager extends MY_Controller {
                }
             }
         }
+        $town_list = $this->c4m_model->get_town(1);
+        $this->assign('town_list', $town_list);
         $this->assign('icon_list', $icon_list);
         $this->assign('data', $data);
         $this->assign('m_id', $m_id);
