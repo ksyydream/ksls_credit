@@ -1,6 +1,7 @@
 {{include file='manager/public/head.html'}}
 <body class="no-skin">
 {{include file='manager/public/header.html'}}
+<link rel="stylesheet" href="/manager_statics/qwadmin/css/colorbox.css"/>
 <div class="main-container" id="main-container">
     <script type="text/javascript">
         try {
@@ -18,19 +19,11 @@
     </style>
     <style>
         #uploadImgcontainer1 li{
-            list-style: none;
-            float: left;
-            position: relative;
-            margin-bottom: 10px;
-            margin-right: 10px;
+
         }
 
         #uploadImgcontainer2 li{
-            list-style: none;
-            float: left;
-            position: relative;
-            margin-bottom: 10px;
-            margin-right: 10px;
+
         }
     </style>
     {{include file='manager/public/sidebar.html'}}
@@ -137,11 +130,13 @@
 
                                 <div class="col-sm-10">
 
-                                    <ul id="uploadImgcontainer1" style="width: 95%">
+                                    <ul id="uploadImgcontainer1" class="ace-thumbnails clearfix"  style="width: 95%">
                                         {{if !empty($data.code_img_list) }}
                                         {{foreach from=$data.code_img_list item=item}}
                                         <li>
+                                            <a href="{{$item.img}}" title="身份证图片" data-rel="colorbox">
                                             <img src="{{$item.img}}?imageView2/0/w/200/h/200/q/75|imageslim" alt="" style="height: 120px">
+                                                </a>
                                             <span class="delete-this" onclick="del_pic(this);"><i></i></span>
                                             <input type="hidden" name="pic_short1[]" class="pic_short" value="{{$item.img}}">
 
@@ -173,11 +168,13 @@
 
                                 <div class="col-sm-10">
 
-                                    <ul id="uploadImgcontainer2" style="width: 95%">
+                                    <ul id="uploadImgcontainer2" class="ace-thumbnails clearfix"  style="width: 95%">
                                         {{if !empty($data.job_img_list) }}
                                         {{foreach from=$data.job_img_list item=item}}
                                         <li>
+                                            <a href="{{$item.img}}" title="执业证图片" data-rel="colorbox">
                                             <img src="{{$item.img}}?imageView2/0/w/200/h/200/q/75|imageslim" alt="" style="height: 120px">
+                                                </a>
                                             <span class="delete-this" onclick="del_pic(this);"><i></i></span>
                                             <input type="hidden" name="pic_short2[]" class="pic_short" value="{{$item.img}}">
 
@@ -234,6 +231,10 @@
 <!-- inline scripts related to this page -->
 <script src="/manager_statics/qwadmin/js/date-time/bootstrap-datepicker.js"></script>
 <script src="/manager_statics/app/ajaxfileupload.js"></script>
+<script src="/manager_statics/qwadmin/js/jquery.colorbox.js"></script>
+
+<!-- ace scripts -->
+<script src="/manager_statics/qwadmin/js/ace-elements.js"></script>
 <script type="text/javascript">
     function triggerFileUpload(flag) {
         var data_ = "{{$f_user_id}}_{{$time}}_" +  Math.floor(Math.random()*(9000)+1000);
@@ -292,12 +293,15 @@
 
     function uploadFile(flag) {
         var action = '';
+        var img_name_ = '';
         switch (flag){
             case 1:
                 action =   'agent_code_pic';
+                img_name_ =   '身份证图片';
                 break;
             case 2:
                 action =   'agent_job_pic';
+                img_name_ =   '执业证图片';
                 break;
             default:
                 alert("调用失败!");
@@ -317,7 +321,7 @@
                 $.each(data.img,function(index,item){
                     var path = item + '?imageView2/0/w/200/h/200/q/75|imageslim';
                     if($.inArray(item, now_pic) < 0){
-                        html += '<li><img src="' + path + '" alert="" style="height: 120px" />';
+                        html += '<li><a href="' + item + '" title="' + img_name_ + '" data-rel="colorbox"><img src="' + path + '" alert="" style="height: 120px" /></a>';
                         html += '<span class="delete-this" onclick="del_pic(this);"><i></i></span>';
                         html += '<input type="hidden" name="pic_short' + flag.toString() + '[]" class="pic_short" value="' + item + '">';
                         //html += '<input type="hidden" name="folder[]" value="'+ $("#folder").val() +'">';
@@ -326,6 +330,32 @@
                 });
                 $("#uploadImgcontainer" + flag.toString()).append(html);
 
+
+                var $overflow = '';
+                var colorbox_params = {
+                    rel: 'colorbox',
+                    reposition:true,
+                    scalePhotos:true,
+                    scrolling:false,
+                    previous:'<i class="ace-icon fa fa-arrow-left"></i>',
+                    next:'<i class="ace-icon fa fa-arrow-right"></i>',
+                    close:'&times;',
+                    current:'{current} of {total}',
+                    maxWidth:'100%',
+                    maxHeight:'100%',
+                    onOpen:function(){
+                        $overflow = document.body.style.overflow;
+                        document.body.style.overflow = 'hidden';
+                    },
+                    onClosed:function(){
+                        document.body.style.overflow = $overflow;
+                    },
+                    onComplete:function(){
+                        $.colorbox.resize();
+                    }
+                };
+
+                $('.ace-thumbnails [data-rel="colorbox"]').unbind('colorbox').colorbox(colorbox_params);
             });
             return true;
         }
@@ -372,3 +402,33 @@
 </script>
 </body>
 </html>
+<script type="text/javascript">
+    jQuery(function($) {
+        var $overflow = '';
+        var colorbox_params = {
+            rel: 'colorbox',
+            reposition:true,
+            scalePhotos:true,
+            scrolling:false,
+            previous:'<i class="ace-icon fa fa-arrow-left"></i>',
+            next:'<i class="ace-icon fa fa-arrow-right"></i>',
+            close:'&times;',
+            current:'{current} of {total}',
+            maxWidth:'100%',
+            maxHeight:'100%',
+            onOpen:function(){
+                $overflow = document.body.style.overflow;
+                document.body.style.overflow = 'hidden';
+            },
+            onClosed:function(){
+                document.body.style.overflow = $overflow;
+            },
+            onComplete:function(){
+                $.colorbox.resize();
+            }
+        };
+
+        $('.ace-thumbnails [data-rel="colorbox"]').unbind('colorbox').colorbox(colorbox_params);
+
+    })
+</script>

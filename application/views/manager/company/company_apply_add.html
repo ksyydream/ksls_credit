@@ -1,13 +1,10 @@
 {{include file='manager/public/head.html'}}
 <body class="no-skin">
 {{include file='manager/public/header.html'}}
+<link rel="stylesheet" href="/manager_statics/qwadmin/css/colorbox.css"/>
 <style>
     #uploadImgcontainer li{
-        list-style: none;
-        float: left;
-        position: relative;
-        margin-bottom: 10px;
-        margin-right: 10px;
+
     }
 </style>
 <div class="main-container" id="main-container">
@@ -204,11 +201,13 @@
 
                                                 <div class="col-sm-10">
 
-                                                    <ul id="uploadImgcontainer" style="width: 95%">
+                                                    <ul id="uploadImgcontainer" class="ace-thumbnails clearfix" style="width: 95%">
                             {{if !empty($data.img) }}
                             {{foreach from=$data.img item=item}}
                             <li>
+                                <a href="{{$item.img_path}}" title="图片资料" data-rel="colorbox">
                                 <img src="{{$item.img_path}}?imageView2/0/w/200/h/200/q/75|imageslim" alt="" style="height: 120px">
+                                    </a>
                                 <span class="delete-this" onclick="del_pic(this);"><i></i></span>
                                <input type="hidden" name="pic_short[]" class="pic_short" value="{{$item.img_path}}">
                              
@@ -404,6 +403,11 @@
 
 <script src="/manager_statics/qwadmin/js/date-time/bootstrap-datepicker.js"></script>
 <script src="/manager_statics/app/ajaxfileupload.js"></script>
+
+<script src="/manager_statics/qwadmin/js/jquery.colorbox.js"></script>
+
+<!-- ace scripts -->
+<script src="/manager_statics/qwadmin/js/ace-elements.js"></script>
 <script type="text/javascript">
     function triggerFileUpload(flag) {
         var data_ = "{{$f_user_id}}_{{$time}}_" + flag.toString() + "_" +  Math.floor(Math.random()*(9000)+1000);
@@ -464,7 +468,7 @@
                 $.each(data.img,function(index,item){
                     var path = item + '?imageView2/0/w/200/h/200/q/75|imageslim';
                     if($.inArray(item, now_pic) < 0){
-                        html += '<li><img src="' + path + '" alert="" style="height: 120px" />';
+                        html += '<li><a href="' + item + '" title="图片资料" data-rel="colorbox"><img src="' + path + '" alert="" style="height: 120px" /></a>';
                         html += '<span class="delete-this" onclick="del_pic(this);"><i></i></span>';
                         html += '<input type="hidden" name="pic_short[]" class="pic_short" value="' + item + '">';
                         //html += '<input type="hidden" name="folder[]" value="'+ $("#folder").val() +'">';
@@ -472,6 +476,32 @@
                     }
                 });
                 $("#uploadImgcontainer").append(html);
+
+                var $overflow = '';
+                var colorbox_params = {
+                    rel: 'colorbox',
+                    reposition:true,
+                    scalePhotos:true,
+                    scrolling:false,
+                    previous:'<i class="ace-icon fa fa-arrow-left"></i>',
+                    next:'<i class="ace-icon fa fa-arrow-right"></i>',
+                    close:'&times;',
+                    current:'{current} of {total}',
+                    maxWidth:'100%',
+                    maxHeight:'100%',
+                    onOpen:function(){
+                        $overflow = document.body.style.overflow;
+                        document.body.style.overflow = 'hidden';
+                    },
+                    onClosed:function(){
+                        document.body.style.overflow = $overflow;
+                    },
+                    onComplete:function(){
+                        $.colorbox.resize();
+                    }
+                };
+
+                $('.ace-thumbnails [data-rel="colorbox"]').unbind('colorbox').colorbox(colorbox_params);
 
             });
             return true;
@@ -727,3 +757,34 @@ $("#tbody_id").on("click",".delete_yy_",function(){
 </script>
 </body>
 </html>
+<script type="text/javascript">
+    jQuery(function($) {
+        var $overflow = '';
+        var colorbox_params = {
+            rel: 'colorbox',
+            reposition:true,
+            scalePhotos:true,
+            scrolling:false,
+            previous:'<i class="ace-icon fa fa-arrow-left"></i>',
+            next:'<i class="ace-icon fa fa-arrow-right"></i>',
+            close:'&times;',
+            current:'{current} of {total}',
+            maxWidth:'100%',
+            maxHeight:'100%',
+            onOpen:function(){
+                $overflow = document.body.style.overflow;
+                document.body.style.overflow = 'hidden';
+            },
+            onClosed:function(){
+                document.body.style.overflow = $overflow;
+            },
+            onComplete:function(){
+                $.colorbox.resize();
+            }
+        };
+
+        $('.ace-thumbnails [data-rel="colorbox"]').unbind('colorbox').colorbox(colorbox_params);
+
+    })
+</script>
+
