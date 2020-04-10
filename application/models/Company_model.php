@@ -64,7 +64,7 @@ class Company_model extends MY_Model
         if (!$agent_info_) 
             return $this->fun_fail('经纪人已不在企业内！不可操作！');
         $this->db->trans_start();//--------开始事务
-        $this->db->where('id', $agent_id)->where('company_id', $company_id)->update('agent', array('company_id' => -1, 'wq' => -1));
+        $this->db->where('id', $agent_id)->where('company_id', $company_id)->update('agent', array('company_id' => -1, 'wq' => 1));
         $this->save_agent_track4common($agent_id, $company_id, -1, 4);  //加入经纪人轨迹
         $this->agent_apply_all_cancel($agent_id);                       //人事变动，作废经纪人人事申请
         $this->save_company_total_score($company_id);                   //重新计算企业分数和状态

@@ -685,7 +685,7 @@ class Manager_model extends MY_Model
                 }else{
                     $new_company_info_ = array('id' => -1, 'company_name' => null);
                 }
-                $this->db->where('id', $apply_info['agent_id'])->update('agent', array('company_id' => $apply_info['new_company_id'], 'wq' => -1));
+                $this->db->where('id', $apply_info['agent_id'])->update('agent', array('company_id' => $apply_info['new_company_id'], 'wq' => 1));
                 $this->db->where('id', $id)->update('agent_apply', array(
                     'status' => 2,
                     'sdate' => date('Y-m-d H:i:s', time())
@@ -2438,7 +2438,7 @@ class Manager_model extends MY_Model
             }
             $this->db->insert_batch('agent_track',$data_insert);
         }
-        $this->db->where(array('company_id' => $company_id))->update('agent', array('company_id' => -1, 'wq' => -1));
+        $this->db->where(array('company_id' => $company_id))->update('agent', array('company_id' => -1, 'wq' => 1));
 
         $this->db->trans_complete();//------结束事务
         if ($this->db->trans_status() === FALSE) {
