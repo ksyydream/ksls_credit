@@ -2438,7 +2438,7 @@ class Manager_model extends MY_Model
             }
             $this->db->insert_batch('agent_track',$data_insert);
         }
-
+        $this->db->where(array('company_id' => $company_id))->update('agent', array('company_id' => -1, 'wq' => -1));
 
         $this->db->trans_complete();//------结束事务
         if ($this->db->trans_status() === FALSE) {

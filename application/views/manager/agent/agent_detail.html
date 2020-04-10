@@ -332,7 +332,15 @@
     }
 
     function del_pic(obj) {
-        $(obj).parent().remove();
+        var layerIndex = layer.confirm('是否删除此图片,图片操作只在保存后生效', {
+            btn: ['确定','取消'], //按钮
+            area: ['300px', 'auto']
+        }, function(){
+            $(obj).parent().remove();
+            layer.close(layerIndex);
+        },function(){
+
+        });
     }
 
 
