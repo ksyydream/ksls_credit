@@ -977,7 +977,7 @@ class MY_Model extends CI_Model{
         $cert_insert_ = array('status' => 1);
         //先找到年审审核信息,主要查找 年审年份,企业ID
         //DBY 20200325 以后需要根据社区生成证件编号,这里需要在年审信息中查看
-        $pass_info = $this->db->select('company_id, status, annual_date')->from('company_pass')->where(array('id' => $pass_id))->get()->row_array();
+        $pass_info = $this->db->select('company_id, status, annual_date,tj_date')->from('company_pass')->where(array('id' => $pass_id))->get()->row_array();
         if(!$pass_info)
             return false;
         $title_ = 'KS';
@@ -1001,9 +1001,8 @@ class MY_Model extends CI_Model{
             $term_info_ = $this->db->select('*')->from('term')->where(array('annual_year' => $pass_info['annual_date'], 'flag' => 1))->get()->row_array();
             if(!$term_info_)
                 return false;
-            $cert_insert_['start_date'] = $term_info_['begin_date'];
-            $date_                      =  strtotime('+1year', strtotime($term_info_['end_date']));
-            $cert_insert_['end_date']   = date("Y-m-d",$date_);
+            $cert_insert_['start_date'] =   date("Y-m-d",strtotime($pass_info['tj_date']));
+            $cert_insert_['end_date']   =   date("Y-m-d",strtotime('+1year', strtotime($pass_info['tj_date'])));
             $this->db->insert('company_ns_cert', $cert_insert_);
         }
 
