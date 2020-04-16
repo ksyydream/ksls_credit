@@ -1251,7 +1251,7 @@ class Manager extends MY_Controller {
 
     //企业信息保存
     public function company_pending_save(){
-        $res = $this->manager_model->company_pending_save();
+        $res = $this->manager_model->company_pending_save($this->admin_id);
         $this->ajaxReturn($res);
     }
 

@@ -774,6 +774,37 @@ class MY_Model extends CI_Model{
         $t_list = $this->db->select('group_concat(distinct t_id ORDER BY t_id) t_list')->from('admin_town')->where(array('admin_id' => $id))->get()->row_array();
         return explode(",", $t_list['t_list']);
     }
+
+    //通过town_id 判断管理员是否有操作权限 因为可能经常使用 放在主模块中
+    public function check_admin_townByTown_id($admin_id, $town_id){
+        $admin_t_list_ = $this->get_admin_t_list($admin_id);
+        $admin_info = $this->db->select('a.*,b.group_id,c.title')->from('admin a')
+            ->join('auth_group_access b', 'a.admin_id = b.admin_id', 'left')
+            ->join('auth_group c', 'c.id = b.group_id', 'left')
+            ->where('a.admin_id', $admin_id)->get()->row_array();
+        //如果用户组是 超级管理员 就直接通过
+        if($admin_info['group_id'] == 1)
+            return true;
+        if(!$admin_t_list_ || !is_array($admin_t_list_)){
+            return false;
+        }
+        if(in_array($town_id, $admin_t_list_)){
+            return true;
+        }
+        return false;
+    }
+
+    //通过town_id 判断管理员是否有操作权限 因为可能经常使用 放在主模块中
+    public function check_admin_townByCompany_id($admin_id, $company_id){
+        $company_info = $this->db->select('town_id')->from('company_pending')->where('id', $company_id)->get()->row_array();
+        if(!$company_info)
+            return false;
+        $res = $this->check_admin_townByTown_id($admin_id, $company_info['town_id']);
+        if($res)
+            return true;
+        return false;
+    }
+    //
     /**
      *********************************************************************************************
      * 通用逻辑类函数

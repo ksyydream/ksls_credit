@@ -1903,7 +1903,7 @@ class Manager_model extends MY_Model
     }
 
     //企业备案信息保存【重要】对company_pending做处理,理论上只修改信息,不会影响 备案/审核/信用等级 等状态.
-    public function company_pending_save(){
+    public function company_pending_save($admin_id){
         $data = array(
             'company_name'=>trim($this->input->post('company_name')),
             'business_no'=>strtoupper(trim($this->input->post('business_no'))),
@@ -1926,8 +1926,15 @@ class Manager_model extends MY_Model
             'flag' => 1,
             'tj_date' => date('Y-m-d H:i:s',time()),
         );
-
+        $res_check_town_ = $this->check_admin_townByTown_id($admin_id,$data['town_id']);
+        if(!$res_check_town_)
+            return $this->fun_fail('不可设置此社区!');
         $company_id = $this->input->post('company_id');
+        if($company_id){
+            $res_check_town_ = $this->check_admin_townByCompany_id($admin_id, $company_id);
+            if(!$res_check_town_)
+                return $this->fun_fail('不可操作此社区下的企业!');
+        }
         if(!$data['company_name'] || !$data['register_path'] || !$data['business_path'] ||  !$data['business_no']
             //|| !$data['issuing_date']  || !$data['record_num']
             || !$data['company_phone'] || !$data['director_name'] || !$data['town_id'] ||
@@ -2064,6 +2071,9 @@ class Manager_model extends MY_Model
         $company_data = $this->db->select()->from('company_pending')->where('id',$company_id)->order_by('id','desc')->get()->row_array();
         if(!$company_data)
             return $this->fun_fail('企业信息丢失!');
+        $res_check_town_ = $this->check_admin_townByTown_id($admin_id, $company_data['town_id']);
+        if(!$res_check_town_)
+            return $this->fun_fail('不可操作此社区下企业!');
         if(!in_array($company_data['flag'], array(1, 2)))
             return $this->fun_fail('企业状态变更,不可年审!');
         $company_data['annual_date'] = $res_check_['result']['annual_year'];
