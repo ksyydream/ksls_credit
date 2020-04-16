@@ -1778,13 +1778,17 @@ class Manager_model extends MY_Model
         //搜索条件
         $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
         $data['flag'] = $this->input->get('flag')?trim($this->input->get('flag')):null;
+        $data['town_id'] = $this->input->get('town_id')?trim($this->input->get('town_id')):null;
         $this->db->select('count(1) num')->from('company_pending a');
+        $this->db->join('town t', 'a.town_id = t.id', 'left');
         if($data['keyword']){
             $this->db->group_start();
             $this->db->like('a.company_name', $data['keyword']);
             $this->db->or_like('a.business_no', $data['keyword']);
             $this->db->group_end();
         }
+        if($data['town_id'])
+            $this->db->where('a.town_id', $data['town_id']);
         if($flag)
             $this->db->where_in('a.flag',$flag);
         if($data['flag'])
@@ -1797,14 +1801,17 @@ class Manager_model extends MY_Model
         $data['total_rows'] = $num->num;
 
         //获取详细列
-        $this->db->select('a.*, b.grade_name')->from('company_pending a');
+        $this->db->select('a.*, b.grade_name,t.name town_name_')->from('company_pending a');
         $this->db->join('company_grade b', 'a.grade_no = b.grade_no', 'left');
+        $this->db->join('town t', 'a.town_id = t.id', 'left');
         if($data['keyword']){
             $this->db->group_start();
             $this->db->like('a.company_name', $data['keyword']);
             $this->db->or_like('a.business_no', $data['keyword']);
             $this->db->group_end();
         }
+        if($data['town_id'])
+            $this->db->where('a.town_id', $data['town_id']);
         if($flag)
             $this->db->where_in('a.flag',$flag);
         if($data['flag'])
@@ -1825,15 +1832,18 @@ class Manager_model extends MY_Model
         //获取详细列
         $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
         $data['flag'] = $this->input->get('flag')?trim($this->input->get('flag')):null;
-
+        $data['town_id'] = $this->input->get('town_id')?trim($this->input->get('town_id')):null;
 
         $this->db->select('count(1) num')->from('company_pending a');
+        $this->db->join('town t', 'a.town_id = t.id', 'left');
         if($data['keyword']){
             $this->db->group_start();
             $this->db->like('a.company_name', $data['keyword']);
             $this->db->or_like('a.business_no', $data['keyword']);
             $this->db->group_end();
         }
+        if($data['town_id'])
+            $this->db->where('a.town_id', $data['town_id']);
         if($flag)
             $this->db->where_in('a.flag',$flag);
         if($data['flag'])
@@ -1845,14 +1855,17 @@ class Manager_model extends MY_Model
         $num = $this->db->get()->row();
         $data['total_rows'] = $num->num;
 
-        $this->db->select('a.*, b.grade_name')->from('company_pending a');
+        $this->db->select('a.*, b.grade_name,t.name town_name_')->from('company_pending a');
         $this->db->join('company_grade b', 'a.grade_no = b.grade_no', 'left');
+        $this->db->join('town t', 'a.town_id = t.id', 'left');
         if($data['keyword']){
             $this->db->group_start();
             $this->db->like('a.company_name', $data['keyword']);
             $this->db->or_like('a.business_no', $data['keyword']);
             $this->db->group_end();
         }
+        if($data['town_id'])
+            $this->db->where('a.town_id', $data['town_id']);
         if($flag)
             $this->db->where_in('a.flag',$flag);
         if($data['flag'])
@@ -1896,6 +1909,7 @@ class Manager_model extends MY_Model
             'business_no'=>strtoupper(trim($this->input->post('business_no'))),
             'register_path'=>trim($this->input->post('register_path')),
             'business_path'=>trim($this->input->post('business_path')),
+            'town_id'=>trim($this->input->post('town_id')),
             'issuing_date'=>trim($this->input->post('issuing_date')),
             'company_phone'=>trim($this->input->post('company_phone')),
             'director_name'=>trim($this->input->post('director_name')),
@@ -1916,7 +1930,7 @@ class Manager_model extends MY_Model
         $company_id = $this->input->post('company_id');
         if(!$data['company_name'] || !$data['register_path'] || !$data['business_path'] ||  !$data['business_no']
             //|| !$data['issuing_date']  || !$data['record_num']
-            || !$data['company_phone'] || !$data['director_name'] ||
+            || !$data['company_phone'] || !$data['director_name'] || !$data['town_id'] ||
             !$data['director_phone'] || !$data['legal_name'] || !$data['legal_phone']){
             return $this->fun_fail('缺少必要信息!');
         }

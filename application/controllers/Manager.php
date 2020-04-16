@@ -1166,6 +1166,8 @@ class Manager extends MY_Controller {
         $this->assign('pager', $pager);
         $this->assign('page', $page);
         $this->assign('data', $data);
+        $town_list = $this->c4m_model->get_town(1);
+        $this->assign('town_list', $town_list);
         $this->display('manager/company/company_apply_list.html');
     }
 
@@ -1270,8 +1272,8 @@ class Manager extends MY_Controller {
         $excel->getActiveSheet()->mergeCells('A1:N2');
         $excel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(26);
-        $letter = array('A','B','C','D','E','F','G','H','I','J','K','L');
-        $tableheader = array('企业名称','统一社会信用代码','注册地址','经营地址','企业电话','负责人姓名','负责人电话', '法人姓名','法人电话','分支机构数量','当前信用分','信用等级');
+        $letter = array('A','B','C','D','E','F','G','H','I','J','K','L','M');
+        $tableheader = array('企业名称','统一社会信用代码','注册地址','经营地址','企业电话','负责人姓名','负责人电话', '法人姓名','法人电话','分支机构数量','当前信用分','信用等级','所属社区');
         for($i = 0;$i < count($tableheader);$i++) {
             $excel->getActiveSheet()->setCellValue("$letter[$i]3","$tableheader[$i]");
             $excel->getActiveSheet()->getStyle("$letter[$i]3")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
@@ -1288,21 +1290,22 @@ class Manager extends MY_Controller {
         $excel->getActiveSheet()->getColumnDimension("J")->setWidth(18);
         $excel->getActiveSheet()->getColumnDimension("K")->setWidth(18);
         $excel->getActiveSheet()->getColumnDimension("L")->setWidth(18);
+        $excel->getActiveSheet()->getColumnDimension("M")->setWidth(18);
         $data = array();
 
         foreach ($data_res['res_list'] as $k=>$v){
-            $data[] = array($v['company_name'],$v['business_no'],$v['register_path'],$v['business_path'],$v['record_num'],$v['issuing_date'],$v['company_phone']
-            ,$v['director_name'],$v['director_phone'],$v['legal_name'],$v['legal_phone'],$v['fz_num'],$v['total_score'],$v['grade_name']);
+            $data[] = array($v['company_name'],$v['business_no'],$v['register_path'],$v['business_path'],$v['company_phone']
+            ,$v['director_name'],$v['director_phone'],$v['legal_name'],$v['legal_phone'],$v['fz_num'],$v['total_score'],$v['grade_name'],$v['town_name_']);
         }
 
         for ($i = 4;$i <= count($data) + 3;$i++) {
             $j = 0;
             foreach ($data[$i - 4] as $key=>$value) {
                 if($key==1){
-                    $excel->getActiveSheet()->setCellValue("$letter[$j]$i"," $value");
-                    $excel->getActiveSheet()->getStyle("$letter[$j]$i")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
+                    $excel->getActiveSheet()->setCellValue("$letter[$j]"."$i"," $value");
+                    $excel->getActiveSheet()->getStyle("$letter[$j]"."$i")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
                 }else{
-                    $excel->getActiveSheet()->setCellValue("$letter[$j]$i","$value",PHPExcel_Cell_DataType::TYPE_STRING);
+                    $excel->getActiveSheet()->setCellValue("$letter[$j]"."$i","$value",PHPExcel_Cell_DataType::TYPE_STRING);
                 }
                 $j++;
             }
