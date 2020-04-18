@@ -223,9 +223,10 @@ class Home_model extends MY_Model
         $job_code = trim($this->input->get('job_code'));
         if(!$job_code)
             return null;
-        $this->db->select('a.*, b.company_name');
+        $this->db->select('a.*, b.company_name, c.grade_name');
         $this->db->from('agent a');
         $this->db->join('company_pending b', 'a.company_id = b.id and b.flag = 2', 'left');
+        $this->db->join('agent_grade c','a.grade_no = c.grade_no','left');
         $this->db->where('a.job_code', $job_code);
         $data = $this->db->get()->row_array();
         return $data;
@@ -278,6 +279,64 @@ class Home_model extends MY_Model
         $this->db->order_by('a.record_id', 'desc');
         $data['res_list'] = $this->db->get()->result_array();
         return $data;
+    }
+
+    //status 0代表 经纪人信用事件,1代表 人事轨迹
+    public function saff_load(){
+        $page = $this->input->post('page') ? $this->input->post('page') : 1;
+        $year = $this->input->post('year');
+        $status = $this->input->post('status');
+        $agent_id = $this->input->post('agent_id');
+        if(!$agent_id)
+            return $this->fun_fail('查询失败1');
+        $data['limit'] = 10;
+        $data['total'] = -1;
+        switch($status){
+            case 0:
+                $this->db->select('count(1) num');
+                $this->db->from('event4agent_record a');
+                $this->db->join('agent b','a.agent_id = b.id', 'left');
+                $this->db->where('a.agent_id', $agent_id);
+                if($year && is_numeric($year)){
+                    $this->db->where('a.event_date <=', $year . '-12-31');
+                    $this->db->where('a.event_date >=', $year . '-01-01');
+                }
+                $this->db->where('a.status', 1);
+                $this->db->where('b.flag', 2);
+                $rs_total = $this->db->get()->row();
+                $data['total'] = $rs_total->num;
+                $this->db->select('a.*');
+                $this->db->from('event4agent_record a');
+                $this->db->join('agent b','a.agent_id = b.id', 'left');
+                $this->db->where('a.agent_id', $agent_id);
+                if($year && is_numeric($year)){
+                    $this->db->where('a.event_date <=', $year . '-12-31');
+                    $this->db->where('a.event_date >=', $year . '-01-01');
+                }
+                $this->db->where('a.status', 1);
+                $this->db->where('b.flag', 2);
+                $this->db->limit($data['limit'], $offset = ($page - 1) * $data['limit']);
+                $this->db->order_by('a.event_date', 'desc');
+                $this->db->order_by('a.record_id', 'desc');
+                $data['res_list'] = $this->db->get()->result_array();
+                break;
+            case 1:
+                $this->db->select('a.*,d.company_name to_name,e.company_name from_name,
+		d.flag to_company_flag,e.flag from_company_flag,DATE_FORMAT(create_date,\'%Y-%m-%d\') c_day_
+		, ifnull(a.from_company_name, \'--非执业--\') f_name_
+		, ifnull(a.to_company_name, \'--非执业--\') t_name_')->from('agent_track a');
+                $this->db->join('company_pending d','a.to_company_id = d.id','left');
+                $this->db->join('company_pending e','a.from_company_id = e.id','left');
+                $this->db->where('a.agent_id',$agent_id);
+                $this->db->order_by('a.create_date','desc');
+                $this->db->limit($data['limit'], $offset = ($page - 1) * $data['limit']);
+                $data['res_list'] = $this->db->get()->result_array();
+                break;
+            default:
+                return $this->fun_fail('查询失败');
+        }
+        $data['count'] = count($data['res_list']);
+        return $this->fun_success('查询成功', $data);
     }
 
 }
