@@ -210,11 +210,9 @@
                     return false;
             }
             $.ajaxSettings.async = false; //关闭异步
-            $.get("/mobile/saff_load",{},function(data){
-                alert('get');
-            })
+            //$.get("/mobile/saff_load",{},function(data){alert('get');})
             $.post("/mobile/saff_load",{page:page,status:status,agent_id:agent_id,year:year},function(data){
-                alert('post');
+                //alert('post');
                 var result_ = JSON.parse(data)
                 if(result_.status == 1){
                     //循环所得到的明细记录,生成html
