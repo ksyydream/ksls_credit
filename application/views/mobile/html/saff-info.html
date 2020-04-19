@@ -27,7 +27,7 @@
   以获得更好的体验！</p>
 <![endif]-->
 
-<div class="am-cf admin-main wrapper">
+<div class="am-cf admin-main">
   <!-- content start -->
   <div class="admin-content">
     <div class="admin-content-body">
@@ -138,13 +138,13 @@
 <!-- <a href="#" class="am-icon-btn am-icon-th-list am-show-sm-only admin-menu" data-am-offcanvas="{target: '#admin-offcanvas'}"></a> -->
 
 <!--[if lt IE 9]>
-<script src="/web_assets/assets4saff/js/jquery.min.js"></script>
+<script src="/web_assets/js/jquery-3.2.1.min.js"></script>
 <script src="/web_assets/assets4saff/js/modernizr.js"></script>
 <script src="/web_assets/assets4saff/js/amazeui.ie8polyfill.min.js"></script>
 <![endif]-->
 
 <!--[if (gte IE 9)|!(IE)]><!-->
-<script src="/web_assets/assets4saff/js/jquery.min.js"></script>
+<script src="/web_assets/js/jquery-3.2.1.min.js"></script>
 <script src="/web_assets/assets4saff/js/amazeui.min.js"></script>
 <script src="/web_assets/assets4saff/js/iscroll.js"></script>
 <script src="/web_assets/assets4saff/js/app.js"></script>
@@ -210,7 +210,11 @@
                     return false;
             }
             $.ajaxSettings.async = false; //关闭异步
+            $.get("/mobile/saff_load",{},function(data){
+                alert('get');
+            })
             $.post("/mobile/saff_load",{page:page,status:status,agent_id:agent_id,year:year},function(data){
+                alert('post');
                 var result_ = JSON.parse(data)
                 if(result_.status == 1){
                     //循环所得到的明细记录,生成html
