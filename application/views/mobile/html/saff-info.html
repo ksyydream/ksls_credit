@@ -209,6 +209,7 @@
                 default:
                     return false;
             }
+            $.ajaxSettings.async = false; //关闭异步
             $.post("/mobile/saff_load",{page:page,status:status,agent_id:agent_id,year:year},function(data){
                 var result_ = JSON.parse(data)
                 if(result_.status == 1){
@@ -270,6 +271,7 @@
                     }
                 }
             });
+            $.ajaxSettings.async = true; //打开异步
         }
         get_data(1);
         get_data(0);
