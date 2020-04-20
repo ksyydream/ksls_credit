@@ -219,5 +219,10 @@ class Home extends Home_Controller {
         $this->display('homepage/agent/show_event.html');
     }
 
+    public function qr_code_raw($c_id)
+    {
+        require_once (APPPATH . 'libraries/phpqrcode/phpqrcode.php');
+        QRcode::png($_SERVER['SERVER_NAME'] . '/mobile/mobile_get_company_detail?c_id=' . $c_id);
+    }
 	
 }
