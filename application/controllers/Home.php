@@ -26,7 +26,7 @@ class Home extends Home_Controller {
     }
 
     public function test_cap(){
-        phpinfo();
+        //phpinfo();
         die();
         $company_cap_ = $this->session->userdata('company_cap');
         $agent_cap_ = $this->session->userdata('agent_cap');
@@ -222,7 +222,7 @@ class Home extends Home_Controller {
     public function qr_code_raw($c_id)
     {
         require_once (APPPATH . 'libraries/phpqrcode/phpqrcode.php');
-        QRcode::png($_SERVER['SERVER_NAME'] . '/mobile/mobile_get_company_detail?c_id=' . $c_id);
+        QRcode::png('http://'.$_SERVER['SERVER_NAME'] . '/mobile/mobile_get_company_detail?c_id=' . $c_id);
     }
 	
 }
