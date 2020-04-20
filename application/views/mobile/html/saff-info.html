@@ -14,7 +14,7 @@
   <meta name="apple-mobile-web-app-title" content="Amaze UI" />
   <link rel="stylesheet" href="/web_assets/assets4saff/css/amazeui.min.css"/>
   <link rel="stylesheet" href="/web_assets/assets4saff/css/admin.css">
-  <link rel="stylesheet" href="/web_assets/assets4saff/css/app.css">
+  <link rel="stylesheet" href="/web_assets/assets4saff/css/app.css?v2">
     <style>
         #is_end_1,#is_end_2,#is_end_0{
             text-align: center;font-size: 12px;margin-top: 10px;display: none;
@@ -37,13 +37,13 @@
           <span class="s01 snow-company">{{$data.company_name|default:'-'}}</span>
           <div class="dl01">
             <p class="p2_2"><span class="s02"><i class="am-icon-file-o"></i>执业证号：</span><span>{{$data.job_code}}</span></p>
-            <p class="p2_2"><span class="s02"><i class="am-icon-mobile"></i>联系电话：</span><span>{{$data.phone}}</span></p>
+            <!--<p class="p2_2"><span class="s02"><i class="am-icon-mobile"></i>联系电话：</span><span>{{$data.phone}}</span></p>-->
             <p class="p2_2"><span class="s02"><i class="am-icon-flag-o"></i>职业状态：</span><span>
                 {{if $data.flag == 2}}有效{{/if}}
                 {{if $data.flag == 1}}离昆{{/if}}
                 {{if $data.flag == -1}}无效{{/if}}
             </span></p>
-            <p class="p2_2"><span class="s02"><i class="am-icon-file-text-o"></i>原职业证号：</span><span>{{$data.old_job_code}}</span></p>
+              {{if $data.old_job_code|trim != ''}}<p class="p2_2"><span class="s02"><i class="am-icon-file-text-o"></i>原职业证号：</span><span>{{$data.old_job_code}}</span></p>{{/if}}
           </div>
         </div>
 <!--
@@ -100,6 +100,7 @@
                  </div>
                <div class="clear"></div>
                <div class="div-data">
+                   <p class="p-kong" id="p_kong_"><img src="/web_assets/assets4saff/i/kong1.jpg"></p>
                 <ul class="data-ul" id="div_gener_0">
 
                 </ul>
@@ -174,7 +175,7 @@
 
         $("#btn_0").click(function(){
             if(window.is_end_0){
-                $("#is_end_0").show()
+                //$("#is_end_0").show()
             }else{
                 $('#my-modal-loading').modal()
                 get_data(0)
@@ -192,7 +193,9 @@
 
         $("#select_year").change(function(){
             window.page_0 = 1;
-            $('#div_gener_0').html("");
+            $('#div_gener_0').html('');
+            $("#p_kong_").show();
+            $("#btn_0").show();
             get_data(0);
         });
         function get_data(status){
@@ -210,9 +213,9 @@
                     return false;
             }
             $.ajaxSettings.async = false; //关闭异步
-            //$.get("/mobile/saff_load",{},function(data){alert('get');})
+
             $.post("/mobile/saff_load",{page:page,status:status,agent_id:agent_id,year:year},function(data){
-                //alert('post');
+
                 var result_ = JSON.parse(data)
                 if(result_.status == 1){
                     //循环所得到的明细记录,生成html
@@ -221,6 +224,7 @@
                         case 0:
                             var result_html_ = '';
                             $.each(result_.result.res_list,function(key,val){
+                                $("#p_kong_").hide();
                                 result_html_ += '<li>';
                                 result_html_ += '<p class="p-ul-1">' + val.event_name + '</p>';
                                 result_html_ += ' <div class="div-other"><span class="s-time">' + val.event_date + '</span><span class="s-label-2">' + val.event_type_name + '</span></div>';
@@ -245,7 +249,7 @@
                     if(result_.result.count != result_.result.limit){
                         switch (status){
                             case 0:
-                                $("#is_end_0").show()
+                                //$("#is_end_0").show()
                                 $("#btn_0").hide();
                                 //window.is_end_0 = true
                                 break;
@@ -261,7 +265,7 @@
                     $('#my-modal-loading').modal('close');
                     switch (status){
                         case 0:
-                            $("#is_end_0").show()
+                            //$("#is_end_0").show()
                             $("#btn_0").hide();
                             //window.is_end_0 = true
                             break;
