@@ -39,7 +39,7 @@
           </div>
         </div>
         <div class="am-padding am-bgfff ">
-        <div class="div-tit"><span class="stit">经纪人</span><span class="tit-fr">共{{$data.agent_count}}人 <i class="am-icon-chevron-right"></i></span></div>
+        <div class="div-tit"><span class="stit">经纪人</span><span class="tit-fr">共{{$data.agent_count|default:'0'}}人 <i class="am-icon-chevron-right"></i></span></div>
         <ul class="ul-staff" id="ul_agent_">
            <li class="li-more"><a href="javascript:;" id="btn_1">更多经纪人</a></li>
         </ul>  
