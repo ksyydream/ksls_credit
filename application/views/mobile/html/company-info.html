@@ -1,0 +1,257 @@
+<!doctype html>
+<html class="no-js fixed-layout">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>企业信息</title>
+  <meta name="description" content="企业信息">
+  <meta name="keywords" content="昆山 企业 经纪人 信息">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <link rel="icon" type="image/png" href="/web_assets/assets4saff/i/favicon.png">
+  <link rel="apple-touch-icon-precomposed" href="/web_assets/assets4saff/i/app-icon72x72@2x.png">
+  <meta name="apple-mobile-web-app-title" content="Amaze UI" />
+  <link rel="stylesheet" href="/web_assets/assets4saff/css/amazeui.min.css"/>
+  <link rel="stylesheet" href="/web_assets/assets4saff/css/admin.css">
+  <link rel="stylesheet" href="/web_assets/assets4saff/css/app.css?v2">
+</head>
+<body>
+<!--[if lte IE 9]>
+<p class="browsehappy">你正在使用<strong>过时</strong>的浏览器，Amaze UI 暂不支持。 请 <a href="http://browsehappy.com/" target="_blank">升级浏览器</a>
+  以获得更好的体验！</p>
+<![endif]-->
+
+<div class="am-cf admin-main">
+  <!-- content start -->
+  <div class="admin-content">
+    <div class="admin-content-body">
+        <input type="hidden" id="c_id" value="{{$data.id}}">
+        <div class="am-padding am-bgfff ">          
+          <span class="s01 snow-company snow-company-1"><i class="am-icon-bank"></i>{{$data.company_name}}</span>
+          <p class="p1_2"><span class="label bule">信用等级：{{$data.b_grade_name_}}</span> </p>
+          <div class="dl01">
+            <!--<p class="p2_2"><span class="s02"><i class="am-icon-mobile"></i>企业电话：</span><span></span></p>-->
+            <p class="p2_2"><span class="s02"><i class="am-icon-user"></i>企业法人:</span><span class="bule">{{$data.legal_name}}</span></p>
+            <p class="p2_2"><span class="s02"><i class="am-icon-user-md"></i>企业负责人：</span><span class="bule">{{$data.director_name}}</span></p>
+            <p class="p2_2"><span class="s02"><i class="am-icon-get-pocket"></i>统一信用代码：</span><span>{{$data.business_no}}</span></p>
+            <p class="p2_2"><span class="s02"><i class="am-icon-street-view"></i>经营地址：</span><span>{{$data.business_path}}</span></p>
+          </div>
+        </div>
+        <div class="am-padding am-bgfff ">
+        <div class="div-tit"><span class="stit">经纪人</span><span class="tit-fr">共{{$data.agent_count}}人 <i class="am-icon-chevron-right"></i></span></div>
+        <ul class="ul-staff" id="ul_agent_">
+           <li class="li-more"><a href="javascript:;" id="btn_1">更多经纪人</a></li>
+        </ul>  
+      
+
+
+
+        </div>
+      <div class="am-padding am-bgfff ">
+       <span class="stit">年审记录</span>
+         <div id="carousel" class="carousel-nav">
+            <ul class="infor-xnav">
+                {{foreach from=$data.ns_list key=key item=item}}
+                <li><span class="time">{{$item.annual_year}}</span>
+                    <span class="s-icon {{if $item.status == -1}}s-icon-red{{/if}}"></span>
+                    <span class="result">
+                        {{if $item.status == 1}}年审失败{{/if}}
+                        {{if $item.status == 2}}年审成功{{/if}}
+                        {{if $item.status == -1}}缺席{{/if}}
+                    </span>
+                </li>
+                {{/foreach}}
+            </ul>
+            <div class="div-border"></div>
+        </div>
+      </div>
+    <div class="am-padding am-bgfff ">
+      <span class="stit stit-1">信用事件</span>
+       <div class="div-data">
+         <div class="div-fl div-choose div-choose-1">
+
+                   <div class="sel-year">
+               
+                  
+                      <select id="select_year" data-am-selected="{btnSize: 'sm'}" class="">
+                          {{foreach from=$year_list key=key item=item}}
+                          <option value="{{$item}}">{{$item}}年</option>
+                          {{/foreach}}
+                      </select>
+               
+                  </div>
+
+
+
+                    <div id="c_num_" class="div-res">共0条</div>
+                 </div>
+                 <div class="div-fr">
+                  <div class="current-status">当前状态：{{$data.b_grade_name_}}</div>
+                 </div>
+               <div class="clear"></div>
+
+             <p class="p-kong" id="p_kong_"><img src="/web_assets/assets4saff/i/kong1.jpg"></p>
+                 <ul class="data-ul"  id="div_gener_0">
+
+                </ul>
+           <p id="is_end_0"></p>
+                <div class="more-btns"><a href="javascript:;" id="btn_0" class="more-btn">加载更多</a></div>
+              </div>
+
+
+
+
+    </div>
+
+    </div>
+    <footer class="admin-content-footer">
+      <hr>
+      <!-- <p class="am-padding-left">© 2020 AllMobilize, Inc. Licensed under MIT license.</p> -->
+    </footer>
+  </div>
+  <!-- content end -->
+
+</div>
+
+<!-- <a href="#" class="am-icon-btn am-icon-th-list am-show-sm-only admin-menu" data-am-offcanvas="{target: '#admin-offcanvas'}"></a> -->
+
+<!--[if lt IE 9]>
+<script src="/web_assets/js/jquery-3.2.1.min.js"></script>
+<script src="/web_assets/assets4saff/js/modernizr.js"></script>
+<script src="/web_assets/assets4saff/js/amazeui.ie8polyfill.min.js"></script>
+<![endif]-->
+
+<!--[if (gte IE 9)|!(IE)]><!-->
+<script src="/web_assets/assets4saff/js/jquery.min.js"></script>
+<script src="/web_assets/assets4saff/js/amazeui.min.js"></script>
+<script src="/web_assets/assets4saff/js/iscroll.js"></script>
+<script src="/web_assets/assets4saff/js/app.js"></script>
+<!--<![endif]-->
+<script type="text/javascript">
+    // $(document).ready(function(){
+    //     $(".infot-liBtn").click(function(){
+    //         $(".infot-liBtn").toggleClass("infot-liBtn2").siblings("li.infot-liOff").toggleClass("infot-liOn");
+    //     });
+    //     $(".infor-xnav li").click(function(){
+    //         $(this).addClass("pitch").siblings().removeClass("pitch");
+    //     });
+    // });
+
+    window.addEventListener('load',function(){
+        var $carousel = document.getElementById('carousel'),
+            $ul = $carousel.querySelector('ul'),
+            liArray = $carousel.querySelectorAll('li'),
+            liNum = liArray.length;
+        $ul.style.width = (liArray[0].clientWidth + 10)*9 +"px";
+        var carousel=new iScroll("carousel",{hScrollbar:false, vScrollbar:false, vScroll: false});
+
+    });
+    $(function(){
+        window.is_end_0 = false
+        window.is_end_1 = false
+        window.page_0 = 1
+        window.page_1 = 1
+
+        $("#btn_0").click(function(){
+            if(window.is_end_0){
+
+            }else{
+                $('#my-modal-loading').modal()
+                get_r_data();
+            }
+        })
+
+        $("#btn_1").click(function(){
+            if(window.is_end_1){
+
+            }else{
+                $('#my-modal-loading').modal()
+                get_a_data();
+            }
+        })
+
+        $("#select_year").change(function(){
+            window.page_0 = 1;
+            $('#div_gener_0').html('');
+            $("#p_kong_").show();
+            $("#btn_0").show();
+            get_r_data();
+        });
+        function get_r_data(){
+            var c_id = $("#c_id").val();
+            var year = $("#select_year").val();
+            var page = 1;
+            page = window.page_0
+            $.ajaxSettings.async = false; //关闭异步
+
+            $.post("/mobile/company_r_load",{page:page,c_id:c_id,year:year},function(data){
+                var result_ = JSON.parse(data)
+                if(result_.status == 1){
+                    var result_html_ = '';
+                    $.each(result_.result.res_list,function(key,val){
+                        $("#p_kong_").hide();
+                        result_html_ += '<li>';
+                        result_html_ += '<p class="p-ul-1">' + val.event_name + '</p>';
+                        var c_ = val.event_type_type == 1 ? 's-label-3' : '';
+                        result_html_ += ' <div class="div-other"><span class="s-time">' + val.event_date + '</span><span class="s-label-2 ' + c_ + '">' + val.event_type_name + '</span></div>';
+                        result_html_ += '</li>';
+                    })
+                    $('#div_gener_0').append(result_html_);
+                    $("#c_num_").html("共" + result_.result.total +"条");
+                    window.page_0 += 1
+                    if(result_.result.count != result_.result.limit){
+                        $("#btn_0").hide();
+                    }
+                    $('#my-modal-loading').modal('close');
+                }else{
+                    $('#my-modal-loading').modal('close');
+                    $("#btn_0").hide();
+                }
+            });
+            $.ajaxSettings.async = true; //打开异步
+        }
+        function get_a_data(){
+            var c_id = $("#c_id").val();
+            var page = 1;
+            page = window.page_1;
+            $.ajaxSettings.async = false; //关闭异步
+
+            $.post("/mobile/company_a_load",{page:page,c_id:c_id},function(data){
+                var result_ = JSON.parse(data)
+                if(result_.status == 1){
+                    var result_html_ = '';
+                    $.each(result_.result.res_list,function(key,val){
+                        result_html_ += '<li>';
+                        var c_ = val.wq == 2 ? '<i class="label yellow">网签</i>' : '';
+                        result_html_ += '<span class="staff-name">' + val.name + c_ +' </span><span class="staff-id">执业证号：' + val.job_code + '</span>';
+                        result_html_ += '</li>';
+                    })
+                    $('#btn_1').parent().before(result_html_);
+                    window.page_1 += 1
+                    if(result_.result.count != result_.result.limit){
+                        $("#btn_1").parent().hide();
+                    }
+                    $('#my-modal-loading').modal('close');
+                }else{
+                    $('#my-modal-loading').modal('close');
+                    $("#btn_1").parent().hide();
+                }
+            });
+            $.ajaxSettings.async = true; //打开异步
+        }
+        get_r_data();
+        get_a_data();
+    })
+</script>
+
+<div class="am-modal am-modal-loading am-modal-no-btn" tabindex="-1" id="my-modal-loading">
+    <div class="am-modal-dialog">
+        <!--<div class="am-modal-hd">正在加载...</div>-->
+        <div class="am-modal-bd">
+            <span class="am-icon-spinner am-icon-spin"></span>
+        </div>
+    </div>
+</div>
+</body>
+</html>

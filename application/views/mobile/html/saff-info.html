@@ -37,7 +37,7 @@
           <span class="s01 snow-company">{{$data.company_name|default:'-'}}</span>
           <div class="dl01">
             <p class="p2_2"><span class="s02"><i class="am-icon-file-o"></i>执业证号：</span><span>{{$data.job_code}}</span></p>
-            <!--<p class="p2_2"><span class="s02"><i class="am-icon-mobile"></i>联系电话：</span><span>{{$data.phone}}</span></p>-->
+            <!--<p class="p2_2"><span class="s02"><i class="am-icon-mobile"></i>联系电话：</span><span></span></p>-->
             <p class="p2_2"><span class="s02"><i class="am-icon-flag-o"></i>职业状态：</span><span>
                 {{if $data.flag == 2}}有效{{/if}}
                 {{if $data.flag == 1}}离昆{{/if}}
@@ -104,7 +104,7 @@
                 <ul class="data-ul" id="div_gener_0">
 
                 </ul>
-                   <p id="is_end_0">已到最后一页</p>
+                   <p id="is_end_0"></p>
                 <div class="more-btns"><a href="javascript:;" id="btn_0" class="more-btn">加载更多</a></div>
               </div>
             </div>
@@ -227,7 +227,8 @@
                                 $("#p_kong_").hide();
                                 result_html_ += '<li>';
                                 result_html_ += '<p class="p-ul-1">' + val.event_name + '</p>';
-                                result_html_ += ' <div class="div-other"><span class="s-time">' + val.event_date + '</span><span class="s-label-2">' + val.event_type_name + '</span></div>';
+                                var c_ = val.event_type_type == 1 ? 's-label-3' : '';
+                                result_html_ += ' <div class="div-other"><span class="s-time">' + val.event_date + '</span><span class="s-label-2 ' + c_ + '">' + val.event_type_name + '</span></div>';
                                 result_html_ += '</li>';
                             })
                             $('#div_gener_0').append(result_html_);
