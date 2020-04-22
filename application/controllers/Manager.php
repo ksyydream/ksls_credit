@@ -1375,6 +1375,8 @@ class Manager extends MY_Controller {
         $this->assign('pager', $pager);
         $this->assign('page', $page);
         $this->assign('data', $data);
+        $town_list = $this->c4m_model->get_town(1);
+        $this->assign('town_list', $town_list);
         $this->display('manager/company/company_pass_1_list.html');
     }
 
@@ -1466,6 +1468,8 @@ class Manager extends MY_Controller {
         $this->assign('pager', $pager);
         $this->assign('page', $page);
         $this->assign('data', $data);
+        $town_list = $this->c4m_model->get_town(1);
+        $this->assign('town_list', $town_list);
         $this->display('manager/company/company_pass_2_list.html');
     }
 
