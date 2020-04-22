@@ -1942,12 +1942,12 @@ class Manager_model extends MY_Model
         );
         $res_check_town_ = $this->check_admin_townByTown_id($admin_id,$data['town_id']);
         if(!$res_check_town_)
-            return $this->fun_fail('不可设置此社区!');
+            return $this->fun_fail('不可设置此区镇!');
         $company_id = $this->input->post('company_id');
         if($company_id){
             $res_check_town_ = $this->check_admin_townByCompany_id($admin_id, $company_id);
             if(!$res_check_town_)
-                return $this->fun_fail('不可操作此社区下的企业!');
+                return $this->fun_fail('不可操作此区镇下的企业!');
         }
         if(!$data['company_name'] || !$data['register_path'] || !$data['business_path'] ||  !$data['business_no']
             //|| !$data['issuing_date']  || !$data['record_num']
@@ -2087,7 +2087,7 @@ class Manager_model extends MY_Model
             return $this->fun_fail('企业信息丢失!');
         $res_check_town_ = $this->check_admin_townByTown_id($admin_id, $company_data['town_id']);
         if(!$res_check_town_)
-            return $this->fun_fail('不可操作此社区下企业!');
+            return $this->fun_fail('不可操作此区镇下企业!');
         if(!in_array($company_data['flag'], array(1, 2)))
             return $this->fun_fail('企业状态变更,不可年审!');
         $company_data['annual_date'] = $res_check_['result']['annual_year'];
@@ -2192,11 +2192,14 @@ class Manager_model extends MY_Model
         }
         $pass_info_ = $this->db->where('id', $pass_id)->from('company_pass')->get()->row_array();
         if (!$pass_info_) {
-            return $this->fun_fail('企业信息丢失!');
+            return $this->fun_fail('企业年审信息丢失!');
         }
-        $check_town_ = $this->check_admin_townByTown_id($admin_id, $pass_info_['company_id']);
+        $company_info_ = $this->db->where('id', $pass_info_['company_id'])->from('company_pending')->get()->row_array();
+        if(!$company_info_)
+            return $this->fun_fail('企业信息丢失!');
+        $check_town_ = $this->check_admin_townByTown_id($admin_id, $company_info_['town_id']);
         if(!$check_town_)
-            return $this->fun_fail('不可操作此社区下企业!');
+            return $this->fun_fail('不可操作此区镇下企业!');
         $company_id = $pass_info_['company_id'];
         $check_company_name_ = $this->c4m_model->check_company_name($pass_info_['company_name'], $company_id);
         if($check_company_name_['status'] != 1)
@@ -2292,6 +2295,7 @@ class Manager_model extends MY_Model
                 $this->db->insert_batch('company_pass_icon',$pass_icon);
         }
         $temp_update_data = array('status'=>$status);
+        $temp_update_data['town_id'] = $company_info_['town_id'];
         if($status == 3 || $status == -1){
             $temp_update_data['qx_num'] = 0;
             $this->db->where('id', $company_id)->where('flag', 1)->update('company_pending', array('flag' => 2));
@@ -2412,9 +2416,9 @@ class Manager_model extends MY_Model
         if (!$pass_info_) {
             return $this->fun_fail('企业年审信息丢失!');
         }
-        $check_town_ = $this->check_admin_townByTown_id($admin_id, $pass_info_['company_id']);
+        $check_town_ = $this->check_admin_townByCompany_id($admin_id, $pass_info_['company_id']);
         if(!$check_town_)
-            return $this->fun_fail('不可操作此社区下企业!');
+            return $this->fun_fail('不可操作此区镇下企业!');
         if($pass_info_['status'] != $status)
             return $this->fun_fail('企业年审信息状态已变更!');
         $company_id = $pass_info_['company_id'];
@@ -2475,9 +2479,9 @@ class Manager_model extends MY_Model
         $business_no = $this->input->post('username');
         if(!$company_id || !$business_no)
             return $this->fun_fail('信息缺失!');
-        $check_town_ = $this->check_admin_townByTown_id($admin_id, $company_id);
+        $check_town_ = $this->check_admin_townByCompany_id($admin_id, $company_id);
         if(!$check_town_)
-            return $this->fun_fail('不可操作此社区下企业!');
+            return $this->fun_fail('不可操作此区镇下企业!');
         $this->db->where(array('id' => $company_id, 'business_no' => $business_no))->update('company_pending', array('password' => sha1('123456')));
         return $this->fun_success('重置成功!');
     }
@@ -2493,9 +2497,9 @@ class Manager_model extends MY_Model
             return $this->fun_fail('未找到企业信息!');
         if(!in_array($company_info['flag'], array(1, 2)))
             return $this->fun_fail('企业状态已变更!');
-        $check_town_ = $this->check_admin_townByTown_id($admin_id, $company_id);
+        $check_town_ = $this->check_admin_townByCompany_id($admin_id, $company_id);
         if(!$check_town_)
-            return $this->fun_fail('不可操作此区镇社区下的企业!');
+            return $this->fun_fail('不可操作此区镇下的企业!');
         $this->db->trans_start();//--------开始事务
         $this->db->where(array('id' => $company_id))->where_in('flag', array(1,2))
             ->update('company_pending', array(

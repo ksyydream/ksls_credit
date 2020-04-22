@@ -1273,7 +1273,7 @@ class Manager extends MY_Controller {
         $excel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(26);
         $letter = array('A','B','C','D','E','F','G','H','I','J','K','L','M');
-        $tableheader = array('企业名称','统一社会信用代码','注册地址','经营地址','企业电话','负责人姓名','负责人电话', '法人姓名','法人电话','分支机构数量','当前信用分','信用等级','所属社区');
+        $tableheader = array('企业名称','统一社会信用代码','注册地址','经营地址','企业电话','负责人姓名','负责人电话', '法人姓名','法人电话','分支机构数量','当前信用分','信用等级','所属区镇');
         for($i = 0;$i < count($tableheader);$i++) {
             $excel->getActiveSheet()->setCellValue("$letter[$i]3","$tableheader[$i]");
             $excel->getActiveSheet()->getStyle("$letter[$i]3")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
