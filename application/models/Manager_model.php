@@ -2219,7 +2219,8 @@ class Manager_model extends MY_Model
         }
 
         $update_data = array(
-            'status' => $status
+            'status' => $status,
+            'town_id' => $company_info_['town_id']
         );
         if($status != -1){
             $agent_num = $this->get_agent_num4company($company_id);
@@ -2295,7 +2296,6 @@ class Manager_model extends MY_Model
                 $this->db->insert_batch('company_pass_icon',$pass_icon);
         }
         $temp_update_data = array('status'=>$status);
-        $temp_update_data['town_id'] = $company_info_['town_id'];
         if($status == 3 || $status == -1){
             $temp_update_data['qx_num'] = 0;
             $this->db->where('id', $company_id)->where('flag', 1)->update('company_pending', array('flag' => 2));
