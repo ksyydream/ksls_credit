@@ -2165,7 +2165,8 @@ class Manager_model extends MY_Model
 
     //获取最近一次终审通过的信息
     public function company_pass_data($pass_id){
-        $this->db->select('a.*')->from('company_pass a');
+        $this->db->select('a.*, t.name t_name_')->from('company_pass a');
+        $this->db->join('town t', 't.id = a.town_id', 'left');
         $this->db->where('a.id', $pass_id);
         $detail =  $this->db->get()->row_array();
         $this->db->select()->from('company_pass_img');
@@ -2193,6 +2194,9 @@ class Manager_model extends MY_Model
         if (!$pass_info_) {
             return $this->fun_fail('企业信息丢失!');
         }
+        $check_town_ = $this->check_admin_townByTown_id($admin_id, $pass_info_['company_id']);
+        if(!$check_town_)
+            return $this->fun_fail('不可操作此社区下企业!');
         $company_id = $pass_info_['company_id'];
         $check_company_name_ = $this->c4m_model->check_company_name($pass_info_['company_name'], $company_id);
         if($check_company_name_['status'] != 1)
@@ -2408,6 +2412,9 @@ class Manager_model extends MY_Model
         if (!$pass_info_) {
             return $this->fun_fail('企业年审信息丢失!');
         }
+        $check_town_ = $this->check_admin_townByTown_id($admin_id, $pass_info_['company_id']);
+        if(!$check_town_)
+            return $this->fun_fail('不可操作此社区下企业!');
         if($pass_info_['status'] != $status)
             return $this->fun_fail('企业年审信息状态已变更!');
         $company_id = $pass_info_['company_id'];
@@ -2463,11 +2470,14 @@ class Manager_model extends MY_Model
     }
 
     //重置企业密码
-    public function refresh_company_password(){
+    public function refresh_company_password($admin_id){
         $company_id = $this->input->post('id');
         $business_no = $this->input->post('username');
         if(!$company_id || !$business_no)
             return $this->fun_fail('信息缺失!');
+        $check_town_ = $this->check_admin_townByTown_id($admin_id, $company_id);
+        if(!$check_town_)
+            return $this->fun_fail('不可操作此社区下企业!');
         $this->db->where(array('id' => $company_id, 'business_no' => $business_no))->update('company_pending', array('password' => sha1('123456')));
         return $this->fun_success('重置成功!');
     }

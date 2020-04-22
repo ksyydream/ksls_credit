@@ -1611,7 +1611,7 @@ class Manager extends MY_Controller {
 
     //重置企业密码
     public function refresh_company_password(){
-        $res = $this->manager_model->refresh_company_password();
+        $res = $this->manager_model->refresh_company_password($this->admin_id);
         $this->ajaxReturn($res);
     }
 
