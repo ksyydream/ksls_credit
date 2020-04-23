@@ -1338,6 +1338,8 @@ class Manager extends MY_Controller {
         $this->assign('pager', $pager);
         $this->assign('page', $page);
         $this->assign('data', $data);
+        $town_list = $this->c4m_model->get_town(1);
+        $this->assign('town_list', $town_list);
         $this->display('manager/company/company_cancel_list.html');
     }
 
