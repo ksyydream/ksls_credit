@@ -147,6 +147,23 @@
 
                             <div class="space-4"></div>
 
+                            <div class="form-group">
+
+                                <label class="col-sm-1 control-label no-padding-right" for="form-field-6"> 管辖区镇 </label>
+
+                                <div class="col-sm-9">
+                                    {{foreach from=$town_list key=k1 item=v1}}
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" class="ace" name="town_ids[]" value="{{$v1.id}}" {{if $v1.id|in_array:$t_list}}checked="checked"{{/if}} />
+                                            <span class="lbl">{{$v1.name}}</span>
+                                        </label>
+                                    </div>
+                                    {{/foreach}}
+
+                                </div>
+
+                            </div>
                             <div class="space-4"></div>
 
                             <div class="col-md-offset-2 col-md-9">

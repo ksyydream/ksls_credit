@@ -324,6 +324,17 @@ class Manager_model extends MY_Model
         }
         $this->db->where('admin_id', $admin_id)->delete('auth_group_access');
         $this->db->insert('auth_group_access', array('admin_id' => $admin_id, 'group_id' => $group_id));
+
+        $town_ids = $this->input->post('town_ids');
+        $this->db->where('admin_id', $admin_id)->delete('admin_town');
+        if ($town_ids) {
+            if (is_array($town_ids)) {
+                foreach ($town_ids as $item) {
+                    $this->db->insert('admin_town', array('admin_id' => $admin_id, 't_id' => $item));
+                }
+            }
+        }
+
         return $this->fun_success('保存成功');
     }
 
@@ -1767,13 +1778,28 @@ class Manager_model extends MY_Model
         //搜索条件
         $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
         $data['flag'] = $this->input->get('flag')?trim($this->input->get('flag')):null;
+        $data['town_id'] = $this->input->get('town_id')?trim($this->input->get('town_id')):null;  //保留单个区镇 虽然实际是不使用
+        $data['town_ids'] = $this->input->get('town_ids') ? $this->input->get('town_ids') : array('');
+        //当区镇什么也没有选时就自动取默认
+        if(!$data['town_ids']){
+            $admin_info = $this->session->userdata('admin_info');
+            $admin = $this->get_admin($admin_info['admin_id']);
+            if($admin['group_id'] != 1)
+                $data['town_ids'] = $this->get_admin_t_list($admin_info['admin_id']);
+        }
+
         $this->db->select('count(1) num')->from('company_pending a');
+        $this->db->join('town t', 'a.town_id = t.id', 'left');
         if($data['keyword']){
             $this->db->group_start();
             $this->db->like('a.company_name', $data['keyword']);
             $this->db->or_like('a.business_no', $data['keyword']);
             $this->db->group_end();
         }
+        if($data['town_id'])
+            $this->db->where('a.town_id', $data['town_id']);
+        //if($data['town_ids'] && is_array($data['town_ids']))
+            $this->db->where_in('a.town_id', $data['town_ids']);
         if($flag)
             $this->db->where_in('a.flag',$flag);
         if($data['flag'])
@@ -1786,14 +1812,19 @@ class Manager_model extends MY_Model
         $data['total_rows'] = $num->num;
 
         //获取详细列
-        $this->db->select('a.*, b.grade_name')->from('company_pending a');
+        $this->db->select('a.*, b.grade_name,t.name town_name_')->from('company_pending a');
         $this->db->join('company_grade b', 'a.grade_no = b.grade_no', 'left');
+        $this->db->join('town t', 'a.town_id = t.id', 'left');
         if($data['keyword']){
             $this->db->group_start();
             $this->db->like('a.company_name', $data['keyword']);
             $this->db->or_like('a.business_no', $data['keyword']);
             $this->db->group_end();
         }
+        if($data['town_id'])
+            $this->db->where('a.town_id', $data['town_id']);
+        //if($data['town_ids'] && is_array($data['town_ids']))
+            $this->db->where_in('a.town_id', $data['town_ids']);
         if($flag)
             $this->db->where_in('a.flag',$flag);
         if($data['flag'])
@@ -1814,15 +1845,18 @@ class Manager_model extends MY_Model
         //获取详细列
         $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
         $data['flag'] = $this->input->get('flag')?trim($this->input->get('flag')):null;
-
+        $data['town_id'] = $this->input->get('town_id')?trim($this->input->get('town_id')):null;
 
         $this->db->select('count(1) num')->from('company_pending a');
+        $this->db->join('town t', 'a.town_id = t.id', 'left');
         if($data['keyword']){
             $this->db->group_start();
             $this->db->like('a.company_name', $data['keyword']);
             $this->db->or_like('a.business_no', $data['keyword']);
             $this->db->group_end();
         }
+        if($data['town_id'])
+            $this->db->where('a.town_id', $data['town_id']);
         if($flag)
             $this->db->where_in('a.flag',$flag);
         if($data['flag'])
@@ -1834,14 +1868,17 @@ class Manager_model extends MY_Model
         $num = $this->db->get()->row();
         $data['total_rows'] = $num->num;
 
-        $this->db->select('a.*, b.grade_name')->from('company_pending a');
+        $this->db->select('a.*, b.grade_name,t.name town_name_')->from('company_pending a');
         $this->db->join('company_grade b', 'a.grade_no = b.grade_no', 'left');
+        $this->db->join('town t', 'a.town_id = t.id', 'left');
         if($data['keyword']){
             $this->db->group_start();
             $this->db->like('a.company_name', $data['keyword']);
             $this->db->or_like('a.business_no', $data['keyword']);
             $this->db->group_end();
         }
+        if($data['town_id'])
+            $this->db->where('a.town_id', $data['town_id']);
         if($flag)
             $this->db->where_in('a.flag',$flag);
         if($data['flag'])
@@ -1857,7 +1894,8 @@ class Manager_model extends MY_Model
     }
 
     public function company_pending_edit($id){
-        $this->db->select('a.*')->from('company_pending a');
+        $this->db->select('a.*, t.name t_name_')->from('company_pending a');
+        $this->db->join('town t','t.id = a.town_id', 'left');
         $this->db->where('a.id', $id);
         $detail =  $this->db->get()->row_array();
         if (!$detail) {
@@ -1879,12 +1917,13 @@ class Manager_model extends MY_Model
     }
 
     //企业备案信息保存【重要】对company_pending做处理,理论上只修改信息,不会影响 备案/审核/信用等级 等状态.
-    public function company_pending_save(){
+    public function company_pending_save($admin_id){
         $data = array(
             'company_name'=>trim($this->input->post('company_name')),
             'business_no'=>strtoupper(trim($this->input->post('business_no'))),
             'register_path'=>trim($this->input->post('register_path')),
             'business_path'=>trim($this->input->post('business_path')),
+            'town_id'=>trim($this->input->post('town_id')),
             'issuing_date'=>trim($this->input->post('issuing_date')),
             'company_phone'=>trim($this->input->post('company_phone')),
             'director_name'=>trim($this->input->post('director_name')),
@@ -1901,11 +1940,18 @@ class Manager_model extends MY_Model
             'flag' => 1,
             'tj_date' => date('Y-m-d H:i:s',time()),
         );
-
+        $res_check_town_ = $this->check_admin_townByTown_id($admin_id,$data['town_id']);
+        if(!$res_check_town_)
+            return $this->fun_fail('不可设置此区镇!');
         $company_id = $this->input->post('company_id');
+        if($company_id){
+            $res_check_town_ = $this->check_admin_townByCompany_id($admin_id, $company_id);
+            if(!$res_check_town_)
+                return $this->fun_fail('不可操作此区镇下的企业!');
+        }
         if(!$data['company_name'] || !$data['register_path'] || !$data['business_path'] ||  !$data['business_no']
             //|| !$data['issuing_date']  || !$data['record_num']
-            || !$data['company_phone'] || !$data['director_name'] ||
+            || !$data['company_phone'] || !$data['director_name'] || !$data['town_id'] ||
             !$data['director_phone'] || !$data['legal_name'] || !$data['legal_phone']){
             return $this->fun_fail('缺少必要信息!');
         }
@@ -2039,6 +2085,9 @@ class Manager_model extends MY_Model
         $company_data = $this->db->select()->from('company_pending')->where('id',$company_id)->order_by('id','desc')->get()->row_array();
         if(!$company_data)
             return $this->fun_fail('企业信息丢失!');
+        $res_check_town_ = $this->check_admin_townByTown_id($admin_id, $company_data['town_id']);
+        if(!$res_check_town_)
+            return $this->fun_fail('不可操作此区镇下企业!');
         if(!in_array($company_data['flag'], array(1, 2)))
             return $this->fun_fail('企业状态变更,不可年审!');
         $company_data['annual_date'] = $res_check_['result']['annual_year'];
@@ -2116,7 +2165,8 @@ class Manager_model extends MY_Model
 
     //获取最近一次终审通过的信息
     public function company_pass_data($pass_id){
-        $this->db->select('a.*')->from('company_pass a');
+        $this->db->select('a.*, t.name t_name_')->from('company_pass a');
+        $this->db->join('town t', 't.id = a.town_id', 'left');
         $this->db->where('a.id', $pass_id);
         $detail =  $this->db->get()->row_array();
         $this->db->select()->from('company_pass_img');
@@ -2142,8 +2192,14 @@ class Manager_model extends MY_Model
         }
         $pass_info_ = $this->db->where('id', $pass_id)->from('company_pass')->get()->row_array();
         if (!$pass_info_) {
-            return $this->fun_fail('企业信息丢失!');
+            return $this->fun_fail('企业年审信息丢失!');
         }
+        $company_info_ = $this->db->where('id', $pass_info_['company_id'])->from('company_pending')->get()->row_array();
+        if(!$company_info_)
+            return $this->fun_fail('企业信息丢失!');
+        $check_town_ = $this->check_admin_townByTown_id($admin_id, $company_info_['town_id']);
+        if(!$check_town_)
+            return $this->fun_fail('不可操作此区镇下企业!');
         $company_id = $pass_info_['company_id'];
         $check_company_name_ = $this->c4m_model->check_company_name($pass_info_['company_name'], $company_id);
         if($check_company_name_['status'] != 1)
@@ -2163,7 +2219,8 @@ class Manager_model extends MY_Model
         }
 
         $update_data = array(
-            'status' => $status
+            'status' => $status,
+            'town_id' => $company_info_['town_id']
         );
         if($status != -1){
             $agent_num = $this->get_agent_num4company($company_id);
@@ -2278,8 +2335,17 @@ class Manager_model extends MY_Model
     public function company_pass_list($page=1, $status = array()){
         $data['limit'] = $this->limit;
         //搜索条件
-        $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
-        $data['business_no'] = $this->input->get('business_no')?trim($this->input->get('business_no')):null;
+        $data['keyword'] = $this->input->get('keyword') ? trim($this->input->get('keyword')) : null;
+        $data['business_no'] = $this->input->get('business_no') ? trim($this->input->get('business_no')) : null;
+        $data['town_id'] = $this->input->get('town_id') ? trim($this->input->get('town_id')) : null; //保留单个区镇 虽然实际是不使用
+        $data['town_ids'] = $this->input->get('town_ids') ? $this->input->get('town_ids') : array('');
+        //当区镇什么也没有选时就自动取默认
+        if(!$data['town_ids']){
+            $admin_info = $this->session->userdata('admin_info');
+            $admin = $this->get_admin($admin_info['admin_id']);
+            if($admin['group_id'] != 1)
+                $data['town_ids'] = $this->get_admin_t_list($admin_info['admin_id']);
+        }
         $this->db->select('count(1) num')->from('company_pass a');
         $this->db->join('company_pending b','b.id = a.company_id','left');
         if($data['keyword']){
@@ -2291,12 +2357,18 @@ class Manager_model extends MY_Model
             $this->db->where('b.business_no', $data['business_no']);
         if($status)
             $this->db->where_in('a.status',$status);
+        if($data['town_id']){
+            $this->db->where('b.town_id', $data['town_id']);
+        }
+        //if($data['town_ids'] && is_array($data['town_ids']))
+            $this->db->where_in('b.town_id', $data['town_ids']);
         $num = $this->db->get()->row();
         $data['total_rows'] = $num->num;
 
         //获取详细列
-        $this->db->select('a.id,a.annual_date,a.company_name,a.legal_name,a.tj_date,a.director_name,b.business_no,cs_date,s_date')->from('company_pass a');
+        $this->db->select('a.id,a.annual_date,a.company_name,a.legal_name,a.tj_date,a.director_name,b.business_no,cs_date,s_date,t.name t_name_')->from('company_pass a');
         $this->db->join('company_pending b','b.id = a.company_id','left');
+        $this->db->join('town t','t.id = b.town_id','left');
         if($data['keyword']){
             $this->db->group_start();
             $this->db->like('a.company_name', $data['keyword']);
@@ -2304,6 +2376,12 @@ class Manager_model extends MY_Model
         }
         if($data['business_no'])
             $this->db->where('b.business_no', $data['business_no']);
+        if($data['town_id']){
+            $this->db->where('b.town_id', $data['town_id']);
+        }
+        //if($data['town_ids'] && is_array($data['town_ids']))
+            $this->db->where_in('b.town_id', $data['town_ids']);
+
         if($status){
             $this->db->where_in('a.status',$status);
             if (in_array(3, $status))
@@ -2319,7 +2397,7 @@ class Manager_model extends MY_Model
         }
         
     
-        $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
+        $this->db->limit($data['limit'], $offset = ($page - 1) * $data['limit']);
         $data['res_list'] = $this->db->get()->result_array();
         return $data;
     }
@@ -2337,6 +2415,9 @@ class Manager_model extends MY_Model
         if (!$pass_info_) {
             return $this->fun_fail('企业年审信息丢失!');
         }
+        $check_town_ = $this->check_admin_townByCompany_id($admin_id, $pass_info_['company_id']);
+        if(!$check_town_)
+            return $this->fun_fail('不可操作此区镇下企业!');
         if($pass_info_['status'] != $status)
             return $this->fun_fail('企业年审信息状态已变更!');
         $company_id = $pass_info_['company_id'];
@@ -2392,11 +2473,14 @@ class Manager_model extends MY_Model
     }
 
     //重置企业密码
-    public function refresh_company_password(){
+    public function refresh_company_password($admin_id){
         $company_id = $this->input->post('id');
         $business_no = $this->input->post('username');
         if(!$company_id || !$business_no)
             return $this->fun_fail('信息缺失!');
+        $check_town_ = $this->check_admin_townByCompany_id($admin_id, $company_id);
+        if(!$check_town_)
+            return $this->fun_fail('不可操作此区镇下企业!');
         $this->db->where(array('id' => $company_id, 'business_no' => $business_no))->update('company_pending', array('password' => sha1('123456')));
         return $this->fun_success('重置成功!');
     }
@@ -2412,6 +2496,9 @@ class Manager_model extends MY_Model
             return $this->fun_fail('未找到企业信息!');
         if(!in_array($company_info['flag'], array(1, 2)))
             return $this->fun_fail('企业状态已变更!');
+        $check_town_ = $this->check_admin_townByCompany_id($admin_id, $company_id);
+        if(!$check_town_)
+            return $this->fun_fail('不可操作此区镇下的企业!');
         $this->db->trans_start();//--------开始事务
         $this->db->where(array('id' => $company_id))->where_in('flag', array(1,2))
             ->update('company_pending', array(

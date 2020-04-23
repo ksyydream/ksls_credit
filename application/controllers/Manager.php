@@ -41,6 +41,9 @@ class Manager extends MY_Controller {
         $menu = $this->getMenu($menu);
         $this->assign('menu', $menu);
         $this->assign('self_url',$_SERVER['PHP_SELF']);
+        $this->assign('group_id', $admin['group_id']);
+        $allow_t = $this->manager_model->get_admin_t_list($this->admin_id);
+        $this->assign('allow_t', $allow_t);
     }
 
     protected function getMenu($items, $id = 'id', $pid = 'pid', $son = 'children')
@@ -207,7 +210,10 @@ class Manager extends MY_Controller {
      */
     public function admin_add(){
         $groups = $this->manager_model->get_group_all();
+        $town_list = $this->c4m_model->get_town(1);
         $this->assign('data', array());
+        $this->assign('town_list', $town_list);
+        $this->assign('t_list', array());
         $this->assign('groups', $groups);
         $this->display('manager/admin/form.html');
     }
@@ -223,6 +229,10 @@ class Manager extends MY_Controller {
             $this->show_message('未找到管理员信息!');
         }
         $groups = $this->manager_model->get_group_all();
+        $town_list = $this->c4m_model->get_town(1);
+        $this->assign('town_list', $town_list);
+        $t_list = $this->manager_model->get_admin_t_list($data['admin_id']);
+        $this->assign('t_list', $t_list);
         $this->assign('data', $data);
         $this->assign('groups', $groups);
         $this->display('manager/admin/form.html');
@@ -1156,6 +1166,8 @@ class Manager extends MY_Controller {
         $this->assign('pager', $pager);
         $this->assign('page', $page);
         $this->assign('data', $data);
+        $town_list = $this->c4m_model->get_town(1);
+        $this->assign('town_list', $town_list);
         $this->display('manager/company/company_apply_list.html');
     }
 
@@ -1168,6 +1180,8 @@ class Manager extends MY_Controller {
     public function company_pending_add(){
         $icon_list = $this->c4m_model->get_company_sys_icon();
         $this->assign('icon_list', $icon_list);
+        $town_list = $this->c4m_model->get_town(1);
+        $this->assign('town_list', $town_list);
         $this->assign('f_user_id', $this->admin_id);
         $this->assign('time', time());
         $this->assign('m_id', -1);
@@ -1191,6 +1205,8 @@ class Manager extends MY_Controller {
                }
             }
         }
+        $town_list = $this->c4m_model->get_town(1);
+        $this->assign('town_list', $town_list);
         $this->assign('icon_list', $icon_list);
         $this->assign('data', $data);
         $this->assign('m_id', $m_id);
@@ -1235,7 +1251,7 @@ class Manager extends MY_Controller {
 
     //企业信息保存
     public function company_pending_save(){
-        $res = $this->manager_model->company_pending_save();
+        $res = $this->manager_model->company_pending_save($this->admin_id);
         $this->ajaxReturn($res);
     }
 
@@ -1256,8 +1272,8 @@ class Manager extends MY_Controller {
         $excel->getActiveSheet()->mergeCells('A1:N2');
         $excel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
         $excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(26);
-        $letter = array('A','B','C','D','E','F','G','H','I','J','K','L');
-        $tableheader = array('企业名称','统一社会信用代码','注册地址','经营地址','企业电话','负责人姓名','负责人电话', '法人姓名','法人电话','分支机构数量','当前信用分','信用等级');
+        $letter = array('A','B','C','D','E','F','G','H','I','J','K','L','M');
+        $tableheader = array('企业名称','统一社会信用代码','注册地址','经营地址','企业电话','负责人姓名','负责人电话', '法人姓名','法人电话','分支机构数量','当前信用分','信用等级','所属区镇');
         for($i = 0;$i < count($tableheader);$i++) {
             $excel->getActiveSheet()->setCellValue("$letter[$i]3","$tableheader[$i]");
             $excel->getActiveSheet()->getStyle("$letter[$i]3")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
@@ -1274,21 +1290,22 @@ class Manager extends MY_Controller {
         $excel->getActiveSheet()->getColumnDimension("J")->setWidth(18);
         $excel->getActiveSheet()->getColumnDimension("K")->setWidth(18);
         $excel->getActiveSheet()->getColumnDimension("L")->setWidth(18);
+        $excel->getActiveSheet()->getColumnDimension("M")->setWidth(18);
         $data = array();
 
         foreach ($data_res['res_list'] as $k=>$v){
-            $data[] = array($v['company_name'],$v['business_no'],$v['register_path'],$v['business_path'],$v['record_num'],$v['issuing_date'],$v['company_phone']
-            ,$v['director_name'],$v['director_phone'],$v['legal_name'],$v['legal_phone'],$v['fz_num'],$v['total_score'],$v['grade_name']);
+            $data[] = array($v['company_name'],$v['business_no'],$v['register_path'],$v['business_path'],$v['company_phone']
+            ,$v['director_name'],$v['director_phone'],$v['legal_name'],$v['legal_phone'],$v['fz_num'],$v['total_score'],$v['grade_name'],$v['town_name_']);
         }
 
         for ($i = 4;$i <= count($data) + 3;$i++) {
             $j = 0;
             foreach ($data[$i - 4] as $key=>$value) {
                 if($key==1){
-                    $excel->getActiveSheet()->setCellValue("$letter[$j]$i"," $value");
-                    $excel->getActiveSheet()->getStyle("$letter[$j]$i")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
+                    $excel->getActiveSheet()->setCellValue("$letter[$j]"."$i"," $value");
+                    $excel->getActiveSheet()->getStyle("$letter[$j]"."$i")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
                 }else{
-                    $excel->getActiveSheet()->setCellValue("$letter[$j]$i","$value",PHPExcel_Cell_DataType::TYPE_STRING);
+                    $excel->getActiveSheet()->setCellValue("$letter[$j]"."$i","$value",PHPExcel_Cell_DataType::TYPE_STRING);
                 }
                 $j++;
             }
@@ -1321,6 +1338,8 @@ class Manager extends MY_Controller {
         $this->assign('pager', $pager);
         $this->assign('page', $page);
         $this->assign('data', $data);
+        $town_list = $this->c4m_model->get_town(1);
+        $this->assign('town_list', $town_list);
         $this->display('manager/company/company_cancel_list.html');
     }
 
@@ -1358,6 +1377,8 @@ class Manager extends MY_Controller {
         $this->assign('pager', $pager);
         $this->assign('page', $page);
         $this->assign('data', $data);
+        $town_list = $this->c4m_model->get_town(1);
+        $this->assign('town_list', $town_list);
         $this->display('manager/company/company_pass_1_list.html');
     }
 
@@ -1449,6 +1470,8 @@ class Manager extends MY_Controller {
         $this->assign('pager', $pager);
         $this->assign('page', $page);
         $this->assign('data', $data);
+        $town_list = $this->c4m_model->get_town(1);
+        $this->assign('town_list', $town_list);
         $this->display('manager/company/company_pass_2_list.html');
     }
 
@@ -1540,6 +1563,8 @@ class Manager extends MY_Controller {
         $this->assign('pager', $pager);
         $this->assign('page', $page);
         $this->assign('data', $data);
+        $town_list = $this->c4m_model->get_town(1);
+        $this->assign('town_list', $town_list);
         $this->display('manager/company/company_pass_3_list.html');
     }
 
@@ -1571,6 +1596,8 @@ class Manager extends MY_Controller {
         $this->assign('pager', $pager);
         $this->assign('page', $page);
         $this->assign('data', $data);
+        $town_list = $this->c4m_model->get_town(1);
+        $this->assign('town_list', $town_list);
         $this->display('manager/company/company_pass_f1_list.html');
     }
 
@@ -1590,7 +1617,7 @@ class Manager extends MY_Controller {
 
     //重置企业密码
     public function refresh_company_password(){
-        $res = $this->manager_model->refresh_company_password();
+        $res = $this->manager_model->refresh_company_password($this->admin_id);
         $this->ajaxReturn($res);
     }
 

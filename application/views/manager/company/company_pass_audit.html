@@ -370,7 +370,13 @@
                                             {{if $data.status == -1}}<span class="label label-xlg label-warning">审核失败</span>{{/if}}
                                                                             </div>
                                                                         </div>
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 所属区镇 </div>
 
+                                                                            <div class="profile-info-value">
+                                                                                <span>{{$pending_data.t_name_|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
                                                                         <div class="profile-info-row">
                                                                             <div class="profile-info-name"> 分支机构数量 </div>
 
