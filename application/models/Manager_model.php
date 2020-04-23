@@ -1779,7 +1779,7 @@ class Manager_model extends MY_Model
         $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
         $data['flag'] = $this->input->get('flag')?trim($this->input->get('flag')):null;
         $data['town_id'] = $this->input->get('town_id')?trim($this->input->get('town_id')):null;  //保留单个区镇 虽然实际是不使用
-        $data['town_ids'] = $this->input->get('town_ids') ? $this->input->get('town_ids') : array('');
+        $data['town_ids'] = $this->input->get('town_ids');
         //当区镇什么也没有选时就自动取默认
         if(!$data['town_ids']){
             $admin_info = $this->session->userdata('admin_info');
@@ -1787,7 +1787,7 @@ class Manager_model extends MY_Model
             if($admin['group_id'] != 1)
                 $data['town_ids'] = $this->get_admin_t_list($admin_info['admin_id']);
         }
-
+        $data['town_ids'] = $data['town_ids'] ? $data['town_ids'] : array('');
         $this->db->select('count(1) num')->from('company_pending a');
         $this->db->join('town t', 'a.town_id = t.id', 'left');
         if($data['keyword']){
@@ -1798,7 +1798,7 @@ class Manager_model extends MY_Model
         }
         if($data['town_id'])
             $this->db->where('a.town_id', $data['town_id']);
-        //if($data['town_ids'] && is_array($data['town_ids']))
+        if(is_array($data['town_ids']))
             $this->db->where_in('a.town_id', $data['town_ids']);
         if($flag)
             $this->db->where_in('a.flag',$flag);
@@ -1823,7 +1823,7 @@ class Manager_model extends MY_Model
         }
         if($data['town_id'])
             $this->db->where('a.town_id', $data['town_id']);
-        //if($data['town_ids'] && is_array($data['town_ids']))
+        if(is_array($data['town_ids']))
             $this->db->where_in('a.town_id', $data['town_ids']);
         if($flag)
             $this->db->where_in('a.flag',$flag);
@@ -2338,7 +2338,7 @@ class Manager_model extends MY_Model
         $data['keyword'] = $this->input->get('keyword') ? trim($this->input->get('keyword')) : null;
         $data['business_no'] = $this->input->get('business_no') ? trim($this->input->get('business_no')) : null;
         $data['town_id'] = $this->input->get('town_id') ? trim($this->input->get('town_id')) : null; //保留单个区镇 虽然实际是不使用
-        $data['town_ids'] = $this->input->get('town_ids') ? $this->input->get('town_ids') : array('');
+        $data['town_ids'] = $this->input->get('town_ids');
         //当区镇什么也没有选时就自动取默认
         if(!$data['town_ids']){
             $admin_info = $this->session->userdata('admin_info');
@@ -2346,6 +2346,7 @@ class Manager_model extends MY_Model
             if($admin['group_id'] != 1)
                 $data['town_ids'] = $this->get_admin_t_list($admin_info['admin_id']);
         }
+        $data['town_ids'] = $data['town_ids'] ? $data['town_ids'] : array('');
         $this->db->select('count(1) num')->from('company_pass a');
         $this->db->join('company_pending b','b.id = a.company_id','left');
         if($data['keyword']){
@@ -2360,7 +2361,7 @@ class Manager_model extends MY_Model
         if($data['town_id']){
             $this->db->where('b.town_id', $data['town_id']);
         }
-        //if($data['town_ids'] && is_array($data['town_ids']))
+        if(is_array($data['town_ids']))
             $this->db->where_in('b.town_id', $data['town_ids']);
         $num = $this->db->get()->row();
         $data['total_rows'] = $num->num;
@@ -2379,7 +2380,7 @@ class Manager_model extends MY_Model
         if($data['town_id']){
             $this->db->where('b.town_id', $data['town_id']);
         }
-        //if($data['town_ids'] && is_array($data['town_ids']))
+        if(is_array($data['town_ids']))
             $this->db->where_in('b.town_id', $data['town_ids']);
 
         if($status){
