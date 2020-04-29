@@ -1783,8 +1783,8 @@ class Manager_model extends MY_Model
         //当区镇什么也没有选时就自动取默认
         if(!$data['town_ids']){
             $admin_info = $this->session->userdata('admin_info');
-            $admin = $this->get_admin($admin_info['admin_id']);
-            if($admin['group_id'] != 1)
+            //$admin = $this->get_admin($admin_info['admin_id']);
+            //if($admin['group_id'] != 1)
                 $data['town_ids'] = $this->get_admin_t_list($admin_info['admin_id']);
         }
         $data['town_ids'] = $data['town_ids'] ? $data['town_ids'] : array('');
@@ -1850,8 +1850,8 @@ class Manager_model extends MY_Model
         //当区镇什么也没有选时就自动取默认
         if(!$data['town_ids']){
             $admin_info = $this->session->userdata('admin_info');
-            $admin = $this->get_admin($admin_info['admin_id']);
-            if($admin['group_id'] != 1)
+            //$admin = $this->get_admin($admin_info['admin_id']);
+            //if($admin['group_id'] != 1)
                 $data['town_ids'] = $this->get_admin_t_list($admin_info['admin_id']);
         }
         $data['town_ids'] = $data['town_ids'] ? $data['town_ids'] : array('');
@@ -2354,8 +2354,8 @@ class Manager_model extends MY_Model
         //当区镇什么也没有选时就自动取默认
         if(!$data['town_ids']){
             $admin_info = $this->session->userdata('admin_info');
-            $admin = $this->get_admin($admin_info['admin_id']);
-            if($admin['group_id'] != 1)
+            //$admin = $this->get_admin($admin_info['admin_id']);
+            //if($admin['group_id'] != 1)
                 $data['town_ids'] = $this->get_admin_t_list($admin_info['admin_id']);
         }
         $data['town_ids'] = $data['town_ids'] ? $data['town_ids'] : array('');
