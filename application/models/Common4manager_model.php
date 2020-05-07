@@ -368,4 +368,16 @@ class Common4manager_model extends MY_Model
         return $data;
     }
 
+    public function check_company_ns_pass($company_id){
+        $res_ = $this->check_is_ns_time();
+        if($res_['status'] == 1){
+            $ns_info_ = $res_['result'];
+            $check_ = $this->db->from('company_ns_list')->where(array('company_id' => $company_id, 'annual_year' => $ns_info_['annual_year'], 'status' => 2))->get()->row_array();
+            if($check_)
+                return false;
+            return true;
+        }
+        return true;
+    }
+
 }

@@ -67,4 +67,19 @@ class Ajax_api extends CI_Controller {
         exit();
     }
 
+    //判断企业是否存在本年度年审通过的记录
+    public function check_company_ns_pass(){
+        if(!$company_id = $this->input->post('company_id')){
+            echo 1;
+            exit();
+        }
+        $res = $this->c4m_model->check_company_ns_pass($company_id);
+        if($res){
+            echo 1;
+        }else{
+            echo -1;
+        }
+        exit();
+    }
+
 }
