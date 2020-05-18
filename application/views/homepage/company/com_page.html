@@ -89,14 +89,12 @@
             </dl>
             
         </div>
-        <div class="photos">
+        <div class="photos" style="min-height: 10px;margin-bottom: 10px">
            {{if !empty($data.img) }}
              {{foreach from=$data.img key=k item=item}}
-              <span>
-<a class="example-image-link" href="{{$item.img_path}}" data-lightbox="example-set example_num1" data-title="图片资料">
-                <img src="{{$item.img_path}}?imageView2/0/w/200/h/200/q/75|imageslim" />
-</a>
-              </span>
+              <!--<span>
+<a class="example-image-link" href="" data-lightbox="example-set example_num1" data-title="图片资料"><img src="?imageView2/0/w/200/h/200/q/75|imageslim" /></a>
+              </span>-->
           {{/foreach}}
         {{/if}}
       
