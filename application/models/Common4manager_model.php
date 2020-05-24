@@ -380,4 +380,22 @@ class Common4manager_model extends MY_Model
         return true;
     }
 
+    public function update_company_num(){
+        $this->db->select('a.id,a.company_name,c.num,a.record_num');
+        $this->db->from('company_pending a');
+        $this->db->join('company_ns_cert c','a.id = c.company_id and c.status = 1','left');
+        $list = $this->db->get()->result_array();
+        foreach($list as $v){
+            if($v['record_num'])
+                continue;
+            if($v['num']){
+                $this->db->where('id', $v['id'])->update('company_pending',array('record_num' => $v['num']));
+            }else{
+                $record_num = $this->get_record_num();
+                $this->db->where('id', $v['id'])->update('company_pending',array('record_num' => $record_num));
+            }
+        }
+        echo 1;
+    }
+
 }

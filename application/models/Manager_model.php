@@ -1812,9 +1812,10 @@ class Manager_model extends MY_Model
         $data['total_rows'] = $num->num;
 
         //获取详细列
-        $this->db->select('a.*, b.grade_name,t.name town_name_')->from('company_pending a');
+        $this->db->select('a.*, b.grade_name,t.name town_name_,t.s_name s_town_name_,max(start_date) start_date, max(end_date) end_date')->from('company_pending a');
         $this->db->join('company_grade b', 'a.grade_no = b.grade_no', 'left');
         $this->db->join('town t', 'a.town_id = t.id', 'left');
+        $this->db->join('company_ns_cert c','a.id = c.company_id and c.status = 1','left');
         if($data['keyword']){
             $this->db->group_start();
             $this->db->like('a.company_name', $data['keyword']);
@@ -1835,6 +1836,7 @@ class Manager_model extends MY_Model
         if(in_array(-1, $flag))
             $this->db->order_by('a.cancel_date','desc');
         $this->db->order_by('a.cdate','desc');
+        $this->db->group_by('a.id');
         $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
         $data['res_list'] = $this->db->get()->result_array();
         return $data;
@@ -1940,7 +1942,7 @@ class Manager_model extends MY_Model
             'company_phone'=>trim($this->input->post('company_phone')),
             'director_name'=>trim($this->input->post('director_name')),
             'director_phone'=>trim($this->input->post('director_phone')),
-            'record_num' => trim($this->input->post('record_num')),
+            //'record_num' => trim($this->input->post('record_num')),
             'fz_num' => trim($this->input->post('fz_num')),
             'legal_name'=>trim($this->input->post('legal_name')),
             'legal_phone'=>trim($this->input->post('legal_phone')),
@@ -2025,6 +2027,7 @@ class Manager_model extends MY_Model
             $this->db->where(array('id' => $company_id))->update('company_pending', $data);
         }else{
             $data['username'] = $this->get_username();
+            $data['record_num'] = $this->get_record_num();
             $this->db->insert('company_pending', $data);
             $company_id = $this->db->insert_id();
         }
