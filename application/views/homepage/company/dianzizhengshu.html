@@ -99,7 +99,7 @@ var _html,choosepeo,_peohtml;
     <div class="dl-div">
         <dl class="dl-txt">
             <dt>证书编号：</dt>
-            <dd><span>{{$data.num}}</span></dd>
+            <dd><span>{{$data.record_num}}</span></dd>
         </dl>
         <dl class="dl-txt">
             <dt>公司名称：</dt>
@@ -114,7 +114,7 @@ var _html,choosepeo,_peohtml;
             <span class="ewm"><img src="/home/qr_code_raw/{{$data.company_id}}" alt="" width="130" height="130"></span>
             <div class="sq-div">
                 <p class="p-txt2">授权单位：昆山市住房和城乡建设局</p>
-                <p class="p-txt2">授权日期：{{$data.start_date}} ~ {{$data.end_date}}</p>
+                <p class="p-txt2">授权日期：{{$data.start_date|date_format:'%Y.%m.%d'}} ~ {{$data.end_date|date_format:'%Y.%m.%d'}}</p>
             </div>
             <div class="gaizhang"><img src="/assets/dzzs/i/gaizhang.png" alt="" width="120" height="120" /></div>
         </div>

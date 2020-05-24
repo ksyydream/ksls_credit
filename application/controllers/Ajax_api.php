@@ -82,4 +82,14 @@ class Ajax_api extends CI_Controller {
         exit();
     }
 
+    public function update_company_num(){
+        $res = $this->c4m_model->update_company_num();
+        if($res){
+            echo 1;
+        }else{
+            echo -1;
+        }
+        exit();
+    }
+
 }

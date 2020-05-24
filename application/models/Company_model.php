@@ -99,8 +99,9 @@ class Company_model extends MY_Model
     }
 
     public function get_cert($ns_id, $company_id){
-        $this->db->select('a.*')->from('company_ns_cert a');
+        $this->db->select('a.*,c.record_num')->from('company_ns_cert a');
         $this->db->join('company_ns_list b','a.ns_id = b.id','inner');
+        $this->db->join('company_pending c','a.company_id = c.id','left');
         $this->db->where(array('a.status' => 1, 'a.company_id' => $company_id, 'a.ns_id' => $ns_id, 'b.status' => 2));
         $data = $this->db->get()->row_array();
         return $data;

@@ -726,6 +726,16 @@ class MY_Model extends CI_Model{
         return $username;
     }
 
+    //获取备案号,20200524 备案号用于在生成的证书上显示,因新需求是 证书编号不变
+    public function get_record_num(){
+        $title_ = 'KS';
+        $record_num = $title_ . sprintf('%04s', $this->get_sys_num_auto($title_));
+        $check = $this->db->select('id')->from('company_pending')->where('record_num',$record_num)->order_by('id','desc')->get()->row_array();
+        if($check)
+            $record_num = $this->get_record_num();
+        return $record_num;
+    }
+
     //获取企业当前的经纪人人数，因为使用的地方比较多，写成公共方法
     public function get_agent_num4company($company_id){
          $this->db->select('count(1) num')->from('agent a');
@@ -1016,14 +1026,17 @@ class MY_Model extends CI_Model{
         $pass_info = $this->db->select('company_id, status, annual_date,tj_date')->from('company_pass')->where(array('id' => $pass_id))->get()->row_array();
         if(!$pass_info)
             return false;
-        $title_ = 'KS';
+        $title_ = 'KFQ';
         //通过企业ID查找到当前的名称,企业pass内也有,但还是直接获取company_pending 内的
-        $pending_info = $this->db->select('company_name, legal_name')->from('company_pending')->where(array('id' => $pass_info['company_id']))->get()->row_array();
+        $pending_info = $this->db->select('a.company_name, a.legal_name,b.code')->from('company_pending a')
+            ->join('town b','a.town_id = b.id','left')
+            ->where(array('a.id' => $pass_info['company_id']))->get()->row_array();
         if(!$pending_info)
             return false;
         $cert_insert_['company_name']   = $pending_info['company_name'];
         $cert_insert_['legal_name']     = $pending_info['legal_name'];
         $cert_insert_['company_id']     = $pass_info['company_id'];
+        $title_ = $pending_info['code'] ? $pending_info['code'] : 'KFQ';
         //通过年审时间 获取年审记录信息,如果年审记录是失败 只删除可能存在的证书,如果年审记录是成功,就再继续操作
         $annual_info_ = $this->db->select('*')->from('company_ns_list')->where(array('annual_year' => $pass_info['annual_date'], 'company_id' => $pass_info['company_id']))->get()->row_array();
         if(!$annual_info_)
