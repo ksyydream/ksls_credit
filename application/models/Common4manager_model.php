@@ -381,6 +381,7 @@ class Common4manager_model extends MY_Model
     }
 
     public function update_company_num(){
+        die();
         $this->db->select('a.id,a.company_name,c.num,a.record_num');
         $this->db->from('company_pending a');
         $this->db->join('company_ns_cert c','a.id = c.company_id and c.status = 1','left');
