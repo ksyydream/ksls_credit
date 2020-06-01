@@ -314,7 +314,7 @@
             this.$magnify.append(loadHTML);
             self.$image.attr('src', imgSrc);
             //imgSrc = './images/b1.png';
-            imgSrc = '/manager_statics/app/cj4img/images/b1.jpg';
+            //imgSrc = '/manager_statics/app/cj4img/images/b1.jpg';
             self.imageData = {
                 originalWidth: 800,
                 originalHeight: 450
