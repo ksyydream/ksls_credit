@@ -187,7 +187,43 @@
 
                             </div>
 
+                            <h4 class="blue">
+                                <i class="green ace-icon fa fa-list bigger-110"></i>
+                                个人证件照
+                            </h4>
+                            <div class="space-8"></div>
+                            <div class="form-group">
 
+                                <div class="col-sm-9">
+                                    <a href="javascript:" class="btn btn-white btn-xs btn-primary" onclick="triggerFileUpload(3)">上 传</a>
+
+
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+
+
+                                <div class="col-sm-10">
+
+                                    <ul id="uploadImgcontainer3" class="ace-thumbnails clearfix"  style="width: 95%">
+                                        {{if !empty($data.person_img_list) }}
+                                        {{foreach from=$data.person_img_list item=item}}
+                                        <li>
+                                            <a href="{{$item.img}}" title="个人证件照" data-rel="colorbox">
+                                                <img src="{{$item.img}}?imageView2/0/w/200/h/200/q/75|imageslim" alt="" style="height: 120px">
+                                            </a>
+                                            <span class="delete-this" onclick="del_pic(this);"><i></i></span>
+                                            <input type="hidden" name="pic_short3[]" class="pic_short" value="{{$item.img}}">
+
+                                        </li>
+                                        {{/foreach}}
+                                        {{/if}}
+                                    </ul>
+
+                                </div>
+
+                            </div>
                             <div class="col-md-offset-2 col-md-9">
                                 <button id="save_btn" class="btn btn-info" type="button">
 
@@ -259,6 +295,9 @@
             case 2:
                 action =   'agent_job_pic';
                 break;
+            case 3:
+                action =   'agent_person_pic';
+                break;
             default:
                 alert("调用失败!");
                 return false;
@@ -302,6 +341,10 @@
             case 2:
                 action =   'agent_job_pic';
                 img_name_ =   '执业证图片';
+                break;
+            case 3:
+                action =   'agent_person_pic';
+                img_name_ =   '个人证件照';
                 break;
             default:
                 alert("调用失败!");

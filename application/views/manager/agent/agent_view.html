@@ -181,7 +181,23 @@
 
                                           </ul>
                         
-                        </form>
+                        </form>             <h4 class="blue">
+                                        <i class="green ace-icon fa fa-list bigger-110"></i>
+                                        个人证件照
+                                            </h4>
+                                        <ul class="ace-thumbnails clearfix">
+                                            {{if !empty($data.person_img_list) }}
+                                            {{foreach from=$data.person_img_list key=k item=item}}
+                                            <li>
+                                                <a class="example-image-link" href="{{$item.img}}" data-lightbox="example_num3" data-title="经纪人执业证图片">
+                                                    <img width="150" height="150" alt="150x150" src="{{$item.img}}?imageView2/0/w/200/h/200/q/75|imageslim" />
+                                                </a>
+                                            </li>
+
+                                            {{/foreach}}
+                                            {{/if}}
+
+                                        </ul>
                                     </div>
                                 </div>
                           

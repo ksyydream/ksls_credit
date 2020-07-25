@@ -528,6 +528,7 @@ class Manager_model extends MY_Model
             return $detail;
         $detail['code_img_list'] = $this->db->select()->from('agent_code_img')->where('agent_id', $id)->get()->result_array();
         $detail['job_img_list'] = $this->db->select()->from('agent_job_img')->where('agent_id', $id)->get()->result_array();
+        $detail['person_img_list'] = $this->db->select()->from('agent_person_img')->where('agent_id', $id)->get()->result_array();
         return $detail;
     }
 
@@ -593,6 +594,19 @@ class Manager_model extends MY_Model
                     'm_img' => $pic . '?imageView2/0/w/200/h/200/q/75|imageslim'
                 );
                 $this->db->insert('agent_job_img', $job_pic);
+            }
+        }
+
+        $this->db->delete('agent_person_img', array('agent_id' => $id));
+        $pic_short_job = $this->input->post('pic_short3');
+        if($pic_short_job){
+            foreach($pic_short_job as $idx => $pic) {
+                $job_pic = array(
+                    'agent_id' => $id,
+                    'img' => $pic,
+                    'm_img' => $pic . '?imageView2/0/w/200/h/200/q/75|imageslim'
+                );
+                $this->db->insert('agent_person_img', $job_pic);
             }
         }
 
