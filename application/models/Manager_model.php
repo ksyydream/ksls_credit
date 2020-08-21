@@ -1791,6 +1791,7 @@ class Manager_model extends MY_Model
         $data['limit'] = $this->limit;
         //搜索条件
         $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
+        $data['zz_status'] = $this->input->get('zz_status')?trim($this->input->get('zz_status')):null;
         $data['flag'] = $this->input->get('flag')?trim($this->input->get('flag')):null;
         $data['town_id'] = $this->input->get('town_id')?trim($this->input->get('town_id')):null;  //保留单个区镇 虽然实际是不使用
         $data['town_ids'] = $this->input->get('town_ids');
@@ -1810,6 +1811,8 @@ class Manager_model extends MY_Model
             $this->db->or_like('a.business_no', $data['keyword']);
             $this->db->group_end();
         }
+        if($data['zz_status'])
+            $this->db->where('a.zz_status', $data['zz_status']);
         if($data['town_id'])
             $this->db->where('a.town_id', $data['town_id']);
         if(is_array($data['town_ids']))
@@ -1838,6 +1841,8 @@ class Manager_model extends MY_Model
         }
         if($data['town_id'])
             $this->db->where('a.town_id', $data['town_id']);
+        if($data['zz_status'])
+            $this->db->where('a.zz_status', $data['zz_status']);
         if(is_array($data['town_ids']))
             $this->db->where_in('a.town_id', $data['town_ids']);
         if($flag)
@@ -1860,6 +1865,7 @@ class Manager_model extends MY_Model
     public function company_pending_list_all($flag = array(), $status = array()){
         //获取详细列
         $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
+        $data['zz_status'] = $this->input->get('zz_status')?trim($this->input->get('zz_status')):null;
         $data['flag'] = $this->input->get('flag')?trim($this->input->get('flag')):null;
         $data['town_id'] = $this->input->get('town_id')?trim($this->input->get('town_id')):null;
         $data['town_ids'] = $this->input->get('town_ids');
@@ -1881,6 +1887,8 @@ class Manager_model extends MY_Model
         }
         if($data['town_id'])
             $this->db->where('a.town_id', $data['town_id']);
+        if($data['zz_status'])
+            $this->db->where('a.zz_status', $data['zz_status']);
         if(is_array($data['town_ids']))
             $this->db->where_in('a.town_id', $data['town_ids']);
         if($flag)
@@ -1905,6 +1913,8 @@ class Manager_model extends MY_Model
         }
         if($data['town_id'])
             $this->db->where('a.town_id', $data['town_id']);
+        if($data['zz_status'])
+            $this->db->where('a.zz_status', $data['zz_status']);
         if(is_array($data['town_ids']))
             $this->db->where_in('a.town_id', $data['town_ids']);
         if($flag)
