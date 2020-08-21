@@ -182,4 +182,91 @@ class Command_model extends MY_Model
         }
     }
 
+    public function upload_agent()
+    {
+        require_once(APPPATH . 'libraries/PHPExcel/PHPExcel.php');
+        require_once(APPPATH . 'libraries/PHPExcel/PHPExcel/IOFactory.php');
+        $ext_ = ".xlsx";
+        $uploadfile = './upload_files/upload_agent_temp/agent_temp.xlsx';//获取上传成功的Excel
+        if ($ext_ == ".xlsx") {
+            $objReader = PHPExcel_IOFactory::createReader('Excel2007');
+        } else {
+            $objReader = PHPExcel_IOFactory::createReader('Excel5');
+        }
+
+        //use excel2007 for 2007 format 注意 linux下需要大小写区分 填写Excel2007   //xlsx使用2007,其他使用Excel5
+        $objPHPExcel = $objReader->load($uploadfile);//加载目标Excel
+        // 处理企业信息
+        $sheet = $objPHPExcel->getSheet(0);//读取第一个sheet
+
+        $highestRow = $sheet->getHighestRow(); // 取得总行数
+        $letter = array(0, 1, 2, 3, 4);
+        $tableheader = array('序号', '执业证号', '姓名', '手机号', '身份证号');
+        for ($i = 0; $i < count($tableheader); $i++) {
+            $record_hear_name = trim((string)$sheet->getCellByColumnAndRow($letter[$i], 1)->getValue());
+            if ($record_hear_name != $tableheader[$i]) {
+                return "第" . ($letter[$i] + 1) . "列不是 " . $tableheader[$i] . '!';
+            }
+        }
+        echo '共' . $highestRow . '条';
+        echo "\n";
+        for ($row = 2; $row <= $highestRow; $row++) {
+            echo "$row";
+            echo "\n";
+            $data_insert = array(
+                'job_code'      => trim((string)$sheet->getCellByColumnAndRow(1, $row)->getValue()),
+                'name'          => trim((string)$sheet->getCellByColumnAndRow(2, $row)->getValue()),
+                'phone'         => trim((string)$sheet->getCellByColumnAndRow(3, $row)->getValue()),
+                'card'          => trim((string)$sheet->getCellByColumnAndRow(4, $row)->getValue()),
+                'old_job_code'  => "",
+                'flag'          => 2,
+                'pwd'           => sha1("666666"),
+                'cdate'         => date('Y-m-d H:i:s', time()),
+            );
+            $data_insert['card'] = strtoupper($data_insert['card']);
+            $data_insert['score'] = $this->config->item('agent_score');
+            $chenk_job = $this->db->select()->from('agent')->where('job_code', $data_insert['job_code'])->get()->row_array();
+            $chenk_card = $this->db->select()->from('agent')->where('card', $data_insert['card'])->get()->row_array();
+            if($chenk_job)
+                continue;
+            if($chenk_card)
+                continue;
+            $this->db->insert('agent', $data_insert);
+            $id = $this->db->insert_id();
+            //这里开始获取图片
+            $this->upload_agent_img($id, $data_insert['card'], 'agent_code_img', 'a');
+            $this->upload_agent_img($id, $data_insert['card'], 'agent_job_img', 'b');
+            $this->upload_agent_img($id, $data_insert['card'], 'agent_person_img', 'c');
+            //$this->handle_agent_flag($id);
+        }
+
+        return true;
+
+    }
+
+    public function upload_agent_img($agent_id, $card, $table, $img_type){
+        //$card = strtoupper($card);
+        $path = './upload_files/upload_agent_temp/images/' . $card . '/' . $img_type;///当前目录
+        $handle = opendir($path); //当前目录
+        while (false !== ($file = readdir($handle))) { //遍历该php文件所在目录
+
+            list($filesname,$kzm)=explode(".",$file);//获取扩展名
+
+            if($kzm=="png" or $kzm=="jpg" or $kzm=="JPG") { //文件过滤
+
+                if (!is_dir('./'.$file)) { //文件夹过滤
+                    $flag_time = md5(time().mt_rand(100000,999999));
+                    $file_url_ = $this->save_qiniu('ksls2credit', $card . '/' . $img_type . '/' . $file ,'upload_agent_temp/images', $flag_time);
+                    $code_pic = array(
+                        'agent_id' => $agent_id,
+                        'img' => $file_url_,
+                        'm_img' => $file_url_ . '?imageView2/0/w/200/h/200/q/75|imageslim'
+                    );
+                    $this->db->insert($table, $code_pic);
+                }
+            }
+        }
+        return true;
+    }
+
 }

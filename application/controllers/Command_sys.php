@@ -39,4 +39,10 @@ class Command_sys extends MY_Controller {
     	$this->command_model->handle_agent_grade();
     	$this->command_model->handle_company_ns();
     }
+
+	//index.php Command_sys upload_agent
+	public function upload_agent(){
+		$this->command_model->upload_agent();
+		echo '运行结束';
+	}
 }
