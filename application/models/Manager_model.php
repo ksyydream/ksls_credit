@@ -474,6 +474,140 @@ class Manager_model extends MY_Model
 
     /**
      *********************************************************************************************
+     * 以下代码为从业人员管理
+     *********************************************************************************************
+     */
+
+    public function employees_list($page = 1){
+        $data['limit'] = $this->limit;
+        //搜索条件
+        $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
+        $data['flag'] = $this->input->get('flag')?trim($this->input->get('flag')):null;
+        //获取总记录数
+        $this->db->select('count(1) num')->from('employees a');
+        //$this->db->join('company_pending b','a.company_id = b.id','left');
+        //$this->db->join('company_pass c','b.id = c.company_id','left');
+        if($data['keyword']){
+            $this->db->group_start();
+            $this->db->like('a.name', $data['keyword']);
+            $this->db->or_like('a.employees_code', $data['keyword']);
+            $this->db->group_end();
+        }
+        if($data['flag']){
+            $this->db->where('a.flag', $data['flag']);
+        }
+        $num = $this->db->get()->row();
+        $data['total_rows'] = $num->num;
+
+        //获取详细列
+        $this->db->select('a.*, b.company_name')->from('employees a');
+        $this->db->join('company_pending b','a.company_id = b.id','left');
+        //$this->db->join('company_pass c','b.id = c.company_id','left');
+        if($data['keyword']){
+            $this->db->group_start();
+            $this->db->like('a.name', $data['keyword']);
+            $this->db->or_like('a.employees_code', $data['keyword']);
+            $this->db->group_end();
+        }
+        if($data['flag']){
+            $this->db->where('a.flag', $data['flag']);
+        }
+        $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
+        $this->db->order_by('a.id','desc');
+        $data['res_list'] = $this->db->get()->result_array();
+        return $data;
+    }
+
+    public function employees_edit($id){
+        $this->db->select('a.*, b.company_name')->from('employees a');
+        $this->db->join('company_pending b','a.company_id = b.id','left');
+        $this->db->where('a.id',$id);
+        $detail =  $this->db->get()->row_array();
+        if(!$detail)
+            return $detail;
+        $detail['code_img_list'] = $this->db->select()->from('employees_code_img')->where('employees_id', $id)->get()->result_array();
+        $detail['person_img_list'] = $this->db->select()->from('employees_person_img')->where('employees_id', $id)->get()->result_array();
+        return $detail;
+    }
+
+    public function employees_save(){
+        $data = array(
+            'name'=>trim($this->input->post('name')),
+            'phone'=>trim($this->input->post('phone')) ? trim($this->input->post('phone')) : "",
+            'employees_code'=>trim($this->input->post('employees_code')),
+            'flag' => $this->input->post('flag'),
+            'card'=>trim($this->input->post('card')) ? trim($this->input->post('card')) : "",
+            'pwd'=>sha1("123456"),
+            'cdate' => date('Y-m-d H:i:s', time()),
+        );
+        $id = $this->input->post('id');
+        if(!$data['name'] || !$data['employees_code'] || !$data['flag'] || !$data['card']){
+            return $this->fun_fail('缺少必要信息!');
+        }
+        if($id){
+            $chenk_job = $this->db->select()->from('employees')->where('employees_code', $data['employees_code'])->where('id <>', $id)->get()->row_array();
+            $chenk_card = $this->db->select()->from('employees')->where('card', $data['card'])->where('id <>', $id)->get()->row_array();
+            if($chenk_job)
+                return $this->fun_fail('此职业证号已存在!');
+            if($chenk_card)
+                return $this->fun_fail('此身份证号已存在!');
+            unset($data['pwd']);
+            unset($data['cdate']);
+            //这里还需要判断 如果是离昆或者无效时 需要解绑公司,解绑公司后可能会让公司状态变更 得分产生变化
+            $this->db->where('id', $id)->update('employees', $data);
+        }else{
+            $chenk_job = $this->db->select()->from('employees')->where('employees_code', $data['employees_code'])->get()->row_array();
+            $chenk_card = $this->db->select()->from('employees')->where('card', $data['card'])->get()->row_array();
+            if($chenk_job)
+                return $this->fun_fail('此职业证号已存在!');
+            if($chenk_card)
+                return $this->fun_fail('此身份证号已存在!');
+            //增加经纪人初始信用分
+            $data['score'] = $this->config->item('employees_score');
+            $this->db->insert('employees', $data);
+            $id = $this->db->insert_id();
+        }
+        //保存 身份证照片和执业证照片
+        $this->db->delete('employees_code_img', array('employees_id' => $id));
+        $pic_short_code = $this->input->post('pic_short1');
+        if($pic_short_code){
+            foreach($pic_short_code as $idx => $pic) {
+                $code_pic = array(
+                    'employees_id' => $id,
+                    'img' => $pic,
+                    'm_img' => $pic . '?imageView2/0/w/200/h/200/q/75|imageslim'
+                );
+                $this->db->insert('employees_code_img', $code_pic);
+            }
+        }
+
+        $this->db->delete('employees_person_img', array('employees_id' => $id));
+        $pic_short_job = $this->input->post('pic_short3');
+        if($pic_short_job){
+            foreach($pic_short_job as $idx => $pic) {
+                $job_pic = array(
+                    'employees_id' => $id,
+                    'img' => $pic,
+                    'm_img' => $pic . '?imageView2/0/w/200/h/200/q/75|imageslim'
+                );
+                $this->db->insert('employees_person_img', $job_pic);
+            }
+        }
+        return $this->fun_success('保存成功!');
+    }
+
+    //重置经纪人密码
+    public function refresh_employees_password(){
+        $employees_id = $this->input->post('id');
+        $employees_code = $this->input->post('employees_code');
+        if(!$employees_id || !$employees_code)
+            return $this->fun_fail('信息缺失!');
+        $this->db->where(array('id' => $employees_id, 'employees_code' => $employees_code))->update('employees', array('pwd' => sha1('123456')));
+        return $this->fun_success('重置成功!');
+    }
+
+    /**
+     *********************************************************************************************
      * 以下代码为经纪人管理
      *********************************************************************************************
      */

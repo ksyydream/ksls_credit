@@ -370,6 +370,78 @@ class Manager extends MY_Controller {
         $this->session->sess_destroy();
         redirect(base_url('/manager_login/index'));
     }
+    /**
+     *********************************************************************************************
+     * 以下代码为从业人员管理
+     *********************************************************************************************
+     */
+
+    /**
+     * 从业人员列表
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function employees_list($page = 1){
+        $data = $this->manager_model->employees_list($page);
+        $base_url = "/manager/employees_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('manager/employees/employees_list.html');
+    }
+
+    /**
+     * 从业人员新增页面
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function employees_add(){
+        $this->assign('f_user_id', $this->admin_id);
+        $this->assign('time', time());
+        $this->display('manager/employees/employees_detail.html');
+    }
+
+    public function employees_edit($m_id){
+        $data = $this->manager_model->employees_edit($m_id);
+        if(!$data){
+            $this->show_message('未找到执业经纪人信息!');
+        }
+        $this->assign('f_user_id', $this->admin_id);
+        $this->assign('time', time());
+        $this->assign('data', $data);
+        $this->display('manager/employees/employees_detail.html');
+    }
+
+    /**
+     * 从业人员保存页面
+     * @author yangyang
+     * @date 2019-11-09
+     */
+    public function employees_save(){
+        $res = $this->manager_model->employees_save();
+        if($res['status'] == 1){
+            $this->show_message($res['msg'], site_url('/manager/employees_list'));
+        }else{
+            $this->show_message($res['msg']);
+        }
+    }
+
+    public function employees_view($m_id){
+        $data = $this->manager_model->employees_edit($m_id);
+        if(!$data){
+            $this->show_message('未找到执业经纪人信息!');
+        }
+        $this->assign('data', $data);
+        $this->display('manager/employees/employees_view.html');
+    }
+
+    //重置从业人员密码
+    public function refresh_employees_password(){
+        $res = $this->manager_model->refresh_employees_password();
+        $this->ajaxReturn($res);
+    }
+
 
     /**
      *********************************************************************************************

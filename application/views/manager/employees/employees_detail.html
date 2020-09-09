@@ -1,0 +1,425 @@
+{{include file='manager/public/head.html'}}
+<body class="no-skin">
+{{include file='manager/public/header.html'}}
+<link rel="stylesheet" href="/manager_statics/qwadmin/css/colorbox.css"/>
+<div class="main-container" id="main-container">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('main-container', 'fixed')
+        } catch (e) {
+        }
+    </script>
+    <style>
+        pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+        .string { color: green; }
+        .number { color: darkorange; }
+        .boolean { color: blue; }
+        .null { color: magenta; }
+        .key { color: red; }
+    </style>
+    <style>
+        #uploadImgcontainer1 li{
+
+        }
+
+        #uploadImgcontainer2 li{
+
+        }
+    </style>
+    {{include file='manager/public/sidebar.html'}}
+    <div class="main-content">
+        <div class="main-content-inner">
+            <!-- #section:basics/content.breadcrumbs -->
+            {{include file='manager/public/breadcrumbs.html'}}
+
+            <!-- /section:basics/content.breadcrumbs -->
+            <div class="page-content">
+                {{include file='manager/public/set.html'}}
+
+                <!-- /section:settings.box -->
+                <div class="row">
+                    <div class="col-xs-12">
+                        <!-- PAGE CONTENT BEGINS -->
+                        <form id="save_form" class="form-horizontal" role="form" action="/manager/employees_save" method="post">
+                            <input type="hidden" name="id" value="{{$data.id|default:''}}">
+                            <input type="hidden" name="folder" value="{{$time}}" id="folder">
+                            <h4 class="blue">
+                                <i class="green ace-icon fa fa-list bigger-110"></i>
+                                从业人员基本信息
+                            </h4>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="name"> 姓名 </label>
+                                <div class="col-sm-9">
+                                    <input type="text" id="name" name="name" required="required" class="rcol-xs-10 col-sm-5" value="{{$data.name|default:''}}">
+                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                </div>
+                            </div>
+                            {{if $data.id|default:'' != ''}}
+                            <div class="space-4"></div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="employees_code"> 从业编号 </label>
+                                <div class="col-sm-9">
+                                    <input type="text" id="employees_code" readonly="readonly" class="col-xs-10 col-sm-5" value="{{$data.employees_code|default:''}}">
+                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                </div>
+                            </div>
+                            {{/if}}
+
+                            <div class="space-4"></div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="card"> 身份证号 </label>
+                                <div class="col-sm-9">
+                                    <input type="text" id="card" name="card" required="required" class="rcol-xs-10 col-sm-5 js4IDcard" value="{{$data.card|default:''}}">
+                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                </div>
+                            </div>
+
+                            <div class="space-4"></div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="phone"> 联系电话 </label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="phone" id="phone" class="rcol-xs-10 col-sm-5" value="{{$data.phone|default:''}}">
+                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                </div>
+                            </div>
+                            {{if $data.id|default:'' != ''}}
+                            <div class="space-4"></div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="company_id"> 从业机构 </label>
+                                <div class="col-sm-9">
+                                    <input type="text" id="company_id" readonly="readonly" class="col-xs-10 col-sm-5" value="{{$data.company_name|default:''}}">
+                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                </div>
+                            </div>
+                            {{/if}}
+
+                            <div class="space-4"></div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="flag"> 状态 </label>
+                                <div class="col-sm-9 yy_m_7">
+                                    <input type="radio" name="flag" {{if $data.flag|default:'' == 2}}checked="checked"{{/if}}  value="2" >有效&nbsp;&nbsp;&nbsp;
+                                    <input type="radio" name="flag" {{if $data.flag|default:'' == -1}}checked="checked"{{/if}}  value="-1" >无效&nbsp;&nbsp;&nbsp;
+                                    <input type="radio" name="flag" {{if $data.flag|default:'' == 1}}checked="checked"{{/if}}  value="1" >离昆&nbsp;&nbsp;&nbsp;
+                                    <span class="lbl"></span>
+
+                                </div>
+
+                            </div>
+                            <h4 class="blue">
+                                <i class="green ace-icon fa fa-list bigger-110"></i>
+                                上传身份证图片
+                            </h4>
+                            <div class="space-8"></div>
+                            <div class="form-group">
+
+                                <div class="col-sm-9">
+                                    <a href="javascript:" class="btn btn-white btn-xs btn-primary" onclick="triggerFileUpload(1)">上 传</a>
+
+
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+
+
+                                <div class="col-sm-10">
+
+                                    <ul id="uploadImgcontainer1" class="ace-thumbnails clearfix"  style="width: 95%">
+                                        {{if !empty($data.code_img_list) }}
+                                        {{foreach from=$data.code_img_list item=item}}
+                                        <li>
+                                            <a href="{{$item.img}}" title="身份证图片" data-rel="colorbox">
+                                            <img src="{{$item.img}}?imageView2/0/w/200/h/200/q/75|imageslim" alt="" style="height: 120px">
+                                                </a>
+                                            <span class="delete-this" onclick="del_pic(this);"><i></i></span>
+                                            <input type="hidden" name="pic_short1[]" class="pic_short" value="{{$item.img}}">
+
+                                        </li>
+                                        {{/foreach}}
+                                        {{/if}}
+                                    </ul>
+
+                                </div>
+
+                            </div>
+
+
+
+                            <h4 class="blue">
+                                <i class="green ace-icon fa fa-list bigger-110"></i>
+                                个人证件照
+                            </h4>
+                            <div class="space-8"></div>
+                            <div class="form-group">
+
+                                <div class="col-sm-9">
+                                    <a href="javascript:" class="btn btn-white btn-xs btn-primary" onclick="triggerFileUpload(3)">上 传</a>
+
+
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+
+
+                                <div class="col-sm-10">
+
+                                    <ul id="uploadImgcontainer3" class="ace-thumbnails clearfix"  style="width: 95%">
+                                        {{if !empty($data.person_img_list) }}
+                                        {{foreach from=$data.person_img_list item=item}}
+                                        <li>
+                                            <a href="{{$item.img}}" title="个人证件照" data-rel="colorbox">
+                                                <img src="{{$item.img}}?imageView2/0/w/200/h/200/q/75|imageslim" alt="" style="height: 120px">
+                                            </a>
+                                            <span class="delete-this" onclick="del_pic(this);"><i></i></span>
+                                            <input type="hidden" name="pic_short3[]" class="pic_short" value="{{$item.img}}">
+
+                                        </li>
+                                        {{/foreach}}
+                                        {{/if}}
+                                    </ul>
+
+                                </div>
+
+                            </div>
+                            <div class="col-md-offset-2 col-md-9">
+                                <button id="save_btn" class="btn btn-info" type="button">
+
+                                    <i class="icon-ok bigger-110"></i>
+
+                                    保 存
+
+                                </button>
+                                &nbsp; &nbsp; &nbsp;
+                                <a href="/manager/employees_list" class="btn" type="reset">
+
+                                    <i class="icon-undo bigger-110"></i>
+
+                                    返 回
+
+                                </a>
+                            </div>
+                        </form>
+                        <!-- PAGE CONTENT ENDS -->
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.page-content -->
+        </div>
+    </div><!-- /.main-content -->
+    {{include file='manager/public/footer.html'}}
+
+</div><!-- /.main-container -->
+
+{{include file='manager/public/footerjs.html'}}
+<!-- inline scripts related to this page -->
+
+<!--plupload start--------------------------------------------------------------------------->
+<!-- Load plupload and all it's runtimes and finally the UI widget -->
+<link rel="stylesheet" href="/manager_statics/plupload/js/jquery.ui.plupload/css/jquery.ui.plupload.css" type="text/css" />
+<!-- production -->
+<script type="text/javascript" src="/manager_statics/plupload/js/plupload.full.min.js"></script>
+<script type="text/javascript" src="/manager_statics/plupload/js/zh_CN.js"></script>
+<script type="text/javascript" src="/manager_statics/plupload/js/jquery.ui.plupload/jquery.ui.plupload.js"></script>
+<!--plupload END--------------------------------------------------------------------------->
+
+<!-- inline scripts related to this page -->
+<script src="/manager_statics/qwadmin/js/date-time/bootstrap-datepicker.js"></script>
+<script src="/manager_statics/app/ajaxfileupload.js"></script>
+<script src="/manager_statics/qwadmin/js/jquery.colorbox.js"></script>
+
+<!-- ace scripts -->
+<script src="/manager_statics/qwadmin/js/ace-elements.js"></script>
+<script type="text/javascript">
+    function triggerFileUpload(flag) {
+        var data_ = "{{$f_user_id}}_{{$time}}_" +  Math.floor(Math.random()*(9000)+1000);
+        $("#folder").val(data_);
+        var html = '<div id="uploader" style="width:550px;"><p>Your browser doesn\'t have Flash, Silverlight or HTML5 support.</p></div>';
+
+        var layerIndex = layer.confirm(html, {
+            offset: ['100px', (document.body.offsetWidth - 800) / 2],
+            maxWidth: 800,
+            btn: ['确定','取消'],
+            shade: false
+        }, function(){
+            uploadFile(flag);
+            layer.close(layerIndex);
+        }, function(){
+        });
+        var action = '';
+        switch (flag){
+            case 1:
+                action =   'employees_code_pic';
+                break;
+            case 3:
+                action =   'employees_person_pic';
+                break;
+            default:
+                alert("调用失败!");
+                return false;
+        }
+        $("#uploader").plupload({
+            runtimes : 'html5,flash,silverlight',
+            url : "/manager_login/save_pics/" + action + "/" + $("#folder").val(),
+            max_file_size : '50mb',
+            resize : { crop: true },
+            file_data_name: 'userfile',
+            filters : [],
+            filters: {
+                mime_types : [{
+                    title : "Image files",
+                    extensions : "jpg,gif,png,jpeg"
+                }],
+                max_file_size : '8024kb',
+                prevent_duplicates : true
+            },
+            rename: true,
+            sortable: true,
+            dragdrop: true,
+            views: {
+                list: true,
+                thumbs: true,
+                active: 'thumbs'
+            },
+            flash_swf_url : '/manager_statics/plupload/js/Moxie.swf',
+            silverlight_xap_url : '/manager_statics/plupload/js/Moxie.xap'
+        });
+    }
+
+    function uploadFile(flag) {
+        var action = '';
+        var img_name_ = '';
+        switch (flag){
+            case 1:
+                action =   'employees_code_pic';
+                img_name_ =   '身份证图片';
+                break;
+            case 3:
+                action =   'employees_person_pic';
+                img_name_ =   '个人证件照';
+                break;
+            default:
+                alert("调用失败!");
+                return false;
+        }
+        if ($('#uploader').plupload('getFiles').length < 1) {
+            alert("图片未上传,请重新选择.");
+            return false;
+        } else {
+            $.getJSON("/manager_login/get_pics/" + action + "/" + $("#folder").val() +  "/?_=" + Math.random(), function(data){
+                var html = '';
+                var now_pic = [];
+                $('input[name="pic_short' + flag.toString() + '[]"]').each(function(index){
+                    now_pic[index] = $(this).val();
+                });
+
+                $.each(data.img,function(index,item){
+                    var path = item + '?imageView2/0/w/200/h/200/q/75|imageslim';
+                    if($.inArray(item, now_pic) < 0){
+                        html += '<li><a href="' + item + '" title="' + img_name_ + '" data-rel="colorbox"><img src="' + path + '" alert="" style="height: 120px" /></a>';
+                        html += '<span class="delete-this" onclick="del_pic(this);"><i></i></span>';
+                        html += '<input type="hidden" name="pic_short' + flag.toString() + '[]" class="pic_short" value="' + item + '">';
+                        //html += '<input type="hidden" name="folder[]" value="'+ $("#folder").val() +'">';
+                        html += '</li>';
+                    }
+                });
+                $("#uploadImgcontainer" + flag.toString()).append(html);
+
+
+                var $overflow = '';
+                var colorbox_params = {
+                    rel: 'colorbox',
+                    reposition:true,
+                    scalePhotos:true,
+                    scrolling:false,
+                    previous:'<i class="ace-icon fa fa-arrow-left"></i>',
+                    next:'<i class="ace-icon fa fa-arrow-right"></i>',
+                    close:'&times;',
+                    current:'{current} of {total}',
+                    maxWidth:'100%',
+                    maxHeight:'100%',
+                    onOpen:function(){
+                        $overflow = document.body.style.overflow;
+                        document.body.style.overflow = 'hidden';
+                    },
+                    onClosed:function(){
+                        document.body.style.overflow = $overflow;
+                    },
+                    onComplete:function(){
+                        $.colorbox.resize();
+                    }
+                };
+
+                $('.ace-thumbnails [data-rel="colorbox"]').unbind('colorbox').colorbox(colorbox_params);
+            });
+            return true;
+        }
+    }
+
+    function del_pic(obj) {
+        var layerIndex = layer.confirm('是否删除此图片,图片操作只在保存后生效', {
+            btn: ['确定','取消'], //按钮
+            area: ['300px', 'auto']
+        }, function(){
+            $(obj).parent().remove();
+            layer.close(layerIndex);
+        },function(){
+
+        });
+    }
+
+
+    $("#save_btn").click(function(){
+        var name = $.trim($("#name").val());
+        if(name == "" ) {
+            layer.msg('姓名不能为空', {icon: 2});
+            return false;
+        }
+        var card = $.trim($("#card").val());
+        if(card == "" ) {
+            layer.msg('身份证不能为空', {icon: 2});
+            return false;
+        }
+        var flag = $("input[name='flag']:checked").val();
+        if(flag == null){
+            layer.msg('请选择状态!', {icon: 3});
+            return false;
+        }
+        $("#save_form").submit();
+    })
+
+
+</script>
+</body>
+</html>
+<script type="text/javascript">
+    jQuery(function($) {
+        var $overflow = '';
+        var colorbox_params = {
+            rel: 'colorbox',
+            reposition:true,
+            scalePhotos:true,
+            scrolling:false,
+            previous:'<i class="ace-icon fa fa-arrow-left"></i>',
+            next:'<i class="ace-icon fa fa-arrow-right"></i>',
+            close:'&times;',
+            current:'{current} of {total}',
+            maxWidth:'100%',
+            maxHeight:'100%',
+            onOpen:function(){
+                $overflow = document.body.style.overflow;
+                document.body.style.overflow = 'hidden';
+            },
+            onClosed:function(){
+                document.body.style.overflow = $overflow;
+            },
+            onComplete:function(){
+                $.colorbox.resize();
+            }
+        };
+
+        $('.ace-thumbnails [data-rel="colorbox"]').unbind('colorbox').colorbox(colorbox_params);
+
+    })
+</script>
