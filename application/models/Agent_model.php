@@ -30,9 +30,9 @@ class Agent_model extends MY_Model
     if(!$pwd = trim($this->input->post('userpwd'))){
         return $this->fun_fail('密码不能为空!');
     }
-
+    //20200914 登录改为 身份证登录
     $this->db->select()->from('agent')->where(array(
-            'job_code'=>$job_code,
+            'card'=>$job_code,
             'pwd'=>sha1($pwd)
     ));
     $res = $this->db->get()->row_array();
