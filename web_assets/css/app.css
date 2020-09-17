@@ -291,7 +291,7 @@ input:-ms-input-placeholder{  color:#b2b2b2;}i{font-style:normal;}
 
 
 .logining{position: relative;}
-.login-list{position: absolute;top:36px; right: 0;width:150px;background: #fff;box-shadow:2px 2px 5px #d6dde7; }
+.login-list{position: absolute;top:36px; right: 0;width:160px;background: #fff;box-shadow:2px 2px 5px #d6dde7; }
 .login-list li{text-align: left;margin:0 10px;border-bottom: 1px solid #ccc; line-height: 30px;height: 30px;}
 .login-list li:last-child{border:none;}
 .login-list li a{color: #666;padding:0 15px; display: inline-block; font-size: 14px;}
