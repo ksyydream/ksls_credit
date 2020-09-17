@@ -377,6 +377,20 @@ class Manager extends MY_Controller {
      *********************************************************************************************
      */
 
+    //查看经纪人证书
+    public function get_cert4agent($agent_id){
+        $this->load->model('agent_model');
+        $data = $this->agent_model->get_detail4self($agent_id);
+        if(!$data)
+            redirect('/home/index');
+        $this->assign('data', $data);
+        $show_person_ = '';
+        if($data['person_img_list'])
+            $show_person_ = $data['person_img_list'][0]['img'];
+        $this->assign('show_person_', $show_person_);
+        $this->display('homepage/agent/dianzizhengshu.html');
+    }
+
 
     /**
      * 执业经纪人列表
