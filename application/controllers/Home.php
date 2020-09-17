@@ -224,5 +224,11 @@ class Home extends Home_Controller {
         require_once (APPPATH . 'libraries/phpqrcode/phpqrcode.php');
         QRcode::png('http://'.$_SERVER['SERVER_NAME'] . '/mobile/mobile_get_company_detail?c_id=' . $c_id);
     }
+
+    public function qr_code_raw4agent($job_code)
+    {
+        require_once (APPPATH . 'libraries/phpqrcode/phpqrcode.php');
+        QRcode::png('http://'.$_SERVER['SERVER_NAME'] . '/mobile/mobile_get_agent_detail?job_code=' . $job_code);
+    }
 	
 }

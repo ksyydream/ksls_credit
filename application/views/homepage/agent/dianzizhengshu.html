@@ -98,21 +98,27 @@ var _html,choosepeo,_peohtml;
 <div class="wrap">
     <div class="congratulate-div">
         <div class="dianzizhengshu">
-            <div class="show_pic"><img src="assets/i/img1.jpg" width="160" height="210" /></div>
+            <div class="show_pic">
+                {{if $show_person_ != ''}}
+                <img src="{{$show_person_}}?imageView2/0/w/200/h/200/q/75|imageslim" width="160" height="210" />
+                {{else}}
+                <img src="/assets/dzzs/i/default.jpeg" width="160" height="210" />
+                {{/if}}
+            </div>
             <div class="dl-div">
                 <dl class="dl-txt">
                     <dt>姓    名：</dt>
-                    <dd><span>陈静</span></dd>
+                    <dd><span>{{$data.name}}</span></dd>
                 </dl>
                 <dl class="dl-txt">
                     <dt>证书编号：</dt>
-                    <dd><span>191306</span></dd>
+                    <dd><span>{{$data.job_code}}</span></dd>
                 </dl>
                 <dl class="dl-txt">
                     <dt>身份证号：</dt>
-                    <dd><span>000000000000000000</span></dd>
+                    <dd><span>{{$data.card}}</span></dd>
                 </dl>
-                <img src="assets/i/erweima.jpg" width="108" height="108"><!-- 二维码-->
+                <img src="/home/qr_code_raw/{{$data.job_code}}" width="108" height="108"><!-- 二维码-->
 
             </div>
         </div>

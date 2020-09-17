@@ -55,6 +55,9 @@ class Agent_model extends MY_Model
         $this->db->join('company_pending b', 'a.company_id = b.id', 'left');
         $this->db->where('a.id', $id);
         $data = $this->db->get()->row_array();
+        if(!$data)
+            return $data;
+        $data['person_img_list'] = $this->db->select()->from('agent_person_img')->where('agent_id', $id)->get()->result_array();
         return $data;
     }
 
