@@ -211,6 +211,8 @@ class Command_model extends MY_Model
         echo '共' . $highestRow . '条';
         echo "\n";
         for ($row = 2; $row <= $highestRow; $row++) {
+            $this->db->close();
+            $this->db->initialize();
             echo "$row";
             echo "\n";
             $data_insert = array(
