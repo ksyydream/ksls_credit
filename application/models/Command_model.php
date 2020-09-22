@@ -245,8 +245,12 @@ class Command_model extends MY_Model
     }
 
     public function upload_agent_img($agent_id, $card, $table, $img_type){
+        if(!is_dir('./upload_files/upload_agent_temp/images/' . $card))
+            return false;
         //$card = strtoupper($card);
         $path = './upload_files/upload_agent_temp/images/' . $card . '/' . $img_type;///当前目录
+        if(!is_dir($path))
+            return false;
         $handle = opendir($path); //当前目录
         while (false !== ($file = readdir($handle))) { //遍历该php文件所在目录
 
