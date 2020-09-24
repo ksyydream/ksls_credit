@@ -174,4 +174,9 @@ class Agent_model extends MY_Model
         $this->db->where(array('id' => $agent_id))->update('agent', array('pwd' => sha1($new_password)));
         return $this->fun_success('修改成功，请重新登录!');
     }
+
+    public function get_detail4power($agent_id){
+        $agent_detail = $this->read('agent',$agent_id);
+        return $agent_detail;
+    }
 }

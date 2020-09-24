@@ -90,6 +90,8 @@ class Agent extends Home_Controller {
 	}
 
 	public function get_cert(){
+		if($this->is_whow_agent_cert_ != 1)
+			redirect('/home/index');
 		$data = $this->agent_model->get_detail4self($this->agent_id);
 		if(!$data)
 			redirect('/home/index');

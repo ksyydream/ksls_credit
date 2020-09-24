@@ -383,6 +383,12 @@ class Manager extends MY_Controller {
         $data = $this->agent_model->get_detail4self($agent_id);
         if(!$data)
             redirect('/home/index');
+        //判断是否可以生成证书
+        if($data && strlen($data['job_code']) == 6 && in_array(substr($data['job_code'],0,2), array('20','19'))) {
+
+        }else{
+            redirect('/home/index');
+        }
         $this->assign('data', $data);
         $show_person_ = '';
         if($data['person_img_list'])
