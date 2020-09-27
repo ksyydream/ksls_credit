@@ -483,6 +483,7 @@ class Manager_model extends MY_Model
         //搜索条件
         $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
         $data['flag'] = $this->input->get('flag')?trim($this->input->get('flag')):null;
+        $data['work_status_'] = $this->input->get('work_status_')?trim($this->input->get('work_status_')):null;
         //获取总记录数
         $this->db->select('count(1) num')->from('agent a');
         //$this->db->join('company_pending b','a.company_id = b.id','left');
@@ -495,6 +496,12 @@ class Manager_model extends MY_Model
         }
         if($data['flag']){
             $this->db->where('a.flag', $data['flag']);
+        }
+        if($data['work_status_']){
+            if($data['work_status_'] == -1)
+                $this->db->where('a.company_id', -1);
+            if($data['work_status_'] == 1)
+                $this->db->where('a.company_id >', -1);
         }
         $num = $this->db->get()->row();
         $data['total_rows'] = $num->num;
@@ -511,6 +518,12 @@ class Manager_model extends MY_Model
         }
         if($data['flag']){
             $this->db->where('a.flag', $data['flag']);
+        }
+        if($data['work_status_']){
+            if($data['work_status_'] == -1)
+                $this->db->where('a.company_id', -1);
+            if($data['work_status_'] == 1)
+                $this->db->where('a.company_id >', -1);
         }
         $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
         $this->db->order_by('a.id','desc');
