@@ -552,12 +552,13 @@ class Manager_model extends MY_Model
             'job_code'=>trim($this->input->post('job_code')),
             'old_job_code'=>trim($this->input->post('old_job_code')),
             'flag' => $this->input->post('flag'),
+            'work_type' => $this->input->post('work_type'),
             'card'=>trim($this->input->post('card')) ? trim($this->input->post('card')) : "",
             'pwd'=>sha1("666666"),
             'cdate' => date('Y-m-d H:i:s', time()),
         );
         $id = $this->input->post('id');
-        if(!$data['name'] || !$data['job_code'] || !$data['flag'] || !$data['card']){
+        if(!$data['name'] || !$data['job_code'] || !$data['flag'] || !$data['card'] || !$data['work_type']){
             return $this->fun_fail('缺少必要信息!');
         }
         if($id){
