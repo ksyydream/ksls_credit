@@ -729,7 +729,7 @@ class MY_Model extends CI_Model{
     //自动生成 从业编号
     public function get_job_num(){
         $title_ = 'SZ';
-        $num_ = $title_ . sprintf('%07s', $this->get_sys_num_auto($title_));
+        $num_ = $title_ . '_9' . sprintf('%07s', $this->get_sys_num_auto($title_));
         $check = $this->db->select('id')->from('agent')->where('job_num', $num_)->order_by('id','desc')->get()->row_array();
         if($check)
             $num_ = $this->get_job_num();
@@ -750,6 +750,8 @@ class MY_Model extends CI_Model{
     public function get_agent_num4company($company_id){
          $this->db->select('count(1) num')->from('agent a');
         $this->db->where('flag', 2);
+        //20200928 只计算持证经纪人人数, 也就是不包含 从业人员
+        $this->db->where('work_type', 1);
         $this->db->where('grade_no >', 1);
         $this->db->where('company_id', $company_id);
         $num = $this->db->get()->row();

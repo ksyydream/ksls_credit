@@ -484,6 +484,7 @@ class Manager_model extends MY_Model
         $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
         $data['flag'] = $this->input->get('flag')?trim($this->input->get('flag')):null;
         $data['work_status_'] = $this->input->get('work_status_')?trim($this->input->get('work_status_')):null;
+        $data['work_type'] = $this->input->get('work_type')?trim($this->input->get('work_type')):null;
         //获取总记录数
         $this->db->select('count(1) num')->from('agent a');
         //$this->db->join('company_pending b','a.company_id = b.id','left');
@@ -492,10 +493,14 @@ class Manager_model extends MY_Model
             $this->db->group_start();
             $this->db->like('a.name', $data['keyword']);
             $this->db->or_like('a.job_code', $data['keyword']);
+            $this->db->or_like('a.job_num', $data['keyword']);
             $this->db->group_end();
         }
         if($data['flag']){
             $this->db->where('a.flag', $data['flag']);
+        }
+        if($data['work_type']){
+            $this->db->where('a.work_type', $data['work_type']);
         }
         if($data['work_status_']){
             if($data['work_status_'] == -1)
@@ -514,10 +519,14 @@ class Manager_model extends MY_Model
             $this->db->group_start();
             $this->db->like('a.name', $data['keyword']);
             $this->db->or_like('a.job_code', $data['keyword']);
+            $this->db->or_like('a.job_num', $data['keyword']);
             $this->db->group_end();
         }
         if($data['flag']){
             $this->db->where('a.flag', $data['flag']);
+        }
+        if($data['work_type']){
+            $this->db->where('a.work_type', $data['work_type']);
         }
         if($data['work_status_']){
             if($data['work_status_'] == -1)
@@ -644,10 +653,10 @@ class Manager_model extends MY_Model
      //重置经纪人密码
     public function refresh_agent_password(){
         $agent_id = $this->input->post('id');
-        $job_code = $this->input->post('job_code');
-        if(!$agent_id || !$job_code)
+        $job_num = $this->input->post('job_num');
+        if(!$agent_id || !$job_num)
             return $this->fun_fail('信息缺失!');
-        $this->db->where(array('id' => $agent_id, 'job_code' => $job_code))->update('agent', array('pwd' => sha1('666666')));
+        $this->db->where(array('id' => $agent_id, 'job_num' => $job_num))->update('agent', array('pwd' => sha1('666666')));
         return $this->fun_success('重置成功!');
     }
 
