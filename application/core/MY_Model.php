@@ -726,6 +726,16 @@ class MY_Model extends CI_Model{
         return $username;
     }
 
+    //自动生成 从业编号
+    public function get_job_num(){
+        $title_ = 'SZ';
+        $num_ = $title_ . sprintf('%07s', $this->get_sys_num_auto($title_));
+        $check = $this->db->select('id')->from('agent')->where('job_num', $num_)->order_by('id','desc')->get()->row_array();
+        if($check)
+            $num_ = $this->get_job_num();
+        return $num_;
+    }
+
     //获取备案号,20200524 备案号用于在生成的证书上显示,因新需求是 证书编号不变
     public function get_record_num(){
         $title_ = 'KS';

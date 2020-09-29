@@ -558,13 +558,24 @@ class Manager_model extends MY_Model
             'cdate' => date('Y-m-d H:i:s', time()),
         );
         $id = $this->input->post('id');
-        if(!$data['name'] || !$data['job_code'] || !$data['flag'] || !$data['card'] || !$data['work_type']){
+        if(!$data['name'] || !$data['flag'] || !$data['card'] || !$data['work_type']){
             return $this->fun_fail('缺少必要信息!');
         }
+
+        if($data['work_type'] != 1){
+            //如果不是执业经纪人 就去掉执业证号传入
+            $data['job_code'] = '';
+        }else{
+            if(!$data['job_code']){
+                return $this->fun_fail('缺少必要信息!');
+            }
+        }
+
         if($id){
             $chenk_job = $this->db->select()->from('agent')->where('job_code', $data['job_code'])->where('id <>', $id)->get()->row_array();
             $chenk_card = $this->db->select()->from('agent')->where('card', $data['card'])->where('id <>', $id)->get()->row_array();
-            if($chenk_job)
+            //只有当是 执业经纪人时才做执业证号唯一判断
+            if($chenk_job && $data['work_type'] == 1)
                 return $this->fun_fail('此职业证号已存在!');
             if($chenk_card)
                 return $this->fun_fail('此身份证号已存在!');
@@ -575,12 +586,14 @@ class Manager_model extends MY_Model
         }else{
             $chenk_job = $this->db->select()->from('agent')->where('job_code', $data['job_code'])->get()->row_array();
             $chenk_card = $this->db->select()->from('agent')->where('card', $data['card'])->get()->row_array();
-            if($chenk_job)
+            //只有当是 执业经纪人时才做执业证号唯一判断
+            if($chenk_job && $data['work_type'] == 1)
                 return $this->fun_fail('此职业证号已存在!');
             if($chenk_card)
                 return $this->fun_fail('此身份证号已存在!');
             //增加经纪人初始信用分
             $data['score'] = $this->config->item('agent_score');
+            $data['job_num'] = $this->get_job_num();
             $this->db->insert('agent', $data);
             $id = $this->db->insert_id();
         }
