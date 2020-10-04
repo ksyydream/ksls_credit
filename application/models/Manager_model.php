@@ -2043,7 +2043,7 @@ class Manager_model extends MY_Model
         //if($check_num_['status'] != 1)
             //return $this->fun_fail('备案号已占用!');
         //检查执业证号是否可用或者重复
-        $code_ = $this->input->post('agent_job_code');
+        $code_ = $this->input->post('new_agent_id');
         $check_repeat_agent_ = $this->c4m_model->check_repeat_agent($company_id, $code_);
         if($check_repeat_agent_['status'] != 1)
             return $this->fun_fail($check_repeat_agent_['msg']);
@@ -2051,8 +2051,8 @@ class Manager_model extends MY_Model
         $save4track_old = array();
         //判断如果是新增的 先判断下经纪人数量
         if(!$this->input->post('company_id')){
-            if(count($code_) < 3)
-                return $this->fun_fail('新增报备时,经纪人不能小于三人!');
+            if($check_repeat_agent_['result']['job_code_count'] < 3)
+                return $this->fun_fail('新增报备时,持证经纪人不能小于三人!');
         }else{
             $check_company_flag_ = $this->db->select('flag')->from('company_pending')->where('id',$company_id)->order_by('id','desc')->get()->row_array();
             if(!$check_company_flag_)
@@ -2091,20 +2091,23 @@ class Manager_model extends MY_Model
             $this->db->insert('company_pending', $data);
             $company_id = $this->db->insert_id();
         }
-        //处理经纪人
-        $this->db->where('company_id',$company_id)->update('agent',array('company_id' => -1, 'wq' => 1));
-        $arr_agent_job_code = $this->input->post('agent_job_code');
-        $arr_agent_wq = $this->input->post('setwq');
-        $arr_agent_company_id = array(
-            'company_id' => $company_id,
-        );
-        if ($arr_agent_job_code && is_array($arr_agent_job_code)) {
-            foreach($arr_agent_job_code as $idx => $pic) {
-                $update_data4agent_ = $arr_agent_company_id;
-                $update_data4agent_['wq'] = $arr_agent_wq[$idx];
-                $this->db->where('job_code',$pic)->where('flag',2)->update('agent', $update_data4agent_);
+        //处理经纪人 20201004经纪人批量操作只在 新增时有效
+        if(!$this->input->post('company_id')){
+            $this->db->where('company_id',$company_id)->update('agent',array('company_id' => -1, 'wq' => 1));
+            $arr_new_agent_id = $this->input->post('new_agent_id');
+            $arr_agent_wq = $this->input->post('setwq');
+            $arr_agent_company_id = array(
+                'company_id' => $company_id,
+            );
+            if ($arr_new_agent_id && is_array($arr_new_agent_id)) {
+                foreach($arr_new_agent_id as $idx => $pic) {
+                    $update_data4agent_ = $arr_agent_company_id;
+                    $update_data4agent_['wq'] = $arr_agent_wq[$idx];
+                    $this->db->where('id',$pic)->where('flag',2)->update('agent', $update_data4agent_);
+                }
             }
         }
+
        
         //处理图片
         $this->db->delete('company_pending_img', array('company_id' => $company_id));
@@ -2131,6 +2134,7 @@ class Manager_model extends MY_Model
         //判断如果是新增的 就自动提报年审
         if(!$this->input->post('company_id'))
             $this->save_pass_company($company_id);
+
         $this->save_company_total_score($company_id);
         $this->db->trans_complete();//------结束事务
         if ($this->db->trans_status() === FALSE) {

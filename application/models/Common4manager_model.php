@@ -102,7 +102,10 @@ class Common4manager_model extends MY_Model
         $this->db->from('agent a');
         $this->db->join('company_pending b', 'a.company_id = b.id', 'left');
         $this->db->join('agent_grade c', 'a.grade_no = c.grade_no', 'left');
+        $this->db->group_start();
         $this->db->where('a.job_code', $job_code);
+        $this->db->or_where('a.job_num', $job_code);
+        $this->db->group_end();
         $this->db->where('a.flag', 2);
         return $this->db->get()->row_array();
     }
@@ -225,6 +228,7 @@ class Common4manager_model extends MY_Model
         }
     }
 
+    //20201004 原本配合check_repeat_agent做job_code判断,因引入从业人员编号,暂不使用
     public function check_code4get($job_code, $company_id = -1){
         if(!$job_code)
              return $this->fun_fail('执业证号异常!');
@@ -242,24 +246,45 @@ class Common4manager_model extends MY_Model
         }
     }
 
+    public function check_agent_id4get($agent_id, $company_id = -1){
+        if(!$agent_id)
+            return $this->fun_fail('信息异常!');
+        $this->db->select('*')->from('agent');
+        $this->db->where('id',$agent_id);
+        $this->db->where('flag',2);
+        $this->db->where('grade_no >', 1);
+        $agent_detail =  $this->db->get()->row_array();
+        if(!$agent_detail)
+            return $this->fun_fail('人员状态异常!');
+        if($agent_detail['company_id']==-1 || $agent_detail['company_id'] == $company_id){
+            return $this->fun_success('可以使用!', $agent_detail);
+        }else{
+            return $this->fun_fail('人员不可操作!');
+        }
+    }
+
     //检查重复和不规范的经纪人，用于企业信息保存和提交
-    public function check_repeat_agent($company_id = null, $code_ = array()){
-        if ($code_ && is_array($code_)) {
-            foreach($code_ as $idx => $card_) {
-            $check_card = $this->check_code4get(trim($card_), $company_id);
+    //20201004 因经纪人表中除持证经纪人外,增加从业人员,此人员没有执业证号,所以现判断不可使用执业证号判断,改为直接用id
+    public function check_repeat_agent($company_id = null, $ids_ = array()){
+        $result_ = array('job_code_count' => 0);
+        if ($ids_ && is_array($ids_)) {
+            foreach($ids_ as $idx => $agent_id_) {
+            $check_card = $this->check_agent_id4get(trim($agent_id_), $company_id);
             if($check_card['status'] != 1){
                  return $this->fun_fail($check_card['msg']);
             }else{
-                foreach($code_ as $idx2 => $card_2) {
+                if($check_card['result']['work_type'] == 1)
+                    $result_['job_code_count'] += 1;
+                foreach($ids_ as $idx2 => $agent_id_2_) {
                     //$card_2 = trim($card_2);
-                    if($idx != $idx2 && trim($card_) == trim($card_2)) {
+                    if($idx != $idx2 && trim($agent_id_) == trim($agent_id_2_)) {
                         return $this->fun_fail('存在重复录入执业经纪人!');
                     }
                 }
             }
             }
         }
-        return $this->fun_success('可以使用!');
+        return $this->fun_success('可以使用!', $result_);
     }
 
     //检查审核状态是否按照规则执行

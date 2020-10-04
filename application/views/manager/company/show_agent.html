@@ -1,6 +1,7 @@
 <div class="profile-user-info profile-user-info-striped">
     <input type="hidden" id="insert_agent_id_" value="{{$data.id|default:''}}">
     <input type="hidden" id="insert_agent_name_" value="{{$data.name|default:''}}">
+    <input type="hidden" id="insert_agent_job_num_" value="{{$data.job_num|default:''}}">
     <input type="hidden" id="insert_agent_job_code_" value="{{$data.job_code|default:''}}">
     <input type="hidden" id="insert_agent_card_" value="{{$data.card|default:''}}">
     <input type="hidden" id="insert_agent_phone_" value="{{$data.phone|default:''}}">
@@ -9,6 +10,15 @@
 
                                                                             <div class="profile-info-value">
                                                                                 <span>{{$data.name|default:''}}</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="profile-info-row">
+                                                                            <div class="profile-info-name"> 从业编号 </div>
+
+                                                                            <div class="profile-info-value">
+                                                                                <i class="fa fa-thumb-tack light-orange bigger-110"></i>
+                                                                                <span>{{$data.job_num|default:''}}</span>
                                                                             </div>
                                                                         </div>
 
@@ -95,15 +105,18 @@
     $("#insert_btn_agent_").click(function(){
         var insert_agent_phone_ = $("#insert_agent_phone_").val();
         var insert_agent_job_code_ = $("#insert_agent_job_code_").val();
+        var insert_agent_job_num_ = $("#insert_agent_job_num_").val();
         var insert_agent_card_ = $("#insert_agent_card_").val();
         var insert_agent_name_ = $("#insert_agent_name_").val();
         var insert_agent_id_ = $("#insert_agent_id_").val();
         var html_ = ' <tr>';
         html_ += '<td>' + insert_agent_name_ + '</td>';
         html_ += '<td>' + insert_agent_job_code_ + '</td>';
+        html_ += '<td>' + insert_agent_job_num_ + '</td>';
          html_ += '<td>' + insert_agent_card_ + '</td>';
           html_ += '<td>' + insert_agent_phone_ + '</td>';
             html_ += '<td><input type="hidden" name="setwq[]" value="1"><input name="ckwq[]" type="checkbox" /></td><td>';
+        html_ += '<input type="hidden" name="agent_job_num[]" value="' + insert_agent_job_num_ + '">';
           html_ += '<input type="hidden" name="agent_job_code[]" value="' + insert_agent_job_code_ + '">';
            html_ += ' <input type="hidden" name="new_agent_id[]" value="' + insert_agent_id_ + '"><a href="javascript:void(0);" dataid="" class="delete_yy_"><i class="ace-icon fa fa-trash bigger-100 red"></i>删除</a>';
         html_ += ' <a target="_blank" href="/manager/agent_view/' + insert_agent_id_ + '" class=""><i class="ace-icon fa fa-book bigger-100 blue"></i>详情</a></td>'
