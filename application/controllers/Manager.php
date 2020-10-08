@@ -1308,8 +1308,15 @@ class Manager extends MY_Controller {
         $this->ajaxReturn($res);
     }
     //企业人员删除
-
+    public function company_pending_delete_agent(){
+        $res = $this->manager_model->company_pending_delete_agent($this->admin_id);
+        $this->ajaxReturn($res);
+    }
     //企业人员设置网签
+    public function company_pending_wq_agent(){
+        $res = $this->manager_model->company_pending_wq_agent($this->admin_id);
+        $this->ajaxReturn($res);
+    }
 
     public function company_pending_down_excel(){
         $data_res = $this->manager_model->company_pending_list_all(array(1,2));

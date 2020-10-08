@@ -1972,6 +1972,7 @@ class Manager_model extends MY_Model
     public function company_pending_temp($company_id, $page = 1){
         $data['company_id'] = $company_id;
         $data['limit'] = $this->limit;
+        //$data['limit'] = 5;
         //搜索条件
         $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
 
@@ -2007,7 +2008,7 @@ class Manager_model extends MY_Model
         if($data['work_type']){
             $this->db->where('a.work_type', $data['work_type']);
         }
-        $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
+        $this->db->limit($data['limit'], $offset = ($page - 1) * $data['limit']);
         $this->db->order_by('a.last_work_time,a.id','desc');
         $data['res_list'] = $this->db->get()->result_array();
         return $data;
@@ -2045,6 +2046,60 @@ class Manager_model extends MY_Model
             return $this->fun_fail('保存失败!');
         } else {
             return $this->fun_success('保存成功!');
+        }
+    }
+
+    //企业人员删除
+    public function company_pending_delete_agent($admin_id){
+        if(!$company_id = $this->input->post('company_id'))
+            return $this->fun_fail('企业信息丢失!');
+        $company_info = $this->company_pending_edit($company_id);
+        if(!$company_info || $company_info['flag'] == -1)
+            return $this->fun_fail('企业信息异常!');
+        if(!$agent_id = $this->input->post('agent_id'))
+            return $this->fun_fail('人员信息丢失!');
+        $res_check_town_ = $this->check_admin_townByCompany_id($admin_id, $company_id);
+        if(!$res_check_town_)
+            return $this->fun_fail('不可操作此区镇下的企业!');
+        //将人员从企业中删除
+        $this->db->trans_start();//--------开始事务
+        $update_rows_ = $this->db->where(array('id' => $agent_id, 'company_id' => $company_id))->update('agent',array('company_id' => -1, 'wq' => 1, 'last_work_time' => time()));
+        //人员加入企业后需要做两个操作
+        //1.更新企业信用分数
+        $this->save_company_total_score($company_id);
+        //2.添加人员轨迹
+        if($update_rows_){
+            $this->save_agent_track4common($agent_id, $company_id, -1, 2);
+        }
+        $this->db->trans_complete();//------结束事务
+        if ($this->db->trans_status() === FALSE) {
+            return $this->fun_fail('保存失败!');
+        } else {
+            return $this->fun_success('保存成功!');
+        }
+    }
+
+    public function company_pending_wq_agent($admin_id){
+        if(!$company_id = $this->input->post('company_id'))
+            return $this->fun_fail('企业信息丢失!');
+        $company_info = $this->company_pending_edit($company_id);
+        if(!$company_info || $company_info['flag'] == -1)
+            return $this->fun_fail('企业信息异常!');
+        if(!$agent_id = $this->input->post('agent_id'))
+            return $this->fun_fail('人员信息丢失!');
+        $res_check_town_ = $this->check_admin_townByCompany_id($admin_id, $company_id);
+        if(!$res_check_town_)
+            return $this->fun_fail('不可操作此区镇下的企业!');
+        $agent_info_ = $this->db->from('agent')->where('id', $agent_id)->get()->row_array();
+        if(!$agent_info_ || $agent_info_['flag'] != 2)
+            return $this->fun_fail('人员信息异常!');
+        if($agent_info_['work_type'] != 1)
+            return $this->fun_fail('非持证经纪人不可设置网签!');
+        $update_rows_ = $this->db->where(array('id' => $agent_id, 'company_id' => $company_id))->update('agent',array('wq' => 2));
+        if($update_rows_){
+            return $this->fun_success('操作成功!');
+        }else{
+            return $this->fun_fail('操作失败!');
         }
     }
 
