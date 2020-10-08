@@ -1195,7 +1195,7 @@ class MY_Model extends CI_Model{
         $data['img'] = $this->db->get()->result_array();
         if($data['img'])
             $this->db->insert_batch('company_log_img',$data['img']);
-        $this->db->select("id agent_id,name,phone,job_code,card,company_id,{$log_id} log_id,wq,old_job_code")->from('agent');
+        $this->db->select("id agent_id,name,phone,job_code,card,company_id,{$log_id} log_id,wq,old_job_code,work_type,job_num")->from('agent');
         $this->db->where('company_id',$company_id);
         $data['agent'] = $this->db->get()->result_array();
         if($data['agent'])

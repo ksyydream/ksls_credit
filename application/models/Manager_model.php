@@ -62,6 +62,7 @@ class Manager_model extends MY_Model
         $action_new = str_replace('_add', '_list', $action_new);
         $action_new = str_replace('_view', '_list', $action_new);
         $action_new = str_replace('_audit', '_list', $action_new);
+        $action_new = str_replace('_temp', '_list', $action_new);
         $this->db->select('s.id,s.title,s.name,s.tips,s.pid,p.pid as ppid,p.title as ptitle');
         $this->db->from('auth_rule s');
         $this->db->join('auth_rule p', 'p.id = s.pid', 'left');
@@ -746,7 +747,7 @@ class Manager_model extends MY_Model
                 }else{
                     $new_company_info_ = array('id' => -1, 'company_name' => null);
                 }
-                $this->db->where('id', $apply_info['agent_id'])->update('agent', array('company_id' => $apply_info['new_company_id'], 'wq' => 1));
+                $this->db->where('id', $apply_info['agent_id'])->update('agent', array('company_id' => $apply_info['new_company_id'], 'wq' => 1,'last_work_time' => time()));
                 $this->db->where('id', $id)->update('agent_apply', array(
                     'status' => 2,
                     'sdate' => date('Y-m-d H:i:s', time())
@@ -1967,6 +1968,86 @@ class Manager_model extends MY_Model
         return $data;
     }
 
+    //企业人员列表
+    public function company_pending_temp($company_id, $page = 1){
+        $data['company_id'] = $company_id;
+        $data['limit'] = $this->limit;
+        //搜索条件
+        $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
+
+        $data['work_type'] = $this->input->get('work_type')?trim($this->input->get('work_type')):null;
+        //获取总记录数
+        $this->db->select('count(1) num')->from('agent a');
+        if($data['keyword']){
+            $this->db->group_start();
+            $this->db->like('a.name', $data['keyword']);
+            $this->db->or_like('a.job_code', $data['keyword']);
+            $this->db->or_like('a.job_num', $data['keyword']);
+            $this->db->group_end();
+        }
+        $this->db->where('a.company_id', $company_id);
+        if($data['work_type']){
+            $this->db->where('a.work_type', $data['work_type']);
+        }
+        $num = $this->db->get()->row();
+        $data['total_rows'] = $num->num;
+
+        //获取详细列
+        $this->db->select('a.*, b.company_name')->from('agent a');
+        $this->db->join('company_pending b','a.company_id = b.id','left');
+        //$this->db->join('company_pass c','b.id = c.company_id','left');
+        if($data['keyword']){
+            $this->db->group_start();
+            $this->db->like('a.name', $data['keyword']);
+            $this->db->or_like('a.job_code', $data['keyword']);
+            $this->db->or_like('a.job_num', $data['keyword']);
+            $this->db->group_end();
+        }
+        $this->db->where('a.company_id', $company_id);
+        if($data['work_type']){
+            $this->db->where('a.work_type', $data['work_type']);
+        }
+        $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
+        $this->db->order_by('a.last_work_time,a.id','desc');
+        $data['res_list'] = $this->db->get()->result_array();
+        return $data;
+    }
+
+    //企业人员添加
+    public function company_pending_add_agent($admin_id){
+        if(!$company_id = $this->input->post('company_id'))
+            return $this->fun_fail('企业信息丢失!');
+        $company_info = $this->company_pending_edit($company_id);
+        if(!$company_info || $company_info['flag'] == -1)
+            return $this->fun_fail('企业信息异常!');
+        if(!$agent_id = $this->input->post('agent_id'))
+            return $this->fun_fail('人员信息丢失!');
+        $this->load->model('common4manager_model', 'c4m_model');
+        $check_agent_ = $this->c4m_model->check_agent_id4get($agent_id, $company_id);
+        if($check_agent_['status'] != 1)
+            return $this->fun_fail($check_agent_['msg']);
+        $res_check_town_ = $this->check_admin_townByCompany_id($admin_id, $company_id);
+        if(!$res_check_town_)
+            return $this->fun_fail('不可操作此区镇下的企业!');
+
+        //将人员加入企业
+        $this->db->trans_start();//--------开始事务
+        $update_rows_ = $this->db->where(array('id' => $agent_id, 'flag' => 2, 'company_id' => -1))->update('agent',array('company_id' => $company_id, 'wq' => 1, 'last_work_time' => time()));
+        //人员加入企业后需要做两个操作
+        //1.更新企业信用分数
+        $this->save_company_total_score($company_id);
+        //2.添加人员轨迹
+        if($update_rows_){
+            $this->save_agent_track4common($agent_id, -1, $company_id, 1);
+        }
+        $this->db->trans_complete();//------结束事务
+        if ($this->db->trans_status() === FALSE) {
+            return $this->fun_fail('保存失败!');
+        } else {
+            return $this->fun_success('保存成功!');
+        }
+    }
+
     public function company_pending_edit($id){
         $this->db->select('a.*, t.name t_name_')->from('company_pending a');
         $this->db->join('town t','t.id = a.town_id', 'left');
@@ -2093,7 +2174,7 @@ class Manager_model extends MY_Model
         }
         //处理经纪人 20201004经纪人批量操作只在 新增时有效
         if(!$this->input->post('company_id')){
-            $this->db->where('company_id',$company_id)->update('agent',array('company_id' => -1, 'wq' => 1));
+            $this->db->where('company_id',$company_id)->update('agent',array('company_id' => -1, 'wq' => 1, 'last_work_time' => time()));
             $arr_new_agent_id = $this->input->post('new_agent_id');
             $arr_agent_wq = $this->input->post('setwq');
             $arr_agent_company_id = array(
@@ -2103,6 +2184,7 @@ class Manager_model extends MY_Model
                 foreach($arr_new_agent_id as $idx => $pic) {
                     $update_data4agent_ = $arr_agent_company_id;
                     $update_data4agent_['wq'] = $arr_agent_wq[$idx];
+                    $update_data4agent_['last_work_time'] = time();
                     $this->db->where('id',$pic)->where('flag',2)->update('agent', $update_data4agent_);
                 }
             }
@@ -2225,7 +2307,7 @@ class Manager_model extends MY_Model
             }
         }
         //经纪人信息 只做暂存,实际 只有在审核结束后有效
-        $this->db->select("id agent_id,name,phone,job_code,card,company_id,wq,old_job_code,{$pass_id} pass_id")->from('agent');
+        $this->db->select("id agent_id,name,phone,job_code,card,company_id,wq,old_job_code,{$pass_id} pass_id,job_num,work_type,last_work_time")->from('agent');
         $this->db->where('flag',2); //如果是离昆的就不要进行保存 //有什么信息就保存什么信息，真正是否显示，还是要看实际的状态
         $this->db->where('company_id', $company_id);
         $pass_agent = $this->db->get()->result_array();
@@ -2360,7 +2442,7 @@ class Manager_model extends MY_Model
 
             //pass存入 审核结束时的数据
             $this->db->where('pass_id', $pass_id)->delete('company_pass_agent');
-            $this->db->select("id agent_id,name,phone,job_code,card,company_id,wq,old_job_code,{$pass_id} pass_id,flag,learn_time,grade_no,score")->from('agent');
+            $this->db->select("id agent_id,name,phone,job_code,card,company_id,wq,old_job_code,{$pass_id} pass_id,flag,learn_time,grade_no,score,work_type,job_num")->from('agent');
             $this->db->where('company_id',$company_id);
             $pass_agent = $this->db->get()->result_array();
             if($pass_agent)
@@ -2605,7 +2687,7 @@ class Manager_model extends MY_Model
             }
             $this->db->insert_batch('agent_track',$data_insert);
         }
-        $this->db->where(array('company_id' => $company_id))->update('agent', array('company_id' => -1, 'wq' => 1));
+        $this->db->where(array('company_id' => $company_id))->update('agent', array('company_id' => -1, 'wq' => 1, 'last_work_time' => time()));
 
         $this->db->trans_complete();//------结束事务
         if ($this->db->trans_status() === FALSE) {
