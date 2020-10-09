@@ -784,6 +784,72 @@ class Manager_model extends MY_Model
         return $this->fun_success('操作成功!');
     }
 
+
+    public function employees_list($page = 1){
+        $data['limit'] = $this->limit;
+        //搜索条件
+        $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
+        $data['flag'] = $this->input->get('flag')?trim($this->input->get('flag')):null;
+        $data['town_id'] = $this->input->get('town_id')?trim($this->input->get('town_id')):null;  //保留单个区镇 虽然实际是不使用
+        $data['town_ids'] = $this->input->get('town_ids');
+        //当区镇什么也没有选时就自动取默认
+        if(!$data['town_ids']){
+            $admin_info = $this->session->userdata('admin_info');
+            $data['town_ids'] = $this->get_admin_t_list($admin_info['admin_id']);
+        }
+        $data['town_ids'] = $data['town_ids'] ? $data['town_ids'] : array('');
+
+        //获取总记录数
+        $this->db->select('count(1) num')->from('employees a');
+        $this->db->join('company_pending b','a.company_id = b.id','left');
+        $this->db->join('town t', 'b.town_id = t.id', 'left');
+        if($data['keyword']){
+            $this->db->group_start();
+            $this->db->like('a.name', $data['keyword']);
+            $this->db->or_like('a.card', $data['keyword']);
+            $this->db->group_end();
+        }
+        if($data['flag']){
+            $this->db->where('a.flag', $data['flag']);
+        }
+        if(is_array($data['town_ids']))
+            $this->db->where_in('b.town_id', $data['town_ids']);
+        $num = $this->db->get()->row();
+        $data['total_rows'] = $num->num;
+
+        //获取详细列
+        $this->db->select('a.*,b.company_name,t.s_name')->from('employees a');
+        $this->db->join('company_pending b','a.company_id = b.id','left');
+        $this->db->join('town t', 'b.town_id = t.id', 'left');
+        if($data['keyword']){
+            $this->db->group_start();
+            $this->db->like('a.name', $data['keyword']);
+            $this->db->or_like('a.card', $data['keyword']);
+            $this->db->group_end();
+        }
+        if($data['flag']){
+            $this->db->where('a.flag', $data['flag']);
+        }
+        if(is_array($data['town_ids']))
+            $this->db->where_in('b.town_id', $data['town_ids']);
+        $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
+        $this->db->order_by('a.id','desc');
+        $data['res_list'] = $this->db->get()->result_array();
+        return $data;
+    }
+
+    public function employees_audit($id){
+        $this->db->select('a.*, b.company_name, t.name t_name')->from('employees a');
+        $this->db->join('company_pending b','a.company_id = b.id','left');
+        $this->db->join('town t','b.town_id = t.id','left');
+        $this->db->where('a.id',$id);
+        $detail =  $this->db->get()->row_array();
+        if(!$detail)
+            return $detail;
+        $detail['code_img_list'] = $this->db->select()->from('employees_code_img')->where('employees_id', $id)->get()->result_array();
+        $detail['person_img_list'] = $this->db->select()->from('employees_person_img')->where('employees_id', $id)->get()->result_array();
+        return $detail;
+    }
     /**
      *********************************************************************************************
      * 经纪人事件
