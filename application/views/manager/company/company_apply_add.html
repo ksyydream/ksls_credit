@@ -51,7 +51,7 @@
                                         <li>
                                             <a data-toggle="tab" href="#faq-tab-2">
                                                 <i class="green ace-icon fa fa-user bigger-120"></i>
-                                                执业人员
+                                                执业经纪人
                                             </a>
                                         </li>
                                         {{if $data.id|default:'' > 0}}
@@ -282,7 +282,7 @@
                                         <div id="faq-tab-2" class="tab-pane fade">
                                             <h4 class="blue">
                                                 <i class="green ace-icon fa fa-user bigger-110"></i>
-                                                执业人员
+                                                执业经纪人
                                             </h4>
                                             {{if $data.id|default:'' == ''}}
                                             <div class="space-8"></div>
@@ -729,7 +729,7 @@
         }
         var thisLayer = layer.confirm(result, {
             btn: ['关闭'], //按钮
-            title:'执业人员信息',
+            title:'执业经纪人信息',
             area: ['850px', 'auto']
         }, function(){
             layer.close(thisLayer)
