@@ -179,13 +179,13 @@
                         </div>
                         <hr />
                         <div class="col-md-offset-2 col-md-9">
-                            <button id="pass_btn" class="btn btn-info" type="button">
+                            {{if $data.flag == 1}}<button id="pass_btn" class="btn btn-info" type="button">
 
                                 <i class="icon-ok bigger-110"></i>
 
                                 通过
 
-                            </button>
+                            </button>{{/if}}
                             &nbsp; &nbsp; &nbsp;
                             <a href="/manager/employees_list" class="btn" type="reset">
 
@@ -195,13 +195,13 @@
 
                             </a>
                             &nbsp; &nbsp; &nbsp;
-                            <button id="cancel_btn" class="btn btn-danger" type="button">
+                            {{if $data.flag == 1}}<button id="cancel_btn" class="btn btn-danger" type="button">
 
                                 <i class="icon-ok bigger-110"></i>
 
                                 拒绝
 
-                            </button>
+                            </button>{{/if}}
 
                         </div>
                         <!-- PAGE CONTENT ENDS -->
