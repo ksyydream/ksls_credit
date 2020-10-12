@@ -55,8 +55,9 @@
                                              <div class="form-group">
                                            
                                     <div class="col-sm-9">
+                                        <form class="form-horizontal" role="form" id="post_form" action="" method="post">
 
-                            <input type="hidden" name="id" id="employees_id" value="{{$data.id|default:''}}">
+                            <input type="hidden" name="employees_id" id="employees_id" value="{{$data.id|default:''}}">
                                           <div class="profile-user-info profile-user-info-striped">
                                               <div class="profile-info-row">
                                                   <div class="profile-info-name"> 姓名 </div>
@@ -115,11 +116,20 @@
                                                   <div class="profile-info-name"> 申请备注 </div>
 
                                                   <div class="profile-info-value">
-                                                      <span>{{$data.remark|default:''}}</span>
+                                                      <span><textarea name="remark" maxlength="150" readonly="readonly" style="width:60%;height:100px;">{{$data.remark|default:''}}</textarea></span>
+                                                  </div>
+                                              </div>
+                                              <div class="profile-info-row">
+                                                  <div class="profile-info-name"> 审核备注 </div>
+
+                                                  <div class="profile-info-value">
+                                                      <span><textarea name="audit_remark" id="audit_remark" maxlength="150" style="width:60%;height:100px;">{{$data.audit_remark|default:''}}</textarea></span>
+                                                      <div class="space-4"></div>
+                                                      <span style="color: red">*拒绝时必须填写,且申请机构可见</span>
                                                   </div>
                                               </div>
                                           </div>
-
+                                        </form>
                                           <h4 class="blue">
                                               <i class="green ace-icon fa fa-list bigger-110"></i>
                                               身份证图片
@@ -210,7 +220,70 @@
 <script src="/manager_statics/app/ajaxfileupload.js"></script>
 <script type="text/javascript" src="/manager_statics/app/lightbox-plus-jquery.min.js?v2"></script>
 <script type="text/javascript">
+    $("#pass_btn").click(function(){
+        layer.confirm('是否确定通过！', {
+            btn: ['确定','取消'], //按钮
+            area: ['400px', 'auto']
+        }, function(){
+            post_form('post_form', '/manager/employees_pass');
+        },function(){
 
+        });
+    })
+
+    $("#cancel_btn").click(function(){
+        layer.confirm('是否确定拒绝,拒绝时必须填写审核备注！', {
+            btn: ['确定','取消'], //按钮
+            area: ['400px', 'auto']
+        }, function(){
+            var audit_remark_ = $.trim($("#audit_remark").val());
+            if(audit_remark_ == ""){
+                layer.msg('拒绝时必须填写审核备注！');
+            }else{
+                post_form('post_form', '/manager/employees_cancel');
+            }
+
+        },function(){
+
+        });
+    })
+
+    function post_form(form_name, url_submit){
+        var index_load = layer.load(1, {
+            shade: [0.1,'#fff'] //0.1透明度的白色背景
+        });
+        var form = document.getElementById(form_name);
+
+        var formdata = new FormData(form);
+        $.ajax({
+            type : "POST",
+            url : url_submit,
+            data : formdata,
+            async: true,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success : function(data) {
+                layer.close(index_load);
+                var return_ = JSON.parse(data)
+                if(return_.status == 1){
+                    var url = '/manager/employees_list';
+                    layer.alert('操作成功!', {
+                        skin: 'layui-layer-molv' //样式类名
+                        ,closeBtn: 0
+                    }, function(){
+                        window.location.replace(url);
+                    });
+                }else{
+                    layer.msg(return_.msg);
+                }
+            },
+            error:function(){
+                layer.close(index_load);
+                layer.msg('网络异常!');
+            }
+        });
+    }
 </script>
 </body>
 </html>

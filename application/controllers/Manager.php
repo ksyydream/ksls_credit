@@ -525,9 +525,16 @@ class Manager extends MY_Controller {
     }
 
     //20201009 从业人员申请通过
+    public function employees_pass(){
+        $res = $this->manager_model->employees_apply_handle($this->admin_id, 2);
+        $this->ajaxReturn($res);
+    }
 
     //20201009 从业人员申请拒绝
-
+    public function employees_cancel(){
+        $res = $this->manager_model->employees_apply_handle($this->admin_id, -1);
+        $this->ajaxReturn($res);
+    }
     /**
      *********************************************************************************************
      * 经纪人事件

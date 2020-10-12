@@ -850,6 +850,92 @@ class Manager_model extends MY_Model
         $detail['person_img_list'] = $this->db->select()->from('employees_person_img')->where('employees_id', $id)->get()->result_array();
         return $detail;
     }
+
+    public function employees_apply_handle($admin_id, $flag){
+        $employees_id = $this->input->post('employees_id');
+        if(!$employees_id)
+            return $this->fun_fail('信息丢失!');
+        $employees_info_ = $this->db->select('*')->from('employees')->where('id',$employees_id)->get()->row_array();
+        if(!$employees_info_)
+            return $this->fun_fail('信息异常!');
+        if($employees_info_['flag'] != 1)
+            return $this->fun_fail('信息已被处理,不可重复操作!');
+        $audit_remark_ = trim($this->input->post('audit_remark'));
+        $company_info_ = $this->db->select("*")->from("company_pending")->where('id', $employees_info_['company_id'])->get()->row_array();
+        if(!$company_info_)
+            return $this->fun_fail('企业信息丢失!');
+        $check_town_ = $this->check_admin_townByTown_id($admin_id, $company_info_['town_id']);
+        if(!$check_town_)
+            return $this->fun_fail('不可操作此区镇下企业!');
+        switch($flag){
+            case 2:
+                //1.需要先验证申请企业是否可用
+                if($company_info_['flag'] == -1)
+                    return $this->fun_fail('企业不可使用!');
+                //2.验证人员是否可用加入,判断身份证号是否存在
+                if(!$employees_info_['card'] || !trim($employees_info_['card']))
+                    return $this->fun_fail('申请信息不完整!');
+                $check_agent_ = $this->db->select('*')->from('agent')->where('card', trim($employees_info_['card']))->get()->row_array();
+                if($check_agent_)
+                    return $this->fun_fail('已存在相同身份证号的人员!');
+
+                //3.完成验证后开始生成人员信息,并生成轨迹 ,从新计算企业信用分数
+                $this->db->trans_start();//--------开始事务
+                $agent_data_ = array(
+                    'name'          =>      trim($employees_info_['name']),
+                    'phone'         =>      trim($employees_info_['phone']) ? trim($employees_info_['phone']) : "",
+                    'job_code'      =>      '',
+                    'old_job_code'  =>      '',
+                    'flag'          =>      2,
+                    'work_type'     =>      2,
+                    'card'          =>      trim($employees_info_['card']),
+                    'pwd'           =>      sha1("666666"),
+                    'cdate'         =>      date('Y-m-d H:i:s', time()),
+                    'company_id'    =>      $employees_info_['company_id'],
+                    'last_work_time'=>      time(),
+
+                );
+                $agent_data_['score'] = $this->config->item('agent_score');
+                $agent_data_['job_num'] = $this->get_job_num();
+                $this->db->insert('agent', $agent_data_);
+                $agent_id = $this->db->insert_id();
+                //回写agent_id
+                $this->db->where(array('id' => $employees_id))->update('employees',array(
+                    'flag' => 2,
+                    'audit_remark' => $audit_remark_,
+                    'audit_time' => date('Y-m-d H:i:s', time()),
+                    'agent_id' => $agent_id
+                ));
+
+                $code_img_list_ = $this->db->select("{$agent_id} agent_id,img,m_img")->from('employees_code_img')->where('employees_id', $employees_id)->get()->result_array();
+                if($code_img_list_)
+                    $this->db->insert_batch('agent_code_img', $code_img_list_);
+                $person_img_list_ = $this->db->select("{$agent_id} agent_id,img,m_img")->from('employees_person_img')->where('employees_id', $employees_id)->get()->result_array();
+                if($person_img_list_)
+                    $this->db->insert_batch('agent_person_img', $person_img_list_);
+
+                //人员加入企业后需要做两个操作
+                //1.更新企业信用分数
+                $this->save_company_total_score($employees_info_['company_id']);
+                //2.添加人员轨迹
+                $this->save_agent_track4common($agent_id, -1, $employees_info_['company_id'], 9);
+
+                $this->db->trans_complete();//------结束事务
+                if ($this->db->trans_status() === FALSE) {
+                    return $this->fun_fail('保存失败!');
+                }
+                break;
+            case -1:
+                if(!$audit_remark_)
+                    return $this->fun_fail('拒绝时,必须填写审核备注!');
+                $this->db->where(array('id' => $employees_id, 'flag' => 1))->update('employees',array('flag' => -1, 'audit_remark' => $audit_remark_, 'audit_time' => date('Y-m-d H:i:s', time()),));
+                break;
+            default:
+                return $this->fun_fail('请求异常!');
+        }
+        return $this->fun_success('操作成功');
+
+    }
     /**
      *********************************************************************************************
      * 经纪人事件
