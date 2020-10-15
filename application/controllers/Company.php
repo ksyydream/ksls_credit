@@ -54,5 +54,10 @@ class Company extends Home_Controller {
 		$this->assign('data', $data);
 		$this->display('homepage/company/dianzizhengshu.html');
 	}
+
+	public function add_agent4companyOnlyEmployess(){
+		$res = $this->company_model->add_agent4companyOnlyEmployess($this->company_id);
+		$this->ajaxReturn($res);
+	}
 	
 }

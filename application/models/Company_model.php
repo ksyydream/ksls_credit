@@ -106,4 +106,35 @@ class Company_model extends MY_Model
         $data = $this->db->get()->row_array();
         return $data;
     }
+
+    public function add_agent4companyOnlyEmployess($company_id){
+        $agent_id = $this->input->post('agent_id');
+        if(!$agent_id)
+            return $this->fun_fail('信息异常!');
+        //检查从业人员是否可以加入
+        $this->db->select('a.*, b.company_name, c.grade_name');
+        $this->db->from('agent a');
+        $this->db->join('company_pending b', 'a.company_id = b.id', 'left');
+        $this->db->join('agent_grade c', 'a.grade_no = c.grade_no', 'left');
+        $this->db->where('a.id', $agent_id);
+        $this->db->where('a.flag', 2);
+        $agent_info_ =  $this->db->get()->row_array();
+        if(!$agent_info_)
+            return $this->fun_fail('经纪人信息异常');
+        if($agent_info_['work_type'] != 2)
+            return $this->fun_fail('不是从业经纪人,不可添加');
+        if($agent_info_['grade_no'] == 1)
+            return $this->fun_fail('信息异常,不可添加');
+        if($agent_info_['company_id'] != -1)
+            return $this->fun_fail('经纪人已就业,不可添加');
+        $update_rows_ = $this->db->where(array('id' => $agent_id, 'flag' => 2, 'company_id' => -1))->update('agent',array('company_id' => $company_id, 'wq' => 1, 'last_work_time' => time()));
+        //人员加入企业后需要做两个操作
+        //1.更新企业信用分数
+        $this->save_company_total_score($company_id);
+        //2.添加人员轨迹
+        if($update_rows_){
+            $this->save_agent_track4common($agent_id, -1, $company_id, 10);
+        }
+        return $this->fun_success('添加成功');
+    }
 }

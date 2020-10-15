@@ -1,0 +1,52 @@
+<form class="am-form am-form-horizontal">
+    <input type="hidden" id="insert_agent_id_" value="{{$data.id|default:''}}">
+    <div class="am-form-group">
+        <label class="am-u-sm-2 am-form-label">姓名</label>
+        <div class="am-u-sm-10">
+            {{$data.name|default:''}}
+        </div>
+    </div>
+
+    <div class="am-form-group">
+        <label class="am-u-sm-2 am-form-label">从业编号</label>
+        <div class="am-u-sm-10">
+            {{$data.job_num|default:''}}
+        </div>
+    </div>
+    <div class="am-form-group">
+        <label class="am-u-sm-2 am-form-label">联系电话</label>
+        <div class="am-u-sm-10">
+            {{$data.phone|default:''}}
+        </div>
+    </div>
+    <div class="am-form-group">
+        <div class="am-u-sm-10 am-u-sm-offset-2">
+            {{if $data.company_id == -1 && $data.flag == 2 && $data.grade_no != 1}}
+            <input type="button" id="insert_btn_agent_" value="加入" class="am-btn am-btn-success">
+
+            {{else}}
+            <span style="color: red">不可加入</span>
+            {{/if}}
+
+        </div>
+    </div>
+</form>
+
+
+
+<script type="text/javascript">
+    
+    $("#insert_btn_agent_").click(function(){
+        var insert_agent_id_ = $("#insert_agent_id_").val();
+        $.post('/company/add_agent4companyOnlyEmployess',{agent_id:insert_agent_id_}, function(html){
+            var data = JSON.parse(html);
+
+            if(data.status == 1){
+                ajax_employees_table('employees_form', 1);
+                layer.closeAll();
+            }
+            else
+                layer.msg(data.msg, {icon: 2});
+        });
+    })
+</script>
