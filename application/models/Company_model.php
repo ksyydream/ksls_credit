@@ -137,4 +137,36 @@ class Company_model extends MY_Model
         }
         return $this->fun_success('添加成功');
     }
+
+    public function employees_apply_list($page = 1, $company_id) {
+        $data['limit'] = 2;//每页显示多少调数据
+
+        $this->db->select('count(1) num');
+        $this->db->from('employees a');
+        $this->db->join('company_pending c','a.company_id = c.id','left');
+
+        $this->db->where('c.id', $company_id);
+        $rs_total = $this->db->get()->row();
+        //总记录数
+        $total_rows = $rs_total->num;
+        $data['total_rows'] = $total_rows;
+
+        //list
+        $this->db->select('a.*');
+        $this->db->from('employees a');
+        $this->db->join('company_pending c','a.company_id = c.id','left');
+        $this->db->where('c.id', $company_id);
+        $this->db->limit($data['limit'], $offset = ($page - 1) * $data['limit']);
+        $this->db->order_by('a.id', 'desc');
+        $data['res_list'] = $this->db->get()->result_array();
+        return $data;
+    }
+
+    public function employees_apply_save($company_id){
+        $emplyees_data_ = array(
+            'name' => $this->input->post('name'),
+            'phone' => $this->input->post('phone'),
+            'card' => $this->input->post('card'),
+        );
+    }
 }
