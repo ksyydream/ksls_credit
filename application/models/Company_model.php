@@ -139,7 +139,7 @@ class Company_model extends MY_Model
     }
 
     public function employees_apply_list($page = 1, $company_id) {
-        $data['limit'] = 2;//每页显示多少调数据
+        $data['limit'] = 8;//每页显示多少调数据
 
         $this->db->select('count(1) num');
         $this->db->from('employees a');
@@ -163,10 +163,96 @@ class Company_model extends MY_Model
     }
 
     public function employees_apply_save($company_id){
-        $emplyees_data_ = array(
-            'name' => $this->input->post('name'),
-            'phone' => $this->input->post('phone'),
-            'card' => $this->input->post('card'),
+        $employees_data_ = array(
+            'name' => trim($this->input->post('name')),
+            'phone' => trim($this->input->post('phone')),
+            'card' => strtoupper(trim($this->input->post('card'))),
+            'company_id' => $company_id,
+            'cdate'=>date('Y-m-d H:i:s',time()),
+            'flag' => 1
         );
+        if($employees_data_['name'] == "" || $employees_data_['name'] == "" || $employees_data_['name'] == ""){
+            return $this->fun_fail("缺少基础信息!");
+        }
+        //检查身份证是否已经是经纪人
+        $check_agent_ = $this->db->select()->from('agent')->where('card', $employees_data_['card'])->get()->row_array();
+        if($check_agent_){
+            return $this->fun_fail("所申请的身份证号已是经纪人!");
+        }
+
+        //检查一下是否有重复提交 身份证申请
+        $check_employees_ = $this->db->select()->from('employees')->where(array(
+            'card' => $employees_data_['card'],
+            'flag' => 1,
+            'company_id' => $company_id
+        ))->get()->row_array();
+        if($check_employees_){
+            return $this->fun_fail("此身份证号人员申请重复提交!");
+        }
+
+        //检查照片数量
+        $pic_short1 = $this->input->post('pic_short1');
+        $pic_short3 = $this->input->post('pic_short3');
+        if(!$pic_short1 || !is_array($pic_short1)){
+            return $this->fun_fail("身份证照片必须上传!");
+        }
+        if(!$pic_short3 || !is_array($pic_short3)){
+            return $this->fun_fail("个人证件照片必须上传!");
+        }
+        if(count($pic_short3) != 1){
+            return $this->fun_fail("个人证件照片只需上传一张!");
+        }
+        $this->db->insert('employees', $employees_data_);
+        $id = $this->db->insert_id();
+
+        $this->db->delete('employees_code_img', array('employees_id' => $id));
+
+        if($pic_short1){
+            foreach($pic_short1 as $idx => $pic) {
+                $code_pic = array(
+                    'employees_id' => $id,
+                    'img' => $pic,
+                    'm_img' => $pic . '?imageView2/0/w/200/h/200/q/75|imageslim'
+                );
+                $this->db->insert('employees_code_img', $code_pic);
+            }
+        }
+
+        $this->db->delete('employees_person_img', array('employees_id' => $id));
+
+        if($pic_short3){
+            foreach($pic_short3 as $idx => $pic) {
+                $job_pic = array(
+                    'employees_id' => $id,
+                    'img' => $pic,
+                    'm_img' => $pic . '?imageView2/0/w/200/h/200/q/75|imageslim'
+                );
+                $this->db->insert('employees_person_img', $job_pic);
+            }
+        }
+        return $this->fun_success('申请成功!');
+    }
+
+    public function employees_apply_cancel($company_id){
+        if(!$employees_id = $this->input->post('employees_id'))
+            return $this->fun_fail('操作异常');
+        $data = $this->db->select()->from('employees')->where('id', $employees_id)->where('company_id', $company_id)->get()->row_array();
+        if(!$data){
+            return $this->fun_fail('申请不存在');
+        }
+        if($data['flag'] != 1)
+            return $this->fun_fail('申请已被操作,不可作废');
+        $this->db->where(array('id' => $employees_id, 'company_id' => $company_id, 'flag' => 1))->update('employees', array('flag' => -2, 'audit_time' => date('Y-m-d H:i:s',time())));
+        return $this->fun_success('操作成功!');
+    }
+
+    public function employees_apply_detail($id, $company_id){
+        $data = $this->db->select()->from('employees')->where('id', $id)->where('company_id', $company_id)->get()->row_array();
+        if(!$data){
+            return $data;
+        }
+        $data['code_img_list'] = $this->db->select()->from('employees_code_img')->where('employees_id', $id)->get()->result_array();
+        $data['person_img_list'] = $this->db->select()->from('employees_person_img')->where('employees_id', $id)->get()->result_array();
+        return $data;
     }
 }

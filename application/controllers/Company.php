@@ -80,6 +80,19 @@ class Company extends Home_Controller {
 		$this->ajaxReturn($res);
 	}
 
+	public function employees_apply_cancel(){
+		$res = $this->company_model->employees_apply_cancel($this->company_id);
+		$this->ajaxReturn($res);
+	}
+
+	public function employees_apply_detail($id){
+		$data = $this->company_model->employees_apply_detail($id, $this->company_id);
+		if(!$data)
+			redirect('/company/employees_apply_list');
+		$this->assign('data', $data);
+		$this->display('homepage/company/employees_apply_detail.html');
+	}
+
 	//这里 虽然manager_login存在图片操作,但还是重复写一遍
 	public function save_pics($f_name, $time){
 		if(!$f_name || strlen($f_name) < 5)

@@ -39,12 +39,12 @@
                      <td>
 
                          {{if $v.flag == 1}}待审{{/if}}
-                         {{if $v.flag == -1}}拒绝{{/if}}
-                         {{if $v.flag == 2}}通过{{/if}}
+                         {{if $v.flag == -1}}审核失败{{/if}}
+                         {{if $v.flag == 2}}审核通过{{/if}}
                          {{if $v.flag == -2}}作废{{/if}}
                      </td>
                      <td>
-                         <a href="congyerenyuan_editor.html" target="_blank" class="agentMore">详情</a>
+                         <a href="/company/employees_apply_detail/{{$v.id}}" target="_blank" class="agentMore">详情</a>
                      </td>
 
                  </tr>
