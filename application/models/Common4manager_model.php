@@ -424,4 +424,15 @@ class Common4manager_model extends MY_Model
         echo 1;
     }
 
+    public function update_agent_job_num(){
+        $agent_list_ = $this->db->select()->from('agent')->where('job_num','')->get()->result_array();
+        if($agent_list_){
+            foreach($agent_list_ as $v){
+                $job_num = $this->get_job_num();
+                $this->db->where(array('id' => $v['id'], 'job_num' => ''))->update('agent', array('job_num' => $job_num));
+            }
+        }
+
+    }
+
 }

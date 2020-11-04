@@ -39,4 +39,9 @@ class Command_sys extends MY_Controller {
     	$this->command_model->handle_agent_grade();
     	$this->command_model->handle_company_ns();
     }
+
+	//php index.php Command_sys update_agent_job_num
+	public function update_agent_job_num(){
+		$this->c4m_model->update_agent_job_num();
+	}
 }
