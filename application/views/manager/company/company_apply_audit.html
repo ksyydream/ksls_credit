@@ -227,7 +227,8 @@
                                 <tr>
 
                                     <th style="width:15%;">姓名</th>
-                                    <th style="width:25%;">执业证号</th>
+                                    <th style="width:20%;">从业编号</th>
+                                    <th style="width:20%;">执业证号</th>
 
                                     <th style="width:25%;">身份证号</th>
                                     <th style="width:15%;">联系电话</th>
@@ -240,7 +241,8 @@
                                     {{if !empty($data.agent) }}
                             {{foreach from=$data.agent item=item}}
                             <tr>
-                                        <td>{{$item.name}}</td>
+                                        <td>{{if $item.work_type == 1}}<span class="label label-warning label-white middle">持证</span>{{/if}}{{$item.name}}</td>
+                                <td>{{$item.job_num}}</td>
                                         <td>{{$item.job_code}}</td>
                                           <td>{{$item.card}}</td>
                                             <td>{{$item.phone}}</td>

@@ -2673,7 +2673,7 @@ class Manager_model extends MY_Model
         //每次审核后都同步一下company_pending 的status 栏位，没有实际意义，只做暂存，
         $this->db->where('id', $company_id)->update('company_pending', $temp_update_data);
         //每次审核后都同步一下 agent 和 icon
-        $this->db->select("id agent_id,name,phone,job_code,card,company_id,wq,old_job_code,{$pass_id} pass_id")->from('agent');
+        $this->db->select("id agent_id,name,phone,job_code,card,company_id,wq,old_job_code,{$pass_id} pass_id,flag,learn_time,grade_no,score,work_type,job_num")->from('agent');
         $this->db->where('flag',2); //如果是离昆的就不要进行保存 //有什么信息就保存什么信息，真正是否显示，还是要看实际的状态
         $this->db->where('company_id', $company_id);
         $pass_agent = $this->db->get()->result_array();
