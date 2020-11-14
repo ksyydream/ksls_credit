@@ -42,7 +42,22 @@ class Command_sys extends MY_Controller {
 
 	//index.php Command_sys upload_agent
 	public function upload_agent(){
-		$this->command_model->upload_agent();
+		die();
+		//$this->command_model->upload_agent();
+		echo '运行结束';
+	}
+
+	//index.php Command_sys insert_img4agent
+	public function insert_img4agent(){
+		die();
+		//$this->command_model->insert_img4agent();
+		echo '运行结束';
+	}
+
+	//index.php Command_sys upload_job_num
+	public function upload_job_num(){
+		die();
+		//$this->command_model->upload_job_num();
 		echo '运行结束';
 	}
 }

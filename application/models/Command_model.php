@@ -275,4 +275,120 @@ class Command_model extends MY_Model
         return true;
     }
 
+    public function insert_img4agent(){
+        //检测是否存在文件
+        $dir = "./upload_files/upload_agent_temp/images/";
+        if (is_dir($dir)) {
+            //打开目录
+            if ($handle = opendir($dir)) {
+                //返回当前文件的条目
+                while (($file = readdir($handle)) !== false) {
+                    //去除特殊目录
+                    if ($file != "." && $file != "..") {
+                        //判断子目录是否还存在子目录
+                        if (is_dir($dir . "/" . $file)) {
+                            echo $file . ' ';
+
+                            $chenk_card = $this->db->select()->from('agent')->where('card', $file)->get()->row_array();
+                            if(!$chenk_card){
+                                echo ' 未找到';
+                            }else{
+                                $this->db->close();
+                                $this->db->initialize();
+                                $this->upload_agent_img($chenk_card['id'], $file, 'agent_code_img', 'a');
+                                $this->upload_agent_img($chenk_card['id'], $file, 'agent_job_img', 'b');
+                                $this->upload_agent_img($chenk_card['id'], $file, 'agent_person_img', 'c');
+                            }
+                            $this->deldir($dir . "/" . $file);
+                            echo "\n";
+                        }
+                    }
+                }
+                //关闭文件夹
+                closedir($handle);
+
+            }
+        }
+        return true;
+    }
+
+    function deldir($dir) {
+        //先删除目录下的文件：
+        $dh=opendir($dir);
+        while ($file=readdir($dh)) {
+            if($file!="." && $file!="..") {
+                $fullpath=$dir."/".$file;
+                if(!is_dir($fullpath)) {
+                    unlink($fullpath);
+                } else {
+                    $this->deldir($fullpath);
+                }
+            }
+        }
+
+        closedir($dh);
+        //删除当前文件夹：
+        if(rmdir($dir)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function upload_job_num()
+    {
+        require_once(APPPATH . 'libraries/PHPExcel/PHPExcel.php');
+        require_once(APPPATH . 'libraries/PHPExcel/PHPExcel/IOFactory.php');
+        $ext_ = ".xlsx";
+        $uploadfile = './upload_files/upload_agent_temp/job_num_temp.xlsx';//获取上传成功的Excel
+        if ($ext_ == ".xlsx") {
+            $objReader = PHPExcel_IOFactory::createReader('Excel2007');
+        } else {
+            $objReader = PHPExcel_IOFactory::createReader('Excel5');
+        }
+
+        //use excel2007 for 2007 format 注意 linux下需要大小写区分 填写Excel2007   //xlsx使用2007,其他使用Excel5
+        $objPHPExcel = $objReader->load($uploadfile);//加载目标Excel
+        // 处理企业信息
+        $sheet = $objPHPExcel->getSheet(0);//读取第一个sheet
+
+        $highestRow = $sheet->getHighestRow(); // 取得总行数
+        $letter = array(0, 1, 2);
+        $tableheader = array('序号', '信息卡编号', '证书编号');
+        for ($i = 0; $i < count($tableheader); $i++) {
+            $record_hear_name = trim((string)$sheet->getCellByColumnAndRow($letter[$i], 1)->getValue());
+            if ($record_hear_name != $tableheader[$i]) {
+                return "第" . ($letter[$i] + 1) . "列不是 " . $tableheader[$i] . '!';
+            }
+        }
+        echo '共' . $highestRow . '条';
+        echo "\n";
+        for ($row = 2; $row <= $highestRow; $row++) {
+            //$this->db->close();
+            //$this->db->initialize();
+            $job_code_ = trim((string)$sheet->getCellByColumnAndRow(2, $row)->getValue());
+            $job_num_ = trim((string)$sheet->getCellByColumnAndRow(1, $row)->getValue());
+            $check_job_num_ = $this->db->select()->from("agent")->where('job_num', $job_num_)->get()->row_array();
+            if($check_job_num_){
+                echo "$job_num_" . '存在  ';
+                echo "\n";
+                continue;
+            }
+            $check_job_code_ = $this->db->select()->from("agent")->where('job_code', $job_code_)->get()->row_array();
+            if(!$check_job_code_){
+                echo "$job_code_" . '不存在  ';
+                echo "\n";
+                continue;
+            }
+            $this->db->where('job_code', $job_code_)->update('agent', array('job_num' => $job_num_));
+            echo "$row";
+            echo "\n";
+
+
+        }
+
+        return true;
+
+    }
+
 }
