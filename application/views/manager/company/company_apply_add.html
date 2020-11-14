@@ -289,7 +289,7 @@
                                             <div class="row">
                                                 <div class="col-xs-10">
                                                     <div class="dataTables_filter">
-                                                        <label>Add:<input type="text" id="search_" placeholder="执业证号/从业编号">&nbsp;<a href="javascript:void(0);" id="btn_add_agent" class="btn btn-white btn-xs btn-primary">新 增</a></label>
+                                                        <label>Add:<input type="text" id="search_" placeholder="执业证号/信息卡号">&nbsp;<a href="javascript:void(0);" id="btn_add_agent" class="btn btn-white btn-xs btn-primary">新 增</a></label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -304,7 +304,7 @@
                                 <tr>
 
                                     <th style="width:15%;">姓名</th>
-                                    <th style="width:20%;">从业编号</th>
+                                    <th style="width:20%;">信息卡号</th>
                                     <th style="width:15%;">执业证号</th>
 
                                     <th style="width:20%;">身份证号</th>
@@ -690,7 +690,7 @@
     $("#btn_add_agent").click(function(){
         var search_ = $.trim($("#search_").val());
         if (search_ == '') {
-            layer.msg('请输入执业证号/从业编号', {icon: 2});
+            layer.msg('请输入执业证号/信息卡号', {icon: 2});
             return false;
         }
         var flag_ = 1;
@@ -705,7 +705,7 @@
         $("[name='agent_job_num[]']").each(function(index3){
             var code_3 = $.trim($(this).val());
             if(code_3 != "" && code_3 == search_){
-                layer.alert('输入的从业编号已在列表中!', {skin: 'layui-layer-lan',closeBtn: 0,shift: 4 });
+                layer.alert('输入的信息卡号已在列表中!', {skin: 'layui-layer-lan',closeBtn: 0,shift: 4 });
                 flag_ = 2;
                 return;
             }
