@@ -816,6 +816,7 @@ class Manager_model extends MY_Model
         }
         if(is_array($data['town_ids']))
             $this->db->where_in('b.town_id', $data['town_ids']);
+        $this->db->where('a.flag <>', -2);
         $num = $this->db->get()->row();
         $data['total_rows'] = $num->num;
 
@@ -834,6 +835,7 @@ class Manager_model extends MY_Model
         }
         if(is_array($data['town_ids']))
             $this->db->where_in('b.town_id', $data['town_ids']);
+        $this->db->where('a.flag <>', -2);
         $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
         $this->db->order_by('a.id','desc');
         $data['res_list'] = $this->db->get()->result_array();
