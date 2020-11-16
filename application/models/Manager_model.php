@@ -608,33 +608,33 @@ class Manager_model extends MY_Model
             $id = $this->db->insert_id();
         }
         //保存 身份证照片和执业证照片
-        //2020-11-15 不再保存 执业证照片,因经纪人信息编辑时 不做操作,其余地方的转存还保留 以便再次使用时开启
-        //$this->db->delete('agent_code_img', array('agent_id' => $id));
-        //$pic_short_code = $this->input->post('pic_short1');
-        //if($pic_short_code){
-        //    foreach($pic_short_code as $idx => $pic) {
-        //        $code_pic = array(
-        //            'agent_id' => $id,
-        //            'img' => $pic,
-        //            'm_img' => $pic . '?imageView2/0/w/200/h/200/q/75|imageslim'
-        //        );
-        //        $this->db->insert('agent_code_img', $code_pic);
-        //    }
-        //}
 
-
-        $this->db->delete('agent_job_img', array('agent_id' => $id));
-        $pic_short_job = $this->input->post('pic_short2');
-        if($pic_short_job){
-            foreach($pic_short_job as $idx => $pic) {
-                $job_pic = array(
+        $this->db->delete('agent_code_img', array('agent_id' => $id));
+        $pic_short_code = $this->input->post('pic_short1');
+        if($pic_short_code){
+            foreach($pic_short_code as $idx => $pic) {
+                $code_pic = array(
                     'agent_id' => $id,
                     'img' => $pic,
                     'm_img' => $pic . '?imageView2/0/w/200/h/200/q/75|imageslim'
                 );
-                $this->db->insert('agent_job_img', $job_pic);
+                $this->db->insert('agent_code_img', $code_pic);
             }
         }
+
+
+        //$this->db->delete('agent_job_img', array('agent_id' => $id));
+        //$pic_short_job = $this->input->post('pic_short2');
+        //if($pic_short_job){
+        //    foreach($pic_short_job as $idx => $pic) {
+        //        $job_pic = array(
+        //            'agent_id' => $id,
+        //            'img' => $pic,
+        //            'm_img' => $pic . '?imageView2/0/w/200/h/200/q/75|imageslim'
+        //        );
+        //        $this->db->insert('agent_job_img', $job_pic);
+        //    }
+        //}
 
         $this->db->delete('agent_person_img', array('agent_id' => $id));
         $pic_short_job = $this->input->post('pic_short3');
