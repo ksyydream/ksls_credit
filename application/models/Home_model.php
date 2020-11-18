@@ -235,6 +235,7 @@ class Home_model extends MY_Model
         $this->db->join('company_pending b', 'a.company_id = b.id and b.flag = 2', 'left');
         $this->db->join('agent_grade c','a.grade_no = c.grade_no','left');
         $this->db->where('a.job_code', $job_code);
+        $this->db->or_where('a.job_num', $job_code);
         $data = $this->db->get()->row_array();
         return $data;
     }
