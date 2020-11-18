@@ -501,6 +501,40 @@ class Manager extends MY_Controller {
         $this->ajaxReturn($res);
     }
 
+    //20201009 从业人员申请
+    public function employees_list($page = 1){
+        $data = $this->manager_model->employees_list($page);
+        $base_url = "/manager/employees_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $town_list = $this->c4m_model->get_town(1);
+        $this->assign('town_list', $town_list);
+        $this->display('manager/agent/employees_list.html');
+    }
+
+    //20201009 从业人员申请详情
+    public function employees_audit($id){
+        $data = $this->manager_model->employees_audit($id);
+        if(!$data){
+            $this->show_message('未找到从业申请信息!');
+        }
+        $this->assign('data', $data);
+        $this->display('manager/agent/employees_view.html');
+    }
+
+    //20201009 从业人员申请通过
+    public function employees_pass(){
+        $res = $this->manager_model->employees_apply_handle($this->admin_id, 2);
+        $this->ajaxReturn($res);
+    }
+
+    //20201009 从业人员申请拒绝
+    public function employees_cancel(){
+        $res = $this->manager_model->employees_apply_handle($this->admin_id, -1);
+        $this->ajaxReturn($res);
+    }
     /**
      *********************************************************************************************
      * 经纪人事件
@@ -1277,6 +1311,44 @@ class Manager extends MY_Controller {
 
     public function company_pending_cancel(){
         $res = $this->manager_model->company_pending_cancel($this->admin_id);
+        $this->ajaxReturn($res);
+    }
+
+    //20201009 企业人员列表
+    public function company_pending_temp($page = 1){
+        //先检查 company_id 是否合法
+        if(!$company_id = $this->input->get('company_id'))
+            $this->show_message('信息异常');
+        $company_info = $this->manager_model->company_pending_edit($company_id);
+        if(!$company_info || $company_info['flag'] == -1)
+            $this->show_message('企业信息异常');
+        $res_check_town_ = $this->manager_model->check_admin_townByTown_id($this->admin_id,$company_info['town_id']);
+        if(!$res_check_town_)
+            $this->show_message('不可操作此区镇企业');
+        $data = $this->manager_model->company_pending_temp($company_id,$page);
+        $base_url = "/manager/company_pending_temp/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        unset($company_info['agent']);
+        $this->assign('company_info', $company_info);
+        $this->display('manager/company/company_pending_temp.html');
+    }
+    //20201009 企业人员添加
+    public function company_pending_add_agent(){
+        $res = $this->manager_model->company_pending_add_agent($this->admin_id);
+        $this->ajaxReturn($res);
+    }
+    //20201009 企业人员删除
+    public function company_pending_delete_agent(){
+        $res = $this->manager_model->company_pending_delete_agent($this->admin_id);
+        $this->ajaxReturn($res);
+    }
+    //20201009 企业人员设置网签
+    public function company_pending_wq_agent(){
+        $res = $this->manager_model->company_pending_wq_agent($this->admin_id);
         $this->ajaxReturn($res);
     }
 

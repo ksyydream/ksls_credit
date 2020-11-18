@@ -1,0 +1,278 @@
+<!doctype html>
+<html class="no-js">
+<head>
+
+    {{include file='homepage/public/head.html'}}
+ <link rel="stylesheet" href="/manager_statics/app/lightbox.min.css?v3"/>
+</head>
+<body class="page">
+  <div class="page-hd">
+   <div class="main1200">
+
+       {{include file='homepage/public/logo.html'}}
+
+       </div>
+ </div>
+
+
+  <div class="page-bd">
+<div class="main1200">
+  <div class="com-tit com-tit_1 s-tit user-com-tit">
+    <em class="em-icon"></em>从业经纪人基本信息
+ 
+
+  </div>
+  
+ <form action="" method="post" id="save_form">
+     <input type="hidden" name="folder" value="{{$time}}" id="folder">
+                <div class="company-info ">
+                <!--     <div class="tit"><em class="em-icon"></em>从业经纪人基本信息</div> -->
+                  
+                        <div class="s-tit"><em class="em-icon"></em>基本信息</div>
+                        <dl class="dl-form">
+                            <dt>姓名</dt>
+                            <dd><input type="text" id="name" name="name" value="" placeholder="姓名" class="input-txt-1">
+                                <p style="display:none" class="tips"><em></em>请输入姓名</p></dd>
+                            <dt>联系电话</dt>
+                            <dd><input type="text" id="phone" name="phone" value="" placeholder="联系电话" class="input-txt-1">
+                                <p style="display:none" class="tips"><em></em>请输入联系电话</p></dd>
+                            <dt>身份证号</dt>
+                            <dd><input type="text" id="card" name="card" value="" placeholder="身份证号" class="input-txt-1 js4IDcard">
+                                <p style="display:none" class="tips"><em></em>请输入身份证号</p></dd>
+                        </dl>
+                        <div class="s-tit"><em class="em-icon"></em>上传身份证照片（正反面）</div>
+                        <div class="upload-btn-div"><a href="javascript:" class="upload-btn" onclick="triggerFileUpload(1)"></a></div>
+                        <div id="uploadImgcontainer1" class="pic-upload">
+
+                        </div>
+                        <div class="s-tit"><em class="em-icon"></em>上传个人证件照</div>
+                        <div class="upload-btn-div"><a href="javascript:" class="upload-btn" onclick="triggerFileUpload(3)"></a><p class="tips">（Tips:请上传一张清晰的免冠蓝底个人证件照）</p></div>
+                        <div id="uploadImgcontainer3" class="pic-upload">
+
+                        </div>
+               
+                </div>
+
+                <a href="javascript:" id="save_btn" class="submit-btn">提交审核</a>
+            </form>
+
+
+
+</div>
+  </div>
+
+
+
+
+</body>
+</html>
+{{include file='homepage/public/foot.html'}}
+
+<link href="/web_assets/js/jquery-ui/jquery-ui.min.css" rel="stylesheet">
+<script src="/web_assets/js/jquery-ui/jquery-ui.min.js"></script>
+<!--plupload start--------------------------------------------------------------------------->
+<!-- Load plupload and all it's runtimes and finally the UI widget -->
+<link rel="stylesheet" href="/manager_statics/plupload/js/jquery.ui.plupload/css/jquery.ui.plupload.css" type="text/css" />
+<!-- production -->
+<script type="text/javascript" src="/manager_statics/plupload/js/plupload.full.min.js"></script>
+<script type="text/javascript" src="/manager_statics/plupload/js/zh_CN.js"></script>
+<script type="text/javascript" src="/manager_statics/plupload/js/jquery.ui.plupload/jquery.ui.plupload.js"></script>
+<!--plupload END--------------------------------------------------------------------------->
+<script type="text/javascript">
+
+    function triggerFileUpload(flag) {
+        var data_ = "{{$time}}_" +  Math.floor(Math.random()*(9000)+1000);
+        $("#folder").val(data_);
+        var html = '<div id="uploader" style="width:550px;"><p>Your browser doesn\'t have Flash, Silverlight or HTML5 support.</p></div>';
+
+        var layerIndex = layer.confirm(html, {
+            offset: ['100px', (document.body.offsetWidth - 800) / 2],
+            maxWidth: 800,
+            btn: ['确定','取消'],
+            shade: false
+        }, function(){
+            uploadFile(flag);
+            layer.close(layerIndex);
+        }, function(){
+        });
+        var action = '';
+        switch (flag){
+            case 1:
+                action =   'agent_code_pic';
+                break;
+            case 3:
+                action =   'agent_person_pic';
+                break;
+            default:
+                alert("调用失败!");
+                return false;
+        }
+        $("#uploader").plupload({
+            runtimes : 'html5,flash,silverlight',
+            url : "/company/save_pics/" + action + "/" + $("#folder").val(),
+            max_file_size : '50mb',
+            resize : { crop: true },
+            file_data_name: 'userfile',
+            filters : [],
+            filters: {
+                mime_types : [{
+                    title : "Image files",
+                    extensions : "jpg,gif,png,jpeg"
+                }],
+                max_file_size : '8024kb',
+                prevent_duplicates : true
+            },
+            rename: true,
+            sortable: true,
+            dragdrop: true,
+            views: {
+                list: true,
+                thumbs: true,
+                active: 'thumbs'
+            },
+            flash_swf_url : '/manager_statics/plupload/js/Moxie.swf',
+            silverlight_xap_url : '/manager_statics/plupload/js/Moxie.xap'
+        });
+    }
+
+    function uploadFile(flag) {
+        var action = '';
+        var img_name_ = '';
+        switch (flag){
+            case 1:
+                action =   'agent_code_pic';
+                img_name_ =   '身份证图片';
+                break;
+            case 3:
+                action =   'agent_person_pic';
+                img_name_ =   '个人证件照';
+                break;
+            default:
+                alert("调用失败!");
+                return false;
+        }
+        if ($('#uploader').plupload('getFiles').length < 1) {
+            alert("图片未上传,请重新选择.");
+            return false;
+        } else {
+            $.getJSON("/manager_login/get_pics/" + action + "/" + $("#folder").val() +  "/?_=" + Math.random(), function(data){
+                var html = '';
+                var now_pic = [];
+                $('input[name="pic_short' + flag.toString() + '[]"]').each(function(index){
+                    now_pic[index] = $(this).val();
+                });
+
+                $.each(data.img,function(index,item){
+                    var path = item + '?imageView2/0/w/200/h/200/q/75|imageslim';
+                    if($.inArray(item, now_pic) < 0){
+                        html+='<div class="imgs-div"><span class="imgs-span"><img layer-src="'+path+'" src="'+path+'" alt=""></span>';
+                        html+='<a href="javascript:" onclick="del_pic(this);" class="close"></a>';
+                        html += '<input type="hidden" name="pic_short' + flag.toString() + '[]" class="pic_short" value="' + item + '">';
+                        html+='</div>';
+                    }
+                });
+                $("#uploadImgcontainer" + flag.toString()).append(html);
+
+            });
+            return true;
+        }
+    }
+
+    function del_pic(obj) {
+        var layerIndex = layer.confirm('是否删除此图片,图片操作只在保存后生效', {
+            btn: ['确定','取消'], //按钮
+            area: ['300px', 'auto']
+        }, function(){
+            $(obj).parent().remove();
+            layer.close(layerIndex);
+        },function(){
+
+        });
+    }
+
+    $("#save_btn").click(function(){
+        submit_fun('/company/employees_apply_save');
+    })
+
+    function submit_fun(url_submit){
+        var index_load = layer.load(1, {
+            shade: [0.1,'#fff'] //0.1透明度的白色背景
+        });
+        var flag = -1;
+        var name = $.trim($("#name").val());
+        if(name == "" ) {
+            layer.close(index_load);
+            layer.msg('姓名不能为空!', {icon: 2});
+            return false;
+        }
+        var phone = $.trim($("#phone").val());
+        if(phone == "" ) {
+            layer.close(index_load);
+            layer.msg('联系电话不能为空!', {icon: 2});
+            return false;
+        }
+        var card = $.trim($("#card").val());
+        if(card == "" ) {
+            layer.close(index_load);
+            layer.msg('身份证号码不能为空!', {icon: 2});
+            return false;
+        }
+
+        var length = $("#uploadImgcontainer1").find(".imgs-div").length;
+        if(length < 1){
+            layer.close(index_load);
+            layer.msg('必须上传身份证照片', {icon: 2});
+            flag=1;return false;
+        }
+
+        var length_3 = $("#uploadImgcontainer3").find(".imgs-div").length;
+        if(length_3 < 1){
+            layer.close(index_load);
+            layer.msg('必须上传个人证件照片', {icon: 2});
+            flag=1;return false;
+        }
+        if(length_3 > 1){
+            layer.close(index_load);
+            layer.msg('个人证件照片 只需上传一张', {icon: 2});
+            flag=1;return false;
+        }
+
+        if(flag != 1) {
+            var form = document.getElementById('save_form');
+
+            var formdata = new FormData(form);
+            $.ajax({
+                type: "POST",
+                url: url_submit,
+                data: formdata,
+                async: true,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    layer.close(index_load);
+                    var return_ = JSON.parse(data)
+                    if (return_.status == 1) {
+                        var url = '/company/employees_apply_list/';
+                        layer.alert('操作成功!', {
+                            skin: 'layui-layer-molv' //样式类名
+                            , closeBtn: 0
+                        }, function () {
+                            window.location.replace(url);
+                        });
+                    } else {
+                        layer.msg(return_.msg);
+                    }
+
+                },
+                error: function () {
+                    layer.close(index_load);
+                    layer.msg('网络异常!');
+                }
+            });
+        }else{
+            layer.close(index_load);
+        }
+
+    }
+</script>

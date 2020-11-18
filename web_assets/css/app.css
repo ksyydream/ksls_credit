@@ -6,7 +6,6 @@ input::-webkit-input-placeholder{ color:#b2b2b2;}
 input::-moz-placeholder{color:#b2b2b2;}
 input:-moz-placeholder{color:#b2b2b2;}
 input:-ms-input-placeholder{  color:#b2b2b2;}i{font-style:normal;}
-.fl{float: left;} em{ font-style: normal;}
 
 
 .ind_main{background: url(../i/ind_bg.jpg) no-repeat center top;height:930px;min-height: 800px; position: relative;}
@@ -75,7 +74,7 @@ input:-ms-input-placeholder{  color:#b2b2b2;}i{font-style:normal;}
 
 .com-data .am-panel-hd{background: none; text-align: center;border:none;}
 
-/*翻页*/
+/*缈婚〉*/
 #company_page {text-align: center;margin: 30px 40px 0;}
 .am-pagination{float: left;}
 .pages-counts{ margin: 20px 10px 0 0;}
@@ -95,7 +94,7 @@ input:-ms-input-placeholder{  color:#b2b2b2;}i{font-style:normal;}
 .agentMore{color: #2dd7cc;}
 
 /**
-* 模拟select
+* 妯℃嫙select
 **/
 .select-box { position: relative;margin-bottom:1rem;width: 228px; }
 .select-city .select-header { width: 228px; height: 36px; padding-right: 26px; background: url(../i/arrow1.png) no-repeat #2dd7cc; line-height: 36px; text-indent: 14px; font-size: 16px; color: #fff; cursor: pointer; overflow: hidden;  text-align: center;}
@@ -112,7 +111,7 @@ input:-ms-input-placeholder{  color:#b2b2b2;}i{font-style:normal;}
 .login_main{background: url(../i/login_bg1.jpg) no-repeat center top; height: 1080px;}
 
 
-/*登录*/
+/*鐧诲綍*/
 .login_main  .main1200 {padding-top:234px}
 
 
@@ -206,14 +205,15 @@ input:-ms-input-placeholder{  color:#b2b2b2;}i{font-style:normal;}
 .upload-btn-div{margin:10px 0 20px 55px;}
 .upload-btn{display: block;width: 105px; height: 36px; line-height: 36px;background: url(../i/submit_bg.png) no-repeat 0 -123px;}
 .upload-btn:hover{text-decoration: none;}
-.pic-upload{margin:0 55px; position: relative;}
-.imgs-div{width:100px; height: 80px; background: #fafafa; float: left; margin:0 10px 10px 0; position: relative;}
-.imgs-span img{width: 100%; height: 100%;}
-.pic-upload .close{width:18px; height: 18px; display: block; background: url(../i/submit_bg.png) no-repeat 0 -103px; position:absolute;top:0;left:0;}
+.pic-upload{margin:0 55px; position: relative; overflow: hidden;}
+.imgs-div{width:100px;  background: #fafafa; margin:0 10px 10px 0; position: relative; float: left;}
+.imgs-span img{width: 100%; }
+.pic-upload .close{width:18px; height: 18px; display: block; background: url(../i/submit_bg.png) no-repeat 0 -103px; position:absolute;top:0;right:0;}
 
-.company-wrap .agent-info .tit{margin-bottom: 0;}
-.company-wrap .agent-info .tit .em-icon{margin-top: 6px;width:33px;height:24px;background: url(../i/submit_bg.png) no-repeat 6px -21px;}
-.company-wrap .onagent-info .tit .em-icon{margin: 6px 0 0 15px;width:25px; height:22px;background-position: 0 -47px;}
+.agent-info .tit{margin-bottom: 0;}
+.user-com-tit{font-size: 18px;color:#77a69a;margin-left: 25px; }
+.user-com-tit .em-icon{margin-top: 6px;width:33px;height:24px;float: left;background: url(../i/submit_bg.png) no-repeat 6px -21px;}
+.user-com-tit .em-icon{margin: 3px 0 0 15px;width:25px; height:22px;background-position: 0 -47px;}
 .agent-tips{margin:0 0 15px 45px;}
 .agent-info .dl-form{padding:15px;width: 260px; float: left;margin-bottom: 20px; background: #fafafa; position: relative;}
 .agent-info .dl-form .close-btn{padding:0;width: 25px; height: 25px; cursor: pointer;  background: url(../i/icon_bg.png) no-repeat 0 -294px; position:absolute;top:5px;right: 5px;}
@@ -228,7 +228,7 @@ input:-ms-input-placeholder{  color:#b2b2b2;}i{font-style:normal;}
 .apply-info .dl-form dd{font-size: 14px; float: left;}
 .apply-info .dl-form dt{padding-top: 15px;}
 .mb15{margin-bottom: 15px;}.mb20{margin-bottom: 20px;}
-.div-edit .s-tit{margin-bottom: 10px;}
+.div-edit .s-tit{margin-bottom: 10px; margin-top: 10px;}
 .agent-table td{border-bottom: 1px solid #ccc; font-size: 14px;padding:10px 0 5px;}
 .agent-table td .span-tit{font-size: 16px;width:110px; float: left; line-height: 36px;}
 .agent-table td .span-input{float: left; font-size: 14px;line-height: 36px; color: #888; position: relative;}
@@ -269,7 +269,7 @@ input:-ms-input-placeholder{  color:#b2b2b2;}i{font-style:normal;}
 
 .apply-info{min-height: 600px;}
 
-.dl-bz dd .c-content-txt,.apply-info dd .c-content-txt{padding:10px; width:558px; height:130px;font-family: "微软雅黑"; line-height: 22px;font-size: 14px; color: #666; border:none; background: #ebebeb;}
+.dl-bz dd .c-content-txt,.apply-info dd .c-content-txt{padding:10px; width:558px; height:130px;font-family: "寰蒋闆呴粦"; line-height: 22px;font-size: 14px; color: #666; border:none; background: #ebebeb;}
 .apply-info dd .c-content-txt{background: none; border:1px solid
 #aaa; padding:5px; line-height: 22px; background:#fff;border-radius: 3px;}
 
@@ -329,3 +329,29 @@ input:-ms-input-placeholder{  color:#b2b2b2;}i{font-style:normal;}
 
 .f-tr{ color: #fff; position: absolute; bottom: 15px; width: 100%;}
 .f-tr p{text-align: center; font-size: 12px;}
+
+.s_tit{ font-size:14px;margin-left: 62px; margin-bottom: 15px; line-height: 16px; height: 20px;}
+.s_tit .angel{width:12px; height: 12px; background: #2dd7cc; float: left; margin-right: 5px; margin-top: 2px; }
+
+.addbtn-cy{ display: block; width:180px; height:36px; background:#2dd7cc; line-height: 50px; color: #fff; text-align: center; line-height:36px;  }
+.addbtn-cy:hover{color: #fff;}
+.com-tit_1{margin-left: 0;}
+
+.mt-20{margin-top: 20px;}
+
+.cypeo-box{ background: #fafafa; padding:20px 0;}
+
+
+.input-txt-addcypeo{width:290px;height: 32px; border:1px solid
+#aaa; padding:5px; line-height: 22px; background:#fff;border-radius: 3px;}
+
+.add-cxpeo{float: right;margin-right: 50px;}
+.cypeo-tit{ height: 40px;}
+
+.add-cy-peo-btn{width:50px; height: 30px; color: #fff; text-align: center; float: right; background: #2dd7cc; line-height: 30px; margin-left: 10px;  border-radius: 3px;}
+.add-cy-peo-btn:hover,.add-cy-peo-btn:focus{color: #fff;}
+
+
+.result-cyinfo{font-size: 16px; margin-bottom:10px;display: block; width: 110px; height: 30px; line-height: 30px; text-align: center;color: #fff; background: #a7ce83; }
+.result-infpo{background: #e88686;padding:10px; color: #fff;}
+.result-cyinfo-fail{background: #e88686;}

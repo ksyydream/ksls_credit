@@ -726,6 +726,16 @@ class MY_Model extends CI_Model{
         return $username;
     }
 
+    //自动生成 从业编号
+    public function get_job_num(){
+        $title_ = 'SZ';
+        $num_ = $title_ . '_9' . sprintf('%07s', $this->get_sys_num_auto($title_));
+        $check = $this->db->select('id')->from('agent')->where('job_num', $num_)->order_by('id','desc')->get()->row_array();
+        if($check)
+            $num_ = $this->get_job_num();
+        return $num_;
+    }
+
     //获取备案号,20200524 备案号用于在生成的证书上显示,因新需求是 证书编号不变
     public function get_record_num(){
         $title_ = 'KS';
@@ -740,6 +750,8 @@ class MY_Model extends CI_Model{
     public function get_agent_num4company($company_id){
          $this->db->select('count(1) num')->from('agent a');
         $this->db->where('flag', 2);
+        //20200928 只计算持证经纪人人数, 也就是不包含 从业人员
+        $this->db->where('work_type', 1);
         $this->db->where('grade_no >', 1);
         $this->db->where('company_id', $company_id);
         $num = $this->db->get()->row();
@@ -1183,7 +1195,7 @@ class MY_Model extends CI_Model{
         $data['img'] = $this->db->get()->result_array();
         if($data['img'])
             $this->db->insert_batch('company_log_img',$data['img']);
-        $this->db->select("id agent_id,name,phone,job_code,card,company_id,{$log_id} log_id,wq,old_job_code")->from('agent');
+        $this->db->select("id agent_id,name,phone,job_code,card,company_id,{$log_id} log_id,wq,old_job_code,work_type,job_num")->from('agent');
         $this->db->where('company_id',$company_id);
         $data['agent'] = $this->db->get()->result_array();
         if($data['agent'])

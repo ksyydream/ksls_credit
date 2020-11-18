@@ -1,0 +1,33 @@
+ <div class="out-table">
+          <table class="data-table" width="100%">
+                 <tr>
+                     <th width="25%">信息卡号</th>
+                  <th width="15%">姓名</th>
+                  <th>联系电话</th>
+                  <th width="15%"></th>
+                 </tr>
+                 {{foreach from=$data.res_list key=key item=item}}
+                    <tr>
+                        <td>{{$item.job_num}}</td>
+                        <td>{{$item.name}}</td>
+                        <td>{{$item.phone}}</td>
+                        <td>
+                    <a href="/home/agent_detail/{{$item.id}}" target="_blank" class="agentMore">详情</a>
+                    {{if $item.company_id == $c_id_}}<a href="javascript:;" onclick="cancel_agent('{{$item.id}}')" class="agentMore">解绑</a>{{/if}}</td>
+                </tr>
+        {{/foreach}}
+                
+             </table>
+          </div>
+
+          <div id="ajax_agent_page" class="page-fy">
+              {{$pager}}
+       </div>
+
+<script type="application/javascript">
+    $("#ajax_agent_page  a").click(function(){
+        agent_page = $(this).data('ci-pagination-page');
+        ajax_agent_table('agent_form', agent_page);
+        return false;
+    });
+</script>

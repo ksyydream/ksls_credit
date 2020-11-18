@@ -173,6 +173,28 @@ class Home extends Home_Controller {
         $this->display('homepage/company/show_agent.html');
     }
 
+    //单独显示企业 持证经纪人
+    public function show_agent_1($page = 1){
+        $data = $this->home_model->show_agent($page, 1);
+        $base_url = "/home/show_agent_1/";
+        //getPageLink
+        $pager = $this->pagination->getPageLink4home($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('homepage/company/show_agent_1.html');
+    }
+    //单独显示企业 从业经纪人
+    public function show_agent_2($page = 1){
+        $data = $this->home_model->show_agent($page, 2);
+        $base_url = "/home/show_agent_2/";
+        //getPageLink
+        $pager = $this->pagination->getPageLink4home($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('homepage/company/show_agent_2.html');
+    }
     //企业详情中的 企业事件列表
     public function show_company_record($page = 1){
         $data = $this->home_model->show_company_record($page);
@@ -182,6 +204,21 @@ class Home extends Home_Controller {
         $this->assign('page', $page);
         $this->assign('data', $data);
         $this->display('homepage/company/show_event.html');
+    }
+    //显示从业人员信息
+    public function show_employess_dialog(){
+        $data = $this->home_model->get_agentByKey4add();
+        if(!$data){
+            echo -1;die();
+        }
+        if($data['work_type'] != 2){
+            echo -2;die();
+        }
+        if($data['company_id'] != -1){
+            echo -3;die();
+        }
+        $this->assign('data', $data);
+        $this->display('homepage/company/show_employess_dialog.html');
     }
 
     //经纪人列表

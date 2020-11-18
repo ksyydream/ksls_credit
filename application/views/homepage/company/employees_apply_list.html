@@ -1,0 +1,70 @@
+
+<!doctype html>
+<html class="no-js">
+<head>
+
+    {{include file='homepage/public/head.html'}}
+ <link rel="stylesheet" href="/manager_statics/app/lightbox.min.css?v3"/>
+</head>
+<body class="page">
+  <div class="page-hd">
+   <div class="main1200">
+       {{include file='homepage/public/logo.html'}}
+   </div>
+ </div>
+
+
+  <div class="page-bd">
+<div class="main1200">
+  <div class="com-tit com-tit_1"><span></span>从业经纪人申请列表</div>
+  
+              <table class="data-table" width="100%">
+                 <tbody><tr>
+                 
+                  <th width="18%">姓名</th>
+                  <th width="18%">联系电话</th>
+               
+              
+                  <td width="20%">提交时间</td>
+                      <th>状态</th>
+                         <th width="15%"></th>
+                 </tr>
+                 {{foreach from=$data.res_list key=k item=v}}
+                 <tr>
+
+                     <td>{{$v.name}}</td>
+                     <td>{{$v.phone}}</td>
+
+                     <td>{{$v.cdate}}</td>
+                     <td>
+
+                         {{if $v.flag == 1}}待审{{/if}}
+                         {{if $v.flag == -1}}审核失败{{/if}}
+                         {{if $v.flag == 2}}审核通过{{/if}}
+                         {{if $v.flag == -2}}作废{{/if}}
+                     </td>
+                     <td>
+                         <a href="/company/employees_apply_detail/{{$v.id}}" target="_blank" class="agentMore">详情</a>
+                     </td>
+
+                 </tr>
+
+                 {{/foreach}}
+
+                        
+             </tbody></table>
+    <div class="clear"></div>
+
+    <div id="company_page" class="page-fy">
+        {{$pager}}
+    </div>
+             <a href="/company/employees_apply_add" class="addbtn-cy mt-20">新增从业人员+</a>
+</div>
+  </div>
+
+
+
+
+</body>
+</html>
+{{include file='homepage/public/foot.html'}}
