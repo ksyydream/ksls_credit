@@ -333,7 +333,7 @@ input:-ms-input-placeholder{  color:#b2b2b2;}i{font-style:normal;}
 .s_tit{ font-size:14px;margin-left: 62px; margin-bottom: 15px; line-height: 16px; height: 20px;}
 .s_tit .angel{width:12px; height: 12px; background: #2dd7cc; float: left; margin-right: 5px; margin-top: 2px; }
 
-.addbtn-cy{ display: block; width:180px; height:36px; background:#2dd7cc; line-height: 50px; color: #fff; text-align: center; line-height:36px;  }
+.addbtn-cy{ display: block; width:180px; height:36px; background:#2dd7cc; line-height: 50px; color: #fff; text-align: center; line-height:36px; margin-left:42px; }
 .addbtn-cy:hover{color: #fff;}
 .com-tit_1{margin-left: 0;}
 
