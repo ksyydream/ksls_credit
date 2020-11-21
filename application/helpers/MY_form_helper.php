@@ -384,7 +384,7 @@ function create_captcha($data = '', $font_path = '')
 
     #直接输出
     //如有必要时添加代码ob_clean();清除缓存保证header前没有任何输出
-    //ob_clean();
+    ob_clean();
     header("Content-Type:image/jpeg");
 
     imagejpeg($im);
