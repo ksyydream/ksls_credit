@@ -1404,6 +1404,50 @@ class Manager extends MY_Controller {
         }
 
         $excel->getActiveSheet()->setTitle('企业信息列表');
+
+        $excel->createSheet();
+        $excel->setActiveSheetIndex(1);
+        $excel->getActiveSheet()->setTitle('经纪人信息');
+
+        $letter = array('A','B','C','D','E','F','G','H','I');
+        $tableheader = array('从业机构','经纪人姓名','信息卡号','执业证号','身份证号','联系电话','是否网签', '人员类型','所属区镇');
+        for($i = 0;$i < count($tableheader);$i++) {
+            $excel->getActiveSheet()->setCellValue("$letter[$i]1","$tableheader[$i]");
+            $excel->getActiveSheet()->getStyle("$letter[$i]1")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        }
+        $excel->getActiveSheet()->getColumnDimension("A")->setWidth(40);
+        $excel->getActiveSheet()->getColumnDimension("B")->setWidth(25);
+        $excel->getActiveSheet()->getColumnDimension("C")->setWidth(25);
+        $excel->getActiveSheet()->getColumnDimension("D")->setWidth(25);
+        $excel->getActiveSheet()->getColumnDimension("E")->setWidth(25);
+        $excel->getActiveSheet()->getColumnDimension("F")->setWidth(18);
+        $excel->getActiveSheet()->getColumnDimension("G")->setWidth(18);
+        $excel->getActiveSheet()->getColumnDimension("H")->setWidth(18);
+        $excel->getActiveSheet()->getColumnDimension("I")->setWidth(18);
+        $data = array();
+        foreach ($data_res['agent_list'] as $k=>$v){
+            $wq_name_ = '否';
+            if($v['wq'] == 2)
+                $wq_name_ = '是';
+            $work_type_name_ = '持证经纪人';
+            if($v['work_type'] == 2)
+                $work_type_name_ = '从业人员';
+            $data[] = array($v['company_name'],$v['name'],$v['job_num'],$v['job_code'],$v['card']
+            ,$v['phone'],$wq_name_,$work_type_name_,$v['town_name_']);
+        }
+
+        for ($i = 2;$i <= count($data) + 1;$i++) {
+            $j = 0;
+            foreach ($data[$i - 2] as $key=>$value) {
+                if($key==4){
+                    $excel->getActiveSheet()->setCellValue("$letter[$j]"."$i"," $value");
+                    $excel->getActiveSheet()->getStyle("$letter[$j]"."$i")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
+                }else{
+                    $excel->getActiveSheet()->setCellValue("$letter[$j]"."$i","$value",PHPExcel_Cell_DataType::TYPE_STRING);
+                }
+                $j++;
+            }
+        }
         $excel->setactivesheetindex(0);
         $write = new \PHPExcel_Writer_Excel5 ($excel);
         header("Pragma: public");

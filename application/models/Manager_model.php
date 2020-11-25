@@ -2121,6 +2121,38 @@ class Manager_model extends MY_Model
             $this->db->order_by('a.cancel_date','desc');
         $this->db->order_by('a.cdate','desc');
         $data['res_list'] = $this->db->get()->result_array();
+        //增加导出经纪人
+        $this->db->select('a1.*,a.company_name,t.name town_name_')->from('company_pending a');
+        $this->db->join('company_grade b', 'a.grade_no = b.grade_no', 'left');
+        $this->db->join('town t', 'a.town_id = t.id', 'left');
+        $this->db->join('agent a1', 'a1.company_id = a.id','left');
+        if($data['keyword']){
+            $this->db->group_start();
+            $this->db->like('a.company_name', $data['keyword']);
+            $this->db->or_like('a.business_no', $data['keyword']);
+            $this->db->group_end();
+        }
+        if($data['town_id'])
+            $this->db->where('a.town_id', $data['town_id']);
+        if($data['zz_status'])
+            $this->db->where('a.zz_status', $data['zz_status']);
+        if(is_array($data['town_ids']))
+            $this->db->where_in('a.town_id', $data['town_ids']);
+        if($flag)
+            $this->db->where_in('a.flag',$flag);
+        if($data['flag'])
+            $this->db->where('a.flag', $data['flag']);
+        if($status){
+            $this->db->where_in('a.status',$status);
+        }
+        $this->db->where('a1.flag', 2);
+        if(in_array(-1, $flag))
+            $this->db->order_by('a.cancel_date','desc');
+        $this->db->order_by('a.cdate','desc');
+        $this->db->order_by('a1.work_type','asc');
+        $this->db->order_by('a1.last_work_time','desc');
+        $data['agent_list'] = $this->db->get()->result_array();
+
         return $data;
     }
 
