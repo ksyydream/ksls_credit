@@ -122,7 +122,7 @@ class Company_model extends MY_Model
         if(!$agent_info_)
             return $this->fun_fail('经纪人信息异常');
         if($agent_info_['work_type'] != 2)
-            return $this->fun_fail('不是从业经纪人,不可添加');
+            return $this->fun_fail('不是从业人员,不可添加');
         if($agent_info_['grade_no'] == 1)
             return $this->fun_fail('信息异常,不可添加');
         if($agent_info_['company_id'] != -1)
