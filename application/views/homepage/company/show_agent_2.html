@@ -20,14 +20,14 @@
              </table>
           </div>
 
-          <div id="ajax_agent_page" class="page-fy">
+          <div id="ajax_employees_page" class="page-fy">
               {{$pager}}
        </div>
 
 <script type="application/javascript">
-    $("#ajax_agent_page  a").click(function(){
-        agent_page = $(this).data('ci-pagination-page');
-        ajax_agent_table('agent_form', agent_page);
+    $("#ajax_employees_page  a").click(function(){
+        employees_page = $(this).data('ci-pagination-page');
+        ajax_employees_table('agent_form', employees_page);
         return false;
     });
 </script>
