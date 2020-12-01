@@ -12,10 +12,10 @@
    <div class="page-bd">
     <div class="main1200">
       <div class="search_box">
-          <form action="">
+          <form action="/home/agent_list" method="get" id="search_agent_form">
            <div class="s-ipt">
-            <input type="search" placeholder="请输入公司名/税号/法定代表人姓名进行查询" class="search_ipt" />
-            <a href="javascript:" class="search-btn"></a>
+            <input type="search" name="a_k" placeholder="请输入经纪人证号/经纪人姓名" class="search_ipt" />
+            <a href="javascript:" id="agent_btn" class="search-btn"></a>
           </div>
         </form>
       </div>
@@ -232,6 +232,10 @@ function ajax_event_table(form, page) {
         });
       
     }
+
+$("#agent_btn").click(function(){
+    $("#search_agent_form").submit();
+})
 </script>
 </body>
 </html>
