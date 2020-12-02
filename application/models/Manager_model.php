@@ -2890,6 +2890,34 @@ class Manager_model extends MY_Model
         return $this->fun_success('重置成功!');
     }
 
+    //重置企业密码
+    public function locking_company_zz($admin_id){
+        $company_id = $this->input->post('id');
+        $business_no = $this->input->post('data_name');
+        $locking_zz = $this->input->post('locking_zz');
+        if(!$company_id || !$business_no)
+            return $this->fun_fail('信息缺失!');
+        $check_town_ = $this->check_admin_townByCompany_id($admin_id, $company_id);
+        if(!$check_town_)
+            return $this->fun_fail('不可操作此区镇下企业!');
+        switch($locking_zz){
+            case 1:
+                //如果是锁定 则在加入锁定状态时 还需要强制加入异常状态
+                $this->db->where(array('id' => $company_id, 'business_no' => $business_no))->update('company_pending', array('locking_zz' => 1));
+                //这里分开做动作是为了以后 强制锁定正常资质做准备
+                $this->db->where(array('id' => $company_id, 'business_no' => $business_no))->update('company_pending', array('zz_status' => -1));
+                break;
+            case 0:
+                //如果是解除锁定则在解除时重新评估企业资质状态
+                $this->db->where(array('id' => $company_id, 'business_no' => $business_no))->update('company_pending', array('locking_zz' => 0));
+                $this->save_company_total_score($company_id);
+                break;
+            default:
+                return $this->fun_fail('信息缺失!');
+        }
+        return $this->fun_success('操作成功!');
+    }
+
     //企业注销
     public function company_pending_cancel($admin_id){
         $company_id = $this->input->post('id');
