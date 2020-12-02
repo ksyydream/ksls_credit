@@ -968,7 +968,8 @@ class MY_Model extends CI_Model{
         $this->db->where('id', $company_id)->set('total_score', 'event_score + sys_score + base_score', FALSE)->update('company_pending');
         if($agent_num < 3 || $is_qx_2_)
             $zz_status_ = -1;
-        $this->db->where('id', $company_id)->set('zz_status', $zz_status_)->update('company_pending');
+        //只对资质状态不锁定的企业进行修改
+        $this->db->where('id', $company_id)->where('locking_zz', 0)->set('zz_status', $zz_status_)->update('company_pending');
 
         if ($annual_year && $is_ns_ && in_array($is_ns_, array(1, 2))) {
             $annual_info_ = $this->db->select('*')->from('company_ns_list')->where(array('annual_year' => $annual_year, 'company_id' => $company_id))->get()->row_array();

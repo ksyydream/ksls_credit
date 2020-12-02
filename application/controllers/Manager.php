@@ -1757,5 +1757,9 @@ class Manager extends MY_Controller {
         $this->ajaxReturn($res);
     }
 
-
+    //锁定企业资质状态
+    public function locking_company_zz(){
+        $res = $this->manager_model->locking_company_zz($this->admin_id);
+        $this->ajaxReturn($res);
+    }
 }
