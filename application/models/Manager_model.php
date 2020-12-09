@@ -495,6 +495,7 @@ class Manager_model extends MY_Model
             $this->db->like('a.name', $data['keyword']);
             $this->db->or_like('a.job_code', $data['keyword']);
             $this->db->or_like('a.job_num', $data['keyword']);
+            $this->db->or_like('a.card', $data['keyword']);
             $this->db->group_end();
         }
         if($data['flag']){
@@ -521,6 +522,7 @@ class Manager_model extends MY_Model
             $this->db->like('a.name', $data['keyword']);
             $this->db->or_like('a.job_code', $data['keyword']);
             $this->db->or_like('a.job_num', $data['keyword']);
+            $this->db->or_like('a.card', $data['keyword']);
             $this->db->group_end();
         }
         if($data['flag']){
