@@ -500,6 +500,11 @@ class MY_Model extends CI_Model{
             'get_json' => json_encode($this->input->get()),
             'cdate' => date('Y-m-d H:i:s',time())
         );
+        if(!$data['action_url']){
+            //Nginx 下 可能获取不到值
+            $data['action_url'] = @explode('?',$_SERVER['REQUEST_URI'])[0];
+
+        }
         $this->db->insert('admin_log',$data);
 
     }
