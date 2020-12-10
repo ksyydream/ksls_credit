@@ -495,7 +495,7 @@ class MY_Model extends CI_Model{
     public function save_admin_log($admin_id){
         $data = array(
             'admin_id' => $admin_id,
-            'action_url' => $_SERVER['PHP_SELF'],
+            'action_url' => $_SERVER['REQUEST_URI'],
             'post_json' => json_encode($this->input->post()),
             'get_json' => json_encode($this->input->get()),
             'cdate' => date('Y-m-d H:i:s',time())
