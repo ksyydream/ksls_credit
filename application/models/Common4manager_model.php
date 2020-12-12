@@ -405,6 +405,15 @@ class Common4manager_model extends MY_Model
         return true;
     }
 
+    //检查是否是从业黑名单
+    //从业黑名单规则还不确定,并且验证的地方也比较多,所以单独拿出来
+    public function check_is_black4agent($card){
+        $check_blacklist = $this->db->select()->from('agent_blacklist')->where(array('card'=>$card, 'status' => 1))->get()->row_array();
+        if($check_blacklist)
+            return true;
+        return false;
+    }
+
     public function update_company_num(){
         die();
         $this->db->select('a.id,a.company_name,c.num,a.record_num');

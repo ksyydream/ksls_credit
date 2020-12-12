@@ -1,0 +1,177 @@
+{{include file='manager/public/head.html'}}
+<body class="no-skin">
+{{include file='manager/public/header.html'}}
+<link rel="stylesheet" href="/manager_statics/qwadmin/css/colorbox.css"/>
+<div class="main-container" id="main-container">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('main-container', 'fixed')
+        } catch (e) {
+        }
+    </script>
+    <style>
+        pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+        .string { color: green; }
+        .number { color: darkorange; }
+        .boolean { color: blue; }
+        .null { color: magenta; }
+        .key { color: red; }
+    </style>
+    <style>
+        #uploadImgcontainer1 li{
+
+        }
+
+        #uploadImgcontainer2 li{
+
+        }
+    </style>
+    {{include file='manager/public/sidebar.html'}}
+    <div class="main-content">
+        <div class="main-content-inner">
+            <!-- #section:basics/content.breadcrumbs -->
+            {{include file='manager/public/breadcrumbs.html'}}
+
+            <!-- /section:basics/content.breadcrumbs -->
+            <div class="page-content">
+                {{include file='manager/public/set.html'}}
+
+                <!-- /section:settings.box -->
+                <div class="row">
+                    <div class="col-xs-12">
+                        <!-- PAGE CONTENT BEGINS -->
+                        <form id="save_form" class="form-horizontal" role="form" action="/manager/agent_blacklist_save" method="post">
+                            <input type="hidden" name="id" value="{{$data.id|default:''}}">
+                            <h4 class="blue">
+                                <i class="green ace-icon fa fa-list bigger-110"></i>
+                                黑名单基本信息
+                            </h4>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="name"> 姓名 </label>
+                                <div class="col-sm-9">
+                                    <input type="text" id="name" name="name" required="required" class="rcol-xs-10 col-sm-5" value="{{$data.name|default:''}}">
+                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                </div>
+                            </div>
+
+
+                            <div class="space-4"></div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="card"> 身份证号 </label>
+                                <div class="col-sm-9">
+                                    <input type="text" id="card" name="card" required="required" class="rcol-xs-10 col-sm-5 js4IDcard" value="{{$data.card|default:''}}">
+                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                </div>
+                            </div>
+                            <div class="space-4"></div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label no-padding-right" for="remark"> 备注 </label>
+                                <div class="col-sm-9">
+                                    <textarea name="remark" id="remark" maxlength="150" style="width:60%;height:100px;"></textarea>
+                                    <span class="help-inline col-xs-12 col-sm-7"></span>
+                                </div>
+                            </div>
+
+
+
+                            <div class="col-md-offset-2 col-md-9">
+                                <button id="save_btn" class="btn btn-info" type="button">
+
+                                    <i class="icon-ok bigger-110"></i>
+
+                                    保 存
+
+                                </button>
+                                &nbsp; &nbsp; &nbsp;
+                                <a href="/manager/agent_blacklist_list" class="btn" type="reset">
+
+                                    <i class="icon-undo bigger-110"></i>
+
+                                    返 回
+
+                                </a>
+                            </div>
+                        </form>
+                        <!-- PAGE CONTENT ENDS -->
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.page-content -->
+        </div>
+    </div><!-- /.main-content -->
+    {{include file='manager/public/footer.html'}}
+
+</div><!-- /.main-container -->
+
+{{include file='manager/public/footerjs.html'}}
+<!-- inline scripts related to this page -->
+
+<!--plupload start--------------------------------------------------------------------------->
+<!-- Load plupload and all it's runtimes and finally the UI widget -->
+<link rel="stylesheet" href="/manager_statics/plupload/js/jquery.ui.plupload/css/jquery.ui.plupload.css" type="text/css" />
+<!-- production -->
+<script type="text/javascript" src="/manager_statics/plupload/js/plupload.full.min.js"></script>
+<script type="text/javascript" src="/manager_statics/plupload/js/zh_CN.js"></script>
+<script type="text/javascript" src="/manager_statics/plupload/js/jquery.ui.plupload/jquery.ui.plupload.js"></script>
+<!--plupload END--------------------------------------------------------------------------->
+
+<!-- inline scripts related to this page -->
+<script src="/manager_statics/qwadmin/js/date-time/bootstrap-datepicker.js"></script>
+<script src="/manager_statics/app/ajaxfileupload.js"></script>
+<script src="/manager_statics/qwadmin/js/jquery.colorbox.js"></script>
+
+<!-- ace scripts -->
+<script src="/manager_statics/qwadmin/js/ace-elements.js"></script>
+<script type="text/javascript">
+
+
+
+    $("#save_btn").click(function(){
+        var name = $.trim($("#name").val());
+        if(name == "" ) {
+            layer.msg('姓名不能为空', {icon: 2});
+            return false;
+        }
+
+        var card = $.trim($("#card").val());
+        if(card == "" ) {
+            layer.msg('身份证不能为空', {icon: 2});
+            return false;
+        }
+
+        var form = document.getElementById('save_form');
+
+        var formdata = new FormData(form);
+        $.ajax({
+            type: "POST",
+            url: '/manager/agent_blacklist_save',
+            data: formdata,
+            async: true,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                var return_ = JSON.parse(data)
+                if (return_.status == 1) {
+                    var url = '/manager/agent_blacklist_list/';
+                    layer.alert('操作成功!', {
+                        skin: 'layui-layer-molv' //样式类名
+                        , closeBtn: 0
+                    }, function () {
+                        window.location.replace(url);
+                    });
+                } else {
+                    layer.msg(return_.msg);
+                }
+
+            },
+            error: function () {
+                layer.close(index_load);
+                layer.msg('网络异常!');
+            }
+        });
+    })
+
+
+</script>
+</body>
+</html>

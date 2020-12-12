@@ -535,6 +535,54 @@ class Manager extends MY_Controller {
         $res = $this->manager_model->employees_apply_handle($this->admin_id, -1);
         $this->ajaxReturn($res);
     }
+
+    /**
+     * 从业黑名单列表
+     * @author yangyang
+     * @date 2020-12-12
+     */
+    public function agent_blacklist_list($page = 1){
+        $data = $this->manager_model->agent_blacklist_list($page);
+        $base_url = "/manager/agent_blacklist_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('manager/agent/agent_blacklist_list.html');
+    }
+
+    /**
+     * 从业黑名单新增页面
+     * @author yangyang
+     * @date 2020-12-12
+     */
+    public function agent_blacklist_add(){
+        $this->display('manager/agent/agent_blacklist_detail.html');
+    }
+
+    public function agent_blacklist_edit($m_id){
+        $data = $this->manager_model->agent_blacklist_edit($m_id);
+        if(!$data){
+            $this->show_message('未找到从业黑名单信息!');
+        }
+        $this->assign('data', $data);
+        $this->display('manager/agent/agent_blacklist_view.html');
+    }
+
+    /**
+     * 从业黑名单保存页面
+     * @author yangyang
+     * @date 2020-12-12
+     */
+    public function agent_blacklist_save(){
+        $res = $this->manager_model->agent_blacklist_save($this->admin_id);
+        $this->ajaxReturn($res);
+    }
+
+    public function agent_blacklist_cancel(){
+        $res = $this->manager_model->agent_blacklist_cancel($this->admin_id);
+        $this->ajaxReturn($res);
+    }
     /**
      *********************************************************************************************
      * 经纪人事件

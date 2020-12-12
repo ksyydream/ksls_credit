@@ -596,6 +596,11 @@ class Manager_model extends MY_Model
             //这里还需要判断 如果是离昆或者无效时 需要解绑公司,解绑公司后可能会让公司状态变更 得分产生变化
             $this->db->where('id', $id)->update('agent', $data);
         }else{
+            //新增前加入验证是否是从业黑名单
+            $this->load->model('common4manager_model', 'c4m_model_temp');
+            $check_is_blace_ = $this->c4m_model_temp->check_is_black4agent($data['card']);
+            if($check_is_blace_)
+                return $this->fun_fail('此身份证号在从业黑名单中,不可新增!');
             $chenk_job = $this->db->select()->from('agent')->where('job_code', $data['job_code'])->get()->row_array();
             $chenk_card = $this->db->select()->from('agent')->where('card', $data['card'])->get()->row_array();
             //只有当是 执业经纪人时才做执业证号唯一判断
@@ -875,6 +880,11 @@ class Manager_model extends MY_Model
             return $this->fun_fail('不可操作此区镇下企业!');
         switch($flag){
             case 2:
+                //加入验证此人员是否是从业黑名单
+                $this->load->model('common4manager_model', 'c4m_model_temp');
+                $check_is_blace_ = $this->c4m_model_temp->check_is_black4agent($employees_info_['card']);
+                if($check_is_blace_)
+                    return $this->fun_fail('此身份证号在从业黑名单中,不可通过!');
                 //1.需要先验证申请企业是否可用
                 if($company_info_['flag'] == -1)
                     return $this->fun_fail('企业不可使用!');
@@ -942,6 +952,93 @@ class Manager_model extends MY_Model
         return $this->fun_success('操作成功');
 
     }
+
+    /**
+     * 从业黑名单
+     * @author yangyang
+     * @date 2020-12-12
+     */
+    public function agent_blacklist_list($page = 1){
+        $data['limit'] = $this->limit;
+        //搜索条件
+        $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
+        $data['status'] = $this->input->get('status')?trim($this->input->get('status')):null;
+        //获取总记录数
+        $this->db->select('count(1) num')->from('agent_blacklist a');
+        if($data['keyword']){
+            $this->db->group_start();
+            $this->db->like('a.name', $data['keyword']);
+            $this->db->or_like('a.card', $data['keyword']);
+            $this->db->group_end();
+        }
+        if($data['status']){
+            $this->db->where('a.status', $data['status']);
+        }
+        $num = $this->db->get()->row();
+        $data['total_rows'] = $num->num;
+
+        //获取详细列
+        $this->db->select('a.*')->from('agent_blacklist a');
+        if($data['keyword']){
+            $this->db->group_start();
+            $this->db->like('a.name', $data['keyword']);
+            $this->db->or_like('a.card', $data['keyword']);
+            $this->db->group_end();
+        }
+        if($data['status']){
+            $this->db->where('a.status', $data['status']);
+        }
+        $this->db->limit($this->limit, $offset = ($page - 1) * $this->limit);
+        $this->db->order_by('a.id','desc');
+        $data['res_list'] = $this->db->get()->result_array();
+        return $data;
+    }
+
+    public function agent_blacklist_edit($id){
+        $this->db->select('a.*')->from('agent_blacklist a');
+        $this->db->where('a.id',$id);
+        $detail =  $this->db->get()->row_array();
+        if(!$detail)
+            return $detail;
+        return $detail;
+    }
+
+    public function agent_blacklist_save($admin_id){
+        $data = array(
+            'name'=>trim($this->input->post('name')),
+            'remark'=>$this->input->post('remark'),
+            'status' => 1,
+            'card'=>trim($this->input->post('card')) ? trim($this->input->post('card')) : "",
+            'cdate' => date('Y-m-d H:i:s', time()),
+            'c_uid' => $admin_id
+        );
+        //$id = $this->input->post('id');
+        if(!$data['name'] || !$data['card']){
+            return $this->fun_fail('缺少必要信息!');
+        }
+        //检查是否已经从业
+        $chenk_card = $this->db->select()->from('agent')->where('card', $data['card'])->get()->row_array();
+        if($chenk_card)
+            return $this->fun_fail('此身份证号已从业!');
+        $check_blacklist = $this->db->select()->from('agent_blacklist')->where(array('card'=>$data['card'], 'status' => 1))->get()->row_array();
+        if($check_blacklist)
+            return $this->fun_fail('此身份证号已经在黑名单中!');
+        $this->db->insert('agent_blacklist', $data);
+        //保存 身份证照片和执业证照片
+        return $this->fun_success('操作成功!');
+    }
+
+    public function agent_blacklist_cancel($admin_id){
+        $id = $this->input->post('black_id');
+        $update_data_ = array(
+            'mdate' => date('Y-m-d H:i:s', time()),
+            'm_uid' => $admin_id,
+            'status' => -1
+        );
+        $res = $this->db->where(array('id' => $id, 'status' => 1))->update('agent_blacklist', $update_data_);
+        return $this->fun_success('操作成功!');
+    }
+
     /**
      *********************************************************************************************
      * 经纪人事件

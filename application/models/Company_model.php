@@ -190,6 +190,12 @@ class Company_model extends MY_Model
             return $this->fun_fail("此身份证号人员申请重复提交!");
         }
 
+        //增加检查是否是从业黑名单
+        $this->load->model('common4manager_model', 'c4m_model_temp');
+        $check_is_blace_ = $this->c4m_model_temp->check_is_black4agent($employees_data_['card']);
+        if($check_is_blace_)
+            return $this->fun_fail('此身份证号在从业黑名单中,不可提交!');
+
         //检查照片数量
         $pic_short1 = $this->input->post('pic_short1');
         $pic_short3 = $this->input->post('pic_short3');
