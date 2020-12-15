@@ -1339,6 +1339,11 @@ class MY_Model extends CI_Model{
             $this->db->where('id', $agent_id)->update('agent', array('company_id' => -1, 'wq' => 1));
             $this->save_company_total_score($agent_info['company_id']);//重新计算企业信用分和异常状态
             $this->db->insert('agent_track',$data_insert);
+        }else{
+            //因从业人员可能会变成持证经纪人 所以不管如何都要重新计算所属企业的信用分和状态
+            if($company_info_){
+                $this->save_company_total_score($agent_info['company_id']);//重新计算企业信用分和异常状态
+            }
         }
         return true;
     }
