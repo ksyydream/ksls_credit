@@ -2367,6 +2367,10 @@ class Manager_model extends MY_Model
     }
 
     public function company_pending_wq_agent($admin_id){
+        if(!$wq = $this->input->post('wq'))
+            return $this->fun_fail('请求异常!');
+        if(!in_array($wq, array(1,2)))
+            return $this->fun_fail('请求异常!!');
         if(!$company_id = $this->input->post('company_id'))
             return $this->fun_fail('企业信息丢失!');
         $company_info = $this->company_pending_edit($company_id);
@@ -2380,9 +2384,10 @@ class Manager_model extends MY_Model
         $agent_info_ = $this->db->from('agent')->where('id', $agent_id)->get()->row_array();
         if(!$agent_info_ || $agent_info_['flag'] != 2)
             return $this->fun_fail('人员信息异常!');
-        if($agent_info_['work_type'] != 1)
+        if($agent_info_['work_type'] != 1 && $wq == 2){
             return $this->fun_fail('非持证经纪人不可设置网签!');
-        $update_rows_ = $this->db->where(array('id' => $agent_id, 'company_id' => $company_id))->update('agent',array('wq' => 2));
+        }
+        $update_rows_ = $this->db->where(array('id' => $agent_id, 'company_id' => $company_id))->update('agent',array('wq' => $wq));
         if($update_rows_){
             return $this->fun_success('操作成功!');
         }else{
