@@ -188,6 +188,7 @@ class Home_model extends MY_Model
             $this->db->group_start();
             $this->db->like('a.name', $data['a_k']);
             $this->db->or_like('a.job_code', $data['a_k']);
+            $this->db->or_like('a.job_num', $data['a_k']);
             $this->db->group_end();
         }
         $this->db->where('a.flag', 2);
@@ -205,6 +206,7 @@ class Home_model extends MY_Model
             $this->db->group_start();
             $this->db->like('a.name', $data['a_k']);
             $this->db->or_like('a.job_code', $data['a_k']);
+            $this->db->or_like('a.job_num', $data['a_k']);
             $this->db->group_end();
         }
         $this->db->where('a.flag', 2);
