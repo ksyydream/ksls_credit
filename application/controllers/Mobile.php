@@ -39,6 +39,10 @@ class Mobile extends MY_Controller {
 		}
 		$this->assign('year_list', $year_list);
 
+		$show_person_ = '';
+		if(isset($data['person_img_list']) && $data['person_img_list'])
+			$show_person_ = $data['person_img_list'][0]['img'];
+		$this->assign('show_person_', $show_person_);
 		$this->display('mobile/html/saff-info.html');
         //$this->display('mobile/html/person_page.html');
     }

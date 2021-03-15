@@ -239,6 +239,8 @@ class Home_model extends MY_Model
         $this->db->where('a.job_code', $job_code);
         $this->db->or_where('a.job_num', $job_code);
         $data = $this->db->get()->row_array();
+        if($data)
+            $data['person_img_list'] = $this->db->select()->from('agent_person_img')->where('agent_id', $data['id'])->get()->result_array();
         return $data;
     }
 

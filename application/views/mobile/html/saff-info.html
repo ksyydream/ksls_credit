@@ -14,7 +14,7 @@
   <meta name="apple-mobile-web-app-title" content="Amaze UI" />
   <link rel="stylesheet" href="/web_assets/assets4saff/css/amazeui.min.css"/>
   <link rel="stylesheet" href="/web_assets/assets4saff/css/admin.css">
-  <link rel="stylesheet" href="/web_assets/assets4saff/css/app.css?v2">
+  <link rel="stylesheet" href="/web_assets/assets4saff/css/app.css?v3">
     <style>
         #is_end_1,#is_end_2,#is_end_0{
             text-align: center;font-size: 12px;margin-top: 10px;display: none;
@@ -33,11 +33,15 @@
     <div class="admin-content-body">
         <input type="hidden" id="agent_id" value="{{$data.id}}">
         <div class="am-padding am-bgfff ">
+            <div class="show-peo-img">
+                <img src="{{$show_person_}}" alt="" >
+            </div>
           <p class="p1_1"><span class="s01 sname">{{$data.name}}</span>{{if $data.company_id != -1 and $data.wq == 2}}<span class="label bule">网签</span>{{/if}} {{if $data.grade_no == 1}}<span class="label red">失信状态</span>{{/if}}</p>
           <span class="s01 snow-company">{{$data.company_name|default:'-'}}</span>
           <div class="dl01">
+              <p class="p2_2"><span class="s02"><i class="am-icon-file-o"></i>从业编号：</span><span>{{$data.job_num}}</span></p>
             <p class="p2_2"><span class="s02"><i class="am-icon-file-o"></i>执业证号：</span><span>{{$data.job_code}}</span></p>
-            <!--<p class="p2_2"><span class="s02"><i class="am-icon-mobile"></i>联系电话：</span><span></span></p>-->
+            <p class="p2_2"><span class="s02"><i class="am-icon-mobile"></i>联系电话：</span><span>{{$data.phone}}</span></p>
             <p class="p2_2"><span class="s02"><i class="am-icon-flag-o"></i>职业状态：</span><span>
                 {{if $data.flag == 2}}有效{{/if}}
                 {{if $data.flag == 1}}离昆{{/if}}

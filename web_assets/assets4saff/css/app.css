@@ -4,9 +4,9 @@ li{list-style: none;}i{font-style: normal;}
 .admin-main{padding-top:0;}
 .am-bgfff{background: #fff;margin:.6rem;}
 .s01{display: block;}
-.sname{font-size: 28px; float: left;margin-right: 1rem;}
-.p1_1{padding:0; margin:0; overflow: hidden;}
-.snow-company{font-size: 16px; margin-bottom: 1rem;}.snow-company-1{font-size: 20px; margin-bottom: 0;}
+.sname{font-size: 24px;}
+.p1_1{padding:0; margin:0; overflow: hidden; text-align: center;}
+.snow-company{font-size: 16px; margin-top: 1rem;}.snow-company-1{font-size: 20px; margin-bottom: 0;}
 .p1_2{padding:0; margin:0;}
 .label{margin-top: 1rem; display: inline-block; padding:.1rem .8rem; background: #c1d9fd;margin-right: 1rem;}
 .p1_2 .label{margin: 0; margin: .5rem 0;}
@@ -77,3 +77,4 @@ li{list-style: none;}i{font-style: normal;}
 
 .stit-1{border-bottom:1px solid #ddd; padding-bottom: 1rem;}
 .div-choose-1{padding-bottom: 1rem;}
+.show-peo-img{text-align: center; }.show-peo-img  img{width: 24%; display: inline; }
