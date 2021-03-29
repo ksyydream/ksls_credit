@@ -60,9 +60,12 @@ class Company_model extends MY_Model
    public function company_cancel_agent($company_id){
         if(!$agent_id = $this->input->post('a_id'))
             return $this->fun_fail('操作异常');
-        $agent_info_ = $this->db->select('id')->from('agent')->where('id', $agent_id)->where('company_id', $company_id)->get()->row_array();
+        $agent_info_ = $this->db->select('id,work_type')->from('agent')->where('id', $agent_id)->where('company_id', $company_id)->get()->row_array();
         if (!$agent_info_) 
             return $this->fun_fail('经纪人已不在企业内！不可操作！');
+       //DBY 20210329 加入判断前台不可自行解绑持证经纪人
+       if($agent_info_['work_type'] == 1)
+           return $this->fun_fail('不可解绑持证经纪人！');
         $this->db->trans_start();//--------开始事务
         $this->db->where('id', $agent_id)->where('company_id', $company_id)->update('agent', array('company_id' => -1, 'wq' => 1));
         $this->save_agent_track4common($agent_id, $company_id, -1, 4);  //加入经纪人轨迹

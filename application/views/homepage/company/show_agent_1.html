@@ -15,7 +15,7 @@
                         <td>{{$item.phone}}</td>
                         <td>
                     <a href="/home/agent_detail/{{$item.id}}" target="_blank" class="agentMore">详情</a>
-                    {{if $item.company_id == $c_id_}}<a href="javascript:;" onclick="cancel_agent('{{$item.id}}')" class="agentMore">解绑</a>{{/if}}</td>
+                    {{if $item.company_id == $c_id_ and 1==2}}<!--<a href="javascript:;" onclick="cancel_agent('{{$item.id}}')" class="agentMore">解绑</a>-->{{/if}}</td>
                 </tr>
         {{/foreach}}
                 
