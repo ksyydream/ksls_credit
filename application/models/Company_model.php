@@ -180,7 +180,7 @@ class Company_model extends MY_Model
         //检查身份证是否已经是经纪人
         $check_agent_ = $this->db->select()->from('agent')->where('card', $employees_data_['card'])->get()->row_array();
         if($check_agent_){
-            return $this->fun_fail("所申请的身份证号已是经纪人!");
+            return $this->fun_fail("该身份证已申领信息卡!");
         }
 
         //检查一下是否有重复提交 身份证申请
