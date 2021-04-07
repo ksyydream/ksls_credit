@@ -2362,7 +2362,7 @@ class Manager_model extends MY_Model
                     break;
             }
         }
-        $this->db->group_by('a.id');
+        $this->db->group_by('a1.id');
         if(in_array(-1, $flag))
             $this->db->order_by('a.cancel_date','desc');
         $this->db->order_by('a.cdate','desc');
