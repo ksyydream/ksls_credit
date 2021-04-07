@@ -2269,6 +2269,7 @@ class Manager_model extends MY_Model
         $this->db->select('a.*, b.grade_name,t.name town_name_')->from('company_pending a');
         $this->db->join('company_grade b', 'a.grade_no = b.grade_no', 'left');
         $this->db->join('town t', 'a.town_id = t.id', 'left');
+        $this->db->join('company_ns_cert c','a.id = c.company_id and c.status = 1','left');
         if($data['keyword']){
             $this->db->group_start();
             $this->db->like('a.company_name', $data['keyword']);
@@ -2319,6 +2320,7 @@ class Manager_model extends MY_Model
         $this->db->join('company_grade b', 'a.grade_no = b.grade_no', 'left');
         $this->db->join('town t', 'a.town_id = t.id', 'left');
         $this->db->join('agent a1', 'a1.company_id = a.id','left');
+        $this->db->join('company_ns_cert c','a.id = c.company_id and c.status = 1','left');
         if($data['keyword']){
             $this->db->group_start();
             $this->db->like('a.company_name', $data['keyword']);
