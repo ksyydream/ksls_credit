@@ -2080,10 +2080,13 @@ class Manager_model extends MY_Model
      * @date 2019-11-12
      */
     public function company_pending_list($page = 1, $flag = array(), $status = array()){
+        $today_ = date("Y-m-d");
         $data['limit'] = $this->limit;
         //搜索条件
         $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
         $data['zz_status'] = $this->input->get('zz_status')?trim($this->input->get('zz_status')):null;
+        $data['ns_cert_flag_'] = $this->input->get('ns_cert_flag_')?trim($this->input->get('ns_cert_flag_')):null;
+        $data['pending_status_'] = $this->input->get('pending_status_')?trim($this->input->get('pending_status_')):null;
         $data['flag'] = $this->input->get('flag')?trim($this->input->get('flag')):null;
         $data['town_id'] = $this->input->get('town_id')?trim($this->input->get('town_id')):null;  //保留单个区镇 虽然实际是不使用
         $data['town_ids'] = $this->input->get('town_ids');
@@ -2095,8 +2098,9 @@ class Manager_model extends MY_Model
                 $data['town_ids'] = $this->get_admin_t_list($admin_info['admin_id']);
         }
         $data['town_ids'] = $data['town_ids'] ? $data['town_ids'] : array('');
-        $this->db->select('count(1) num')->from('company_pending a');
+        $this->db->select('a.id')->from('company_pending a');
         $this->db->join('town t', 'a.town_id = t.id', 'left');
+        $this->db->join('company_ns_cert c','a.id = c.company_id and c.status = 1','left');
         if($data['keyword']){
             $this->db->group_start();
             $this->db->like('a.company_name', $data['keyword']);
@@ -2116,10 +2120,32 @@ class Manager_model extends MY_Model
         if($status){
             $this->db->where_in('a.status',$status);
         }
-
-        $num = $this->db->get()->row();
-        $data['total_rows'] = $num->num;
-
+        if($data['ns_cert_flag_']){
+            switch($data['ns_cert_flag_']){
+                case -1:
+                    $this->db->having("max(end_date) < '$today_'");
+                    $this->db->or_having("max(end_date) is null");
+                    break;
+                case 1:
+                    $this->db->having("max(end_date) >= '$today_'");
+                    break;
+            }
+        }
+        if($data['pending_status_']){
+            switch($data['pending_status_']){
+                case -1:
+                    $this->db->where_in('a.status', array(3,2));
+                    break;
+                case 1:
+                    $this->db->where_in('a.status', array(1,4));
+                    break;
+            }
+        }
+        $this->db->group_by('a.id');
+        $num = $this->db->count_all_results();
+        //die(var_dump($this->db->last_query()));
+        //$data['total_rows'] = $num->num;
+        $data['total_rows'] = $num;
         //获取详细列
         $this->db->select('a.*, b.grade_name,t.name town_name_,t.s_name s_town_name_,max(start_date) start_date, max(end_date) end_date')->from('company_pending a');
         $this->db->join('company_grade b', 'a.grade_no = b.grade_no', 'left');
@@ -2144,6 +2170,27 @@ class Manager_model extends MY_Model
         if($status){
             $this->db->where_in('a.status',$status);
         }
+        if($data['ns_cert_flag_']){
+            switch($data['ns_cert_flag_']){
+                case -1:
+                    $this->db->having("max(end_date) < '$today_'");
+                    $this->db->or_having("max(end_date) is null");
+                    break;
+                case 1:
+                    $this->db->having("max(end_date) >= '$today_'");
+                    break;
+            }
+        }
+        if($data['pending_status_']){
+            switch($data['pending_status_']){
+                case -1:
+                    $this->db->where_in('a.status', array(3,2));
+                    break;
+                case 1:
+                    $this->db->where_in('a.status', array(1,4));
+                    break;
+            }
+        }
         if(in_array(-1, $flag))
             $this->db->order_by('a.cancel_date','desc');
         $this->db->order_by('a.cdate','desc');
@@ -2155,9 +2202,12 @@ class Manager_model extends MY_Model
 
     //打印所使用
     public function company_pending_list_all($flag = array(), $status = array()){
+        $today_ = date("Y-m-d");
         //获取详细列
         $data['keyword'] = $this->input->get('keyword')?trim($this->input->get('keyword')):null;
         $data['zz_status'] = $this->input->get('zz_status')?trim($this->input->get('zz_status')):null;
+        $data['ns_cert_flag_'] = $this->input->get('ns_cert_flag_')?trim($this->input->get('ns_cert_flag_')):null;
+        $data['pending_status_'] = $this->input->get('pending_status_')?trim($this->input->get('pending_status_')):null;
         $data['flag'] = $this->input->get('flag')?trim($this->input->get('flag')):null;
         $data['town_id'] = $this->input->get('town_id')?trim($this->input->get('town_id')):null;
         $data['town_ids'] = $this->input->get('town_ids');
@@ -2190,9 +2240,30 @@ class Manager_model extends MY_Model
         if($status){
             $this->db->where_in('a.status',$status);
         }
-
-        $num = $this->db->get()->row();
-        $data['total_rows'] = $num->num;
+        if($data['ns_cert_flag_']){
+            switch($data['ns_cert_flag_']){
+                case -1:
+                    $this->db->having("max(end_date) < '$today_'");
+                    $this->db->or_having("max(end_date) is null");
+                    break;
+                case 1:
+                    $this->db->having("max(end_date) >= '$today_'");
+                    break;
+            }
+        }
+        if($data['pending_status_']){
+            switch($data['pending_status_']){
+                case -1:
+                    $this->db->where_in('a.status', array(3,2));
+                    break;
+                case 1:
+                    $this->db->where_in('a.status', array(1,4));
+                    break;
+            }
+        }
+        $this->db->group_by('a.id');
+        $num = $this->db->count_all_results();
+        $data['total_rows'] = $num;
 
         $this->db->select('a.*, b.grade_name,t.name town_name_')->from('company_pending a');
         $this->db->join('company_grade b', 'a.grade_no = b.grade_no', 'left');
@@ -2245,6 +2316,27 @@ class Manager_model extends MY_Model
             $this->db->where_in('a.status',$status);
         }
         $this->db->where('a1.flag', 2);
+        if($data['ns_cert_flag_']){
+            switch($data['ns_cert_flag_']){
+                case -1:
+                    $this->db->having("max(end_date) < '$today_'");
+                    $this->db->or_having("max(end_date) is null");
+                    break;
+                case 1:
+                    $this->db->having("max(end_date) >= '$today_'");
+                    break;
+            }
+        }
+        if($data['pending_status_']){
+            switch($data['pending_status_']){
+                case -1:
+                    $this->db->where_in('a.status', array(3,2));
+                    break;
+                case 1:
+                    $this->db->where_in('a.status', array(1,4));
+                    break;
+            }
+        }
         if(in_array(-1, $flag))
             $this->db->order_by('a.cancel_date','desc');
         $this->db->order_by('a.cdate','desc');
