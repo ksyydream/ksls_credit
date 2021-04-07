@@ -2309,6 +2309,7 @@ class Manager_model extends MY_Model
                     break;
             }
         }
+        $this->db->group_by('a.id');
         if(in_array(-1, $flag))
             $this->db->order_by('a.cancel_date','desc');
         $this->db->order_by('a.cdate','desc');
@@ -2348,6 +2349,18 @@ class Manager_model extends MY_Model
                     break;
             }
         }
+        if($data['ns_cert_flag_']){
+            switch($data['ns_cert_flag_']){
+                case -1:
+                    $this->db->having("max(end_date) < '$today_'");
+                    $this->db->or_having("max(end_date) is null");
+                    break;
+                case 1:
+                    $this->db->having("max(end_date) >= '$today_'");
+                    break;
+            }
+        }
+        $this->db->group_by('a.id');
         if(in_array(-1, $flag))
             $this->db->order_by('a.cancel_date','desc');
         $this->db->order_by('a.cdate','desc');
