@@ -74,9 +74,9 @@
                                             <div class="space-8"></div>
                                             {{if $data.id|default:'' > 0}}
                                             <div class="form-group">
-                                                <label class="col-sm-1 control-label no-padding-right" for="company_name"> 当前信用分 </label>
+                                                <label class="col-sm-1 control-label no-padding-right" for="company_name"> 当前信用等级 </label>
                                                 <div class="col-sm-9 yy_m_7">
-                                                    {{$data.total_score|default:'-'}}
+                                                    {{$data.b_grade_name_|default:''}}
                                                 </div>
                                             </div>
                                             <div class="space-4"></div>

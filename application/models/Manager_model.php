@@ -2514,8 +2514,9 @@ class Manager_model extends MY_Model
     }
 
     public function company_pending_edit($id){
-        $this->db->select('a.*, t.name t_name_')->from('company_pending a');
+        $this->db->select('a.*, t.name t_name_,b.grade_name b_grade_name_')->from('company_pending a');
         $this->db->join('town t','t.id = a.town_id', 'left');
+        $this->db->join('company_grade b','a.grade_no = b.grade_no','left');
         $this->db->where('a.id', $id);
         $detail =  $this->db->get()->row_array();
         if (!$detail) {
