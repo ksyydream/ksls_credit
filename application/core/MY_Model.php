@@ -1027,7 +1027,10 @@ class MY_Model extends CI_Model{
                 $this->db->where(array('status' => 1, 'is_nscz' => -1, 'company_id' => $company_id))->update('event4company_record', array('is_nscz' => 1, 'annual_year' => $annual_year));
                 $this->db->where('id', $company_id)->set('total_score', 'event_score + sys_score + base_score', FALSE)->update('company_pending');
                 //更新company_pending的最新年审时间和信用等级
-                $this->db->where('id', $company_id)->where('annual_date <=', $annual_year)->update('company_pending', array('grade_no' => $insert_annual_year_['grade_no'], 'annual_date' => $annual_year, 'qx_num' => 0));
+                //2021-04-28 系统不再做信用等级修改, 信用等级使用线下核准
+                //$this->db->where('id', $company_id)->where('annual_date <=', $annual_year)->update('company_pending', array('grade_no' => $insert_annual_year_['grade_no'], 'annual_date' => $annual_year, 'qx_num' => 0));
+                $this->db->where('id', $company_id)->where('annual_date <=', $annual_year)->update('company_pending', array('annual_date' => $annual_year, 'qx_num' => 0));
+
                 $this->db->where('pass_id', $pass_id)->delete('company_pass_score_log');
                 $this->db->insert_batch('company_pass_score_log', $pass_score_log);
             }
