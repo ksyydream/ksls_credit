@@ -1401,7 +1401,7 @@ class Manager extends MY_Controller {
     }
 
     public function company_pending_down_excel(){
-        ini_set('memory_limit', '64M');
+        ini_set('memory_limit', '128M');
         $data_res = $this->manager_model->company_pending_list_all(array(1,2));
         if($data_res['total_rows'] == 0){
             $this->show_message('没有信息可以导出');
