@@ -160,6 +160,7 @@ class MY_Controller extends CI_Controller
 class Home_Controller extends MY_Controller{
 	public $agent_id = null;
 	public $company_id = null;
+	public $is_whow_agent_cert_ = -1; //经纪人证书权限 1代表有,-1代表没有
 	public function __construct ()
 	{
 		parent::__construct();
@@ -201,6 +202,14 @@ class Home_Controller extends MY_Controller{
 		$this->assign('a_id_', $this->agent_id);
 		$this->assign('c_id_', $this->company_id);
 
+		//检查经纪人证书权限
+		if($this->agent_id){
+			$agent_detail = $this->agent_model->get_detail4power($this->agent_id);
+			if($agent_detail && strlen($agent_detail['job_code']) == 6 && in_array(substr($agent_detail['job_code'],0,2), array('20','19'))) {
+				$this->is_whow_agent_cert_ = 1;
+			}
+		}
+		$this->assign('is_whow_agent_cert_', $this->is_whow_agent_cert_);
 	}
 }
 

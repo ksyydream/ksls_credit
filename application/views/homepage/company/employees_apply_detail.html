@@ -1,0 +1,140 @@
+
+<!doctype html>
+<html class="no-js">
+<head>
+
+    {{include file='homepage/public/head.html'}}
+ <link rel="stylesheet" href="/manager_statics/app/lightbox.min.css?v3"/>
+</head>
+<body class="page">
+  <div class="page-hd">
+   <div class="main1200">
+
+       {{include file='homepage/public/logo.html'}}
+       </div>
+ </div>
+
+
+  <div class="page-bd">
+<div class="main1200">
+
+        <form action="" method="post" id="cancel_form">
+            <input type="hidden" name="employees_id" value="{{$data.id}}">
+            </form>
+                <div class="company-info">
+                    <div class="tit"><em class="em-icon"></em>从业人员信息</div>
+                    {{if $data.flag == 2}}<span class="result-cyinfo ">审核通过</span>{{/if}}
+                    {{if $data.flag == -1}}<span class="result-cyinfo result-cyinfo-fail">审核失败</span>{{/if}}
+                    {{if $data.flag == -2}}<span class="result-cyinfo result-cyinfo-fail">作废</span>{{/if}}
+                    {{if $data.flag == -1}}<p class="result-infpo">{{$data.audit_remark}}</p>{{/if}}
+                    <div class="div-edit">
+                        <div class="s-tit"><em class="em-icon"></em>基本信息</div>
+                        <div class="edit-list com-edit-list">
+                            <span class="span-tit">姓名</span>
+                        <span class="span-input">
+                            <em class="JeditTxt">{{$data.name}}</em>
+                            </em>
+                        </span>
+                         </div>
+                        <div class="edit-list com-edit-list">
+                            <span class="span-tit">联系电话</span>
+                        <span class="span-input">
+                            <em class="JeditTxt">{{$data.phone}}</em>
+
+                        </span>
+                        </div>
+                        <div class="edit-list com-edit-list">
+                            <span class="span-tit">身份证号码</span>
+                        <span class="span-input">
+                            <em class="JeditTxt">{{$data.card}}</em>
+                              </span>
+                           </div>
+
+                        <div class="s-tit mt15"><em class="em-icon"></em>身份证附件（正反面）</div>
+             
+                        <div class="pic-upload">
+                            {{foreach from=$data.code_img_list key=k item=v}}
+                            <div class="imgs-div">
+                                <a class="example-image-link" href="{{$v.img}}" data-lightbox="example-set example_num1" data-title="身份证附件">
+                                <span class="imgs-span"><img data-lightbox="example_num1" src="{{$v.img}}?imageView2/0/w/200/h/200/q/75|imageslim" alt=""></span>
+                                    </a>
+                            </div>
+                            {{/foreach}}
+                        </div>
+
+                    <div class="s-tit mt15"><em class="em-icon"></em>个人证件照附件</div>
+                                    </div>
+                           <div class="pic-upload">
+                               {{foreach from=$data.person_img_list key=k item=v}}
+                               <div class="imgs-div">
+                                   <a class="example-image-link" href="{{$v.img}}" data-lightbox="example-set example_num3" data-title="个人证件照附件">
+                                   <span class="imgs-span"><img data-lightbox="example_num3" src="{{$v.img}}?imageView2/0/w/200/h/200/q/75|imageslim" alt=""></span>
+                                       </a>
+                               </div>
+                               {{/foreach}}
+                        </div>
+
+
+                    </div>
+
+
+                 {{if $data.flag == 1}}<a href="javascript:" id="cancel_btn" class="submit-btn">作废取消</a>{{/if}}
+
+             
+
+
+</div>
+  </div>
+
+  {{include file='homepage/public/foot.html'}}
+  <link rel="stylesheet" href="/manager_statics/app/lightbox.min.css?v3"/>
+  <script type="text/javascript" src="/manager_statics/app/lightbox-plus-jquery.min.js?v2"></script>
+<script type="text/javascript">
+   $(function(){
+
+        $("#cancel_btn").click(function(){
+            var layerIndex = layer.confirm('是否确定作废取消申请!', {
+                btn: ['确定','取消'], //按钮
+                area: ['300px', 'auto']
+            }, function(){
+                var form = document.getElementById('cancel_form');
+
+                var formdata = new FormData(form);
+                $.ajax({
+                    type: "POST",
+                    url: "/company/employees_apply_cancel",
+                    data: formdata,
+                    async: true,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        layer.close(layerIndex);
+                        var return_ = JSON.parse(data)
+                        if (return_.status == 1) {
+                            var url = '/company/employees_apply_list/';
+                            layer.alert('操作成功!', {
+                                skin: 'layui-layer-molv' //样式类名
+                                , closeBtn: 0
+                            }, function () {
+                                window.location.replace(url);
+                            });
+                        } else {
+                            layer.msg(return_.msg);
+                        }
+
+                    },
+                    error: function () {
+                        layer.close(layerIndex);
+                        layer.msg('网络异常!');
+                    }
+                });
+            },function(){
+
+            });
+        })
+   });
+
+</script>
+</body>
+</html>

@@ -202,6 +202,28 @@ class Manager_login extends MY_Controller {
     }
 
     /**
+     * 企业人员修改添加页面
+     * @author yangyang
+     * @date 2019-11-14
+     */
+    public function show_agent4company_edit(){
+        $admin_info = $this->session->userdata('admin_info');
+        if(!$admin_info){
+            echo -1;//如果没有登陆 不可调用
+            exit();
+        }
+        $data = $this->c4m_model->get_agent4company();
+        if (!$data) {
+            echo -2;//没有数据
+            exit();
+        }
+        $company_id = $this->input->post('company_id');
+        $this->assign('company_id', $company_id);
+        $this->assign('data',$data);
+        $this->display('manager/company/show_agent4edit.html');
+    }
+
+    /**
      * 经纪人就业轨迹
      * @author yangyang
      * @date 2019-11-14

@@ -106,6 +106,13 @@ $(function(){
         $("#search_company_form").submit();
       })
 
+    $('#company_page').find('a').click(function () {
+        var action = $(this).attr('href');
+        $('#search_company_form').attr('action',action);
+        $('#search_company_form').submit();
+        return false;
+    })
+
 });
 
 

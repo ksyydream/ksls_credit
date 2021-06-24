@@ -377,6 +377,26 @@ class Manager extends MY_Controller {
      *********************************************************************************************
      */
 
+    //查看经纪人证书
+    public function get_cert4agent($agent_id){
+        $this->load->model('agent_model');
+        $data = $this->agent_model->get_detail4self($agent_id);
+        if(!$data)
+            redirect('/home/index');
+        //判断是否可以生成证书
+        if($data && strlen($data['job_code']) == 6 && in_array(substr($data['job_code'],0,2), array('20','19'))) {
+
+        }else{
+            redirect('/home/index');
+        }
+        $this->assign('data', $data);
+        $show_person_ = '';
+        if($data['person_img_list'])
+            $show_person_ = $data['person_img_list'][0]['img'];
+        $this->assign('show_person_', $show_person_);
+        $this->display('homepage/agent/dianzizhengshu.html');
+    }
+
 
     /**
      * 执业经纪人列表
@@ -481,6 +501,88 @@ class Manager extends MY_Controller {
         $this->ajaxReturn($res);
     }
 
+    //20201009 从业人员申请
+    public function employees_list($page = 1){
+        $data = $this->manager_model->employees_list($page);
+        $base_url = "/manager/employees_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $town_list = $this->c4m_model->get_town(1);
+        $this->assign('town_list', $town_list);
+        $this->display('manager/agent/employees_list.html');
+    }
+
+    //20201009 从业人员申请详情
+    public function employees_audit($id){
+        $data = $this->manager_model->employees_audit($id);
+        if(!$data){
+            $this->show_message('未找到从业申请信息!');
+        }
+        $this->assign('data', $data);
+        $this->display('manager/agent/employees_view.html');
+    }
+
+    //20201009 从业人员申请通过
+    public function employees_pass(){
+        $res = $this->manager_model->employees_apply_handle($this->admin_id, 2);
+        $this->ajaxReturn($res);
+    }
+
+    //20201009 从业人员申请拒绝
+    public function employees_cancel(){
+        $res = $this->manager_model->employees_apply_handle($this->admin_id, -1);
+        $this->ajaxReturn($res);
+    }
+
+    /**
+     * 从业黑名单列表
+     * @author yangyang
+     * @date 2020-12-12
+     */
+    public function agent_blacklist_list($page = 1){
+        $data = $this->manager_model->agent_blacklist_list($page);
+        $base_url = "/manager/agent_blacklist_list/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        $this->display('manager/agent/agent_blacklist_list.html');
+    }
+
+    /**
+     * 从业黑名单新增页面
+     * @author yangyang
+     * @date 2020-12-12
+     */
+    public function agent_blacklist_add(){
+        $this->display('manager/agent/agent_blacklist_detail.html');
+    }
+
+    public function agent_blacklist_edit($m_id){
+        $data = $this->manager_model->agent_blacklist_edit($m_id);
+        if(!$data){
+            $this->show_message('未找到从业黑名单信息!');
+        }
+        $this->assign('data', $data);
+        $this->display('manager/agent/agent_blacklist_view.html');
+    }
+
+    /**
+     * 从业黑名单保存页面
+     * @author yangyang
+     * @date 2020-12-12
+     */
+    public function agent_blacklist_save(){
+        $res = $this->manager_model->agent_blacklist_save($this->admin_id);
+        $this->ajaxReturn($res);
+    }
+
+    public function agent_blacklist_cancel(){
+        $res = $this->manager_model->agent_blacklist_cancel($this->admin_id);
+        $this->ajaxReturn($res);
+    }
     /**
      *********************************************************************************************
      * 经纪人事件
@@ -1260,6 +1362,44 @@ class Manager extends MY_Controller {
         $this->ajaxReturn($res);
     }
 
+    //20201009 企业人员列表
+    public function company_pending_temp($page = 1){
+        //先检查 company_id 是否合法
+        if(!$company_id = $this->input->get('company_id'))
+            $this->show_message('信息异常');
+        $company_info = $this->manager_model->company_pending_edit($company_id);
+        if(!$company_info || $company_info['flag'] == -1)
+            $this->show_message('企业信息异常');
+        $res_check_town_ = $this->manager_model->check_admin_townByTown_id($this->admin_id,$company_info['town_id']);
+        if(!$res_check_town_)
+            $this->show_message('不可操作此区镇企业');
+        $data = $this->manager_model->company_pending_temp($company_id,$page);
+        $base_url = "/manager/company_pending_temp/";
+        $pager = $this->pagination->getPageLink4manager($base_url, $data['total_rows'], $data['limit']);
+
+        $this->assign('pager', $pager);
+        $this->assign('page', $page);
+        $this->assign('data', $data);
+        unset($company_info['agent']);
+        $this->assign('company_info', $company_info);
+        $this->display('manager/company/company_pending_temp.html');
+    }
+    //20201009 企业人员添加
+    public function company_pending_add_agent(){
+        $res = $this->manager_model->company_pending_add_agent($this->admin_id);
+        $this->ajaxReturn($res);
+    }
+    //20201009 企业人员删除
+    public function company_pending_delete_agent(){
+        $res = $this->manager_model->company_pending_delete_agent($this->admin_id);
+        $this->ajaxReturn($res);
+    }
+    //20201009 企业人员设置网签
+    public function company_pending_wq_agent(){
+        $res = $this->manager_model->company_pending_wq_agent($this->admin_id);
+        $this->ajaxReturn($res);
+    }
+
     public function company_pending_down_excel(){
         $data_res = $this->manager_model->company_pending_list_all(array(1,2));
         if($data_res['total_rows'] == 0){
@@ -1312,6 +1452,50 @@ class Manager extends MY_Controller {
         }
 
         $excel->getActiveSheet()->setTitle('企业信息列表');
+
+        $excel->createSheet();
+        $excel->setActiveSheetIndex(1);
+        $excel->getActiveSheet()->setTitle('经纪人信息');
+
+        $letter = array('A','B','C','D','E','F','G','H','I');
+        $tableheader = array('从业机构','经纪人姓名','信息卡号','执业证号','身份证号','联系电话','是否网签', '人员类型','所属区镇');
+        for($i = 0;$i < count($tableheader);$i++) {
+            $excel->getActiveSheet()->setCellValue("$letter[$i]1","$tableheader[$i]");
+            $excel->getActiveSheet()->getStyle("$letter[$i]1")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        }
+        $excel->getActiveSheet()->getColumnDimension("A")->setWidth(40);
+        $excel->getActiveSheet()->getColumnDimension("B")->setWidth(25);
+        $excel->getActiveSheet()->getColumnDimension("C")->setWidth(25);
+        $excel->getActiveSheet()->getColumnDimension("D")->setWidth(25);
+        $excel->getActiveSheet()->getColumnDimension("E")->setWidth(25);
+        $excel->getActiveSheet()->getColumnDimension("F")->setWidth(18);
+        $excel->getActiveSheet()->getColumnDimension("G")->setWidth(18);
+        $excel->getActiveSheet()->getColumnDimension("H")->setWidth(18);
+        $excel->getActiveSheet()->getColumnDimension("I")->setWidth(18);
+        $data = array();
+        foreach ($data_res['agent_list'] as $k=>$v){
+            $wq_name_ = '否';
+            if($v['wq'] == 2)
+                $wq_name_ = '是';
+            $work_type_name_ = '持证经纪人';
+            if($v['work_type'] == 2)
+                $work_type_name_ = '从业人员';
+            $data[] = array($v['company_name'],$v['name'],$v['job_num'],$v['job_code'],$v['card']
+            ,$v['phone'],$wq_name_,$work_type_name_,$v['town_name_']);
+        }
+
+        for ($i = 2;$i <= count($data) + 1;$i++) {
+            $j = 0;
+            foreach ($data[$i - 2] as $key=>$value) {
+                if($key==4){
+                    $excel->getActiveSheet()->setCellValue("$letter[$j]"."$i"," $value");
+                    $excel->getActiveSheet()->getStyle("$letter[$j]"."$i")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
+                }else{
+                    $excel->getActiveSheet()->setCellValue("$letter[$j]"."$i","$value",PHPExcel_Cell_DataType::TYPE_STRING);
+                }
+                $j++;
+            }
+        }
         $excel->setactivesheetindex(0);
         $write = new \PHPExcel_Writer_Excel5 ($excel);
         header("Pragma: public");
@@ -1621,5 +1805,9 @@ class Manager extends MY_Controller {
         $this->ajaxReturn($res);
     }
 
-
+    //锁定企业资质状态
+    public function locking_company_zz(){
+        $res = $this->manager_model->locking_company_zz($this->admin_id);
+        $this->ajaxReturn($res);
+    }
 }

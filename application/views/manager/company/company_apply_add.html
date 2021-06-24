@@ -74,9 +74,9 @@
                                             <div class="space-8"></div>
                                             {{if $data.id|default:'' > 0}}
                                             <div class="form-group">
-                                                <label class="col-sm-1 control-label no-padding-right" for="company_name"> 当前信用分 </label>
+                                                <label class="col-sm-1 control-label no-padding-right" for="company_name"> 当前信用等级 </label>
                                                 <div class="col-sm-9 yy_m_7">
-                                                    {{$data.total_score|default:'-'}}
+                                                    {{$data.b_grade_name_|default:''}}
                                                 </div>
                                             </div>
                                             <div class="space-4"></div>
@@ -284,18 +284,19 @@
                                                 <i class="green ace-icon fa fa-user bigger-110"></i>
                                                 执业经纪人
                                             </h4>
-
+                                            {{if $data.id|default:'' == ''}}
                                             <div class="space-8"></div>
                                             <div class="row">
-                                                <div class="col-xs-9">
+                                                <div class="col-xs-10">
                                                     <div class="dataTables_filter">
-                                                        <label>Add:<input type="text" id="search_" placeholder="执业证号">&nbsp;<a href="javascript:void(0);" id="btn_add_agent" class="btn btn-white btn-xs btn-primary">新 增</a></label>
+                                                        <label>Add:<input type="text" id="search_" placeholder="执业证号/信息卡号">&nbsp;<a href="javascript:void(0);" id="btn_add_agent" class="btn btn-white btn-xs btn-primary">新 增</a></label>
                                                     </div>
                                                 </div>
                                             </div>
+                                            {{/if}}
                                              <div class="form-group">
                                            
-                                        <div class="col-sm-9">
+                                        <div class="col-sm-10">
                                              <table class="table table-striped table-bordered">
 
                                 <thead>
@@ -303,12 +304,13 @@
                                 <tr>
 
                                     <th style="width:15%;">姓名</th>
-                                    <th style="width:20%;">执业证号</th>
+                                    <th style="width:20%;">信息卡号</th>
+                                    <th style="width:15%;">执业证号</th>
 
-                                    <th style="width:25%;">身份证号</th>
+                                    <th style="width:20%;">身份证号</th>
                                     <th style="width:15%;">联系电话</th>
-                                    <th style="width:10%;">网签</th>
-                                     <th style="width:15%;">操作</th>
+                                    <th style="width:5%;">网签</th>
+                                     <th style="width:10%;">操作</th>
                                 </tr>
 
                                 </thead>
@@ -317,18 +319,21 @@
                                     {{if !empty($data.agent) }}
                             {{foreach from=$data.agent item=item}}
                             <tr>
-                                        <td>{{$item.name}}</td>
+                                        <td>{{if $item.work_type == 1}}<span class="label label-warning label-white middle">持证</span>{{/if}}{{$item.name}}</td>
+                                        <td>{{$item.job_num}}</td>
                                         <td>{{$item.job_code}}</td>
+
                                           <td>{{$item.card}}</td>
                                             <td>{{$item.phone}}</td>
                                             <td>
                                                 <input type="hidden" name="setwq[]" value="{{if $item.wq == 2}}2{{else}}1{{/if}}">
-                                                <input name="ckwq[]" {{if $item.wq == 2}} checked{{/if}} type="checkbox" />
+                                                <input name="ckwq[]" {{if $data.id|default:'' > 0}}disabled="disabled"{{/if}} {{if $item.wq == 2}} checked{{/if}} type="checkbox" />
                                             </td>
                                         <td>
+                                            <input type="hidden" name="agent_job_num[]" value="{{$item.job_num}}">
                                             <input type="hidden" name="agent_job_code[]" value="{{$item.job_code}}">
                                             <input type="hidden" name="new_agent_id[]" value="{{$item.id}}">
-                                            <a href="javascript:void(0);" dataid="" class="delete_yy_"><i class="ace-icon fa fa-trash bigger-100 red"></i>删除</a>
+                                            {{if $data.id|default:'' == ''}}<a href="javascript:void(0);" dataid="" class="delete_yy_"><i class="ace-icon fa fa-trash bigger-100 red"></i>删除</a>{{/if}}
                                             <a href="/manager/agent_view/{{$item.id}}" target="_blank" class=""><i class="ace-icon fa fa-book bigger-100 blue"></i>详情</a>
                                         </td>
                                     </tr>
@@ -685,7 +690,7 @@
     $("#btn_add_agent").click(function(){
         var search_ = $.trim($("#search_").val());
         if (search_ == '') {
-            layer.msg('请输入执业证号', {icon: 2});
+            layer.msg('请输入执业证号/信息卡号', {icon: 2});
             return false;
         }
         var flag_ = 1;
@@ -696,6 +701,14 @@
                                 flag_ = 2;
                                 return;
                         }
+        })
+        $("[name='agent_job_num[]']").each(function(index3){
+            var code_3 = $.trim($(this).val());
+            if(code_3 != "" && code_3 == search_){
+                layer.alert('输入的信息卡号已在列表中!', {skin: 'layui-layer-lan',closeBtn: 0,shift: 4 });
+                flag_ = 2;
+                return;
+            }
         })
         if (flag_ != 1) {
             return false;
@@ -741,12 +754,19 @@ $("#tbody_id").on("click",".delete_yy_",function(){
   });
 
  $("#tbody_id").on('click',"[name='ckwq[]']",function(){
-           if($(this).is(':checked')){
-               $(this).prev().val(2);
-           }else{
-               $(this).prev().val(1);
-           }
-       })
+     if($(this).parent().parent().find("input[name='agent_job_code[]']").eq(0).val() == ''){
+         $(this).prev().val(1);
+         layer.msg('此人员不是持证经纪人,不可设置网签!');
+         $(this).prop("checked",false);
+     }else{
+         if($(this).is(':checked')){
+             $(this).prev().val(2);
+         }else{
+             $(this).prev().val(1);
+         }
+     }
+
+ })
    
    $("input[name='icon_list[]']").click(function(){
         var data_class =  $(this).attr('data_class');

@@ -64,10 +64,6 @@
         </div>
         <div class="flwid558">
             <dl class="dl-info1">
-              <dt>信用分值： </dt>
-              <dd>{{$data.total_score|default:'-'}}分</dd>
-            </dl>
-            <dl class="dl-info1">
               <dt>信用等级：</dt>
               <dd>{{$data.b_grade_name_}}</dd>
             </dl>
@@ -217,11 +213,32 @@
           <form id="agent_form">
             <input type="hidden" name="c_id" id="c_id" value="{{$data.id}}">
           </form>
+          <form id="employees_form">
+              <input type="hidden" name="c_id" value="{{$data.id}}">
+          </form>
           <div class="com-tit" id="agent_div"><span></span>企业旗下经纪人</div>
+          <div class="s_tit"><span class="angel"></span>持证经纪人</div>
           <div id="ajax_agent_div">
             
           </div>
-          
+          <div class="clear"></div>
+          <div class="s_tit mt-20"><span class="angel"></span>从业人员</div>
+          <div class="cypeo-box">
+
+              <div class="s_tit cypeo-tit">
+                  <div class="add-cxpeo">
+                      <input type="text" name="employees_key" id="employees_key" value="" placeholder="请输入要加入的从业人员编号或身份证号码" class="input-txt-addcypeo">
+                      <a href="javascript:;" id="btn_add_employees" class="add-cy-peo-btn">加入</a>
+                  </div>
+
+
+              </div>
+              <div id="ajax_employees_div">
+
+              </div>
+              <div class="clear"></div>
+              <a href="/company/employees_apply_list"  class="addbtn-cy">提交新增从业人员申请+</a>
+          </div>
 
       </div>
 
@@ -297,14 +314,16 @@ $(function(){
       })
 });
  var agent_page = 1;
+var employees_page = 1;
  var event_page = 1;
   ajax_agent_table('agent_form', 1);
+  ajax_employees_table('employees_form', 1);
   ajax_event_table('event_form', 1);
     function ajax_agent_table(form, page) {
         agent_page = page; //当前页面 保存为全局变量
         $.ajax({
             type: "POST",
-            url: "/home/show_agent/" + page,//+tab,
+            url: "/home/show_agent_1/" + page,//+tab,
             data: $('#' + form).serialize(),// 你的formid
             success: function (data) {
                 $("#ajax_agent_div").html('');
@@ -312,6 +331,19 @@ $(function(){
             }
         });
     }
+
+function ajax_employees_table(form, page) {
+    employees_page = page; //当前页面 保存为全局变量
+    $.ajax({
+        type: "POST",
+        url: "/home/show_agent_2/" + page,//+tab,
+        data: $('#' + form).serialize(),// 你的formid
+        success: function (data) {
+            $("#ajax_employees_div").html('');
+            $("#ajax_employees_div").append(data);
+        }
+    });
+}
 
     function ajax_event_table(form, page) {
         event_page = page; //当前页面 保存为全局变量
@@ -358,6 +390,7 @@ $(function(){
                         }, function(){
                             layer.closeAll();
                             ajax_agent_table('agent_form', agent_page);
+                            ajax_employees_table('employees_form', employees_page);
                         });
                     }else{
                         layer.alert(return_.msg, {
@@ -366,6 +399,7 @@ $(function(){
                             ,anim: 4 //动画类型
                         });
                         ajax_agent_table('agent_form', agent_page);
+                        ajax_employees_table('employees_form', employees_page);
                     }
                 },
                 error:function(){
@@ -379,6 +413,43 @@ $(function(){
         });
       
     }
+
+$("#btn_add_employees").click(function(){
+    var search_ = $.trim($("#employees_key").val());
+
+    if (search_ == '') {
+        layer.msg('请输入信息卡号或者身份证号', {icon: 2});
+        return false;
+    }
+
+    var result = $.ajax({
+        url : '/home/show_employess_dialog/',
+        data:{keyword:search_},
+        cache : false,
+        async : false,
+        type : "POST"
+    }).responseText;
+    if(result == -1){
+        layer.msg('未找到人员信息!', {icon: 2});
+        return false;
+    }
+    if(result == -2){
+        layer.msg('不是从业人员,不可直接添加!', {icon: 2});
+        return false;
+    }
+    if(result == -3){
+        layer.msg('经纪人已就职,不可添加!', {icon: 2});
+        return false;
+    }
+    var thisLayer = layer.confirm(result, {
+                btn: ['关闭'], //按钮
+                title:'经纪人信息',
+                area: ['350px', 'auto']
+            }, function(){
+                layer.close(thisLayer)
+            }
+    );
+})
 
 </script>
 </body>

@@ -30,9 +30,9 @@ class Agent_model extends MY_Model
     if(!$pwd = trim($this->input->post('userpwd'))){
         return $this->fun_fail('密码不能为空!');
     }
-
+    //20200914 登录改为 身份证登录
     $this->db->select()->from('agent')->where(array(
-            'job_code'=>$job_code,
+            'card'=>$job_code,
             'pwd'=>sha1($pwd)
     ));
     $res = $this->db->get()->row_array();
@@ -55,6 +55,9 @@ class Agent_model extends MY_Model
         $this->db->join('company_pending b', 'a.company_id = b.id', 'left');
         $this->db->where('a.id', $id);
         $data = $this->db->get()->row_array();
+        if(!$data)
+            return $data;
+        $data['person_img_list'] = $this->db->select()->from('agent_person_img')->where('agent_id', $id)->get()->result_array();
         return $data;
     }
 
@@ -170,5 +173,10 @@ class Agent_model extends MY_Model
             return $this->fun_fail('原密码不正确');
         $this->db->where(array('id' => $agent_id))->update('agent', array('pwd' => sha1($new_password)));
         return $this->fun_success('修改成功，请重新登录!');
+    }
+
+    public function get_detail4power($agent_id){
+        $agent_detail = $this->read('agent',$agent_id);
+        return $agent_detail;
     }
 }

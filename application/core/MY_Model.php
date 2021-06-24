@@ -500,6 +500,13 @@ class MY_Model extends CI_Model{
             'get_json' => json_encode($this->input->get()),
             'cdate' => date('Y-m-d H:i:s',time())
         );
+        if(!$data['action_url']){
+            //Nginx 下 可能获取不到值
+            $url_ = $_SERVER['REQUEST_URI'];
+            $url_arr_ = explode('?',$url_);
+            $data['action_url'] = $url_arr_[0];
+
+        }
         $this->db->insert('admin_log',$data);
 
     }
@@ -726,6 +733,16 @@ class MY_Model extends CI_Model{
         return $username;
     }
 
+    //自动生成 从业编号
+    public function get_job_num(){
+        $title_ = 'SZ';
+        $num_ = $title_ . '_9' . sprintf('%07s', $this->get_sys_num_auto($title_));
+        $check = $this->db->select('id')->from('agent')->where('job_num', $num_)->order_by('id','desc')->get()->row_array();
+        if($check)
+            $num_ = $this->get_job_num();
+        return $num_;
+    }
+
     //获取备案号,20200524 备案号用于在生成的证书上显示,因新需求是 证书编号不变
     public function get_record_num(){
         $title_ = 'KS';
@@ -740,6 +757,8 @@ class MY_Model extends CI_Model{
     public function get_agent_num4company($company_id){
          $this->db->select('count(1) num')->from('agent a');
         $this->db->where('flag', 2);
+        //20200928 只计算持证经纪人人数, 也就是不包含 从业人员
+        $this->db->where('work_type', 1);
         $this->db->where('grade_no >', 1);
         $this->db->where('company_id', $company_id);
         $num = $this->db->get()->row();
@@ -956,7 +975,8 @@ class MY_Model extends CI_Model{
         $this->db->where('id', $company_id)->set('total_score', 'event_score + sys_score + base_score', FALSE)->update('company_pending');
         if($agent_num < 3 || $is_qx_2_)
             $zz_status_ = -1;
-        $this->db->where('id', $company_id)->set('zz_status', $zz_status_)->update('company_pending');
+        //只对资质状态不锁定的企业进行修改
+        $this->db->where('id', $company_id)->where('locking_zz', 0)->set('zz_status', $zz_status_)->update('company_pending');
 
         if ($annual_year && $is_ns_ && in_array($is_ns_, array(1, 2))) {
             $annual_info_ = $this->db->select('*')->from('company_ns_list')->where(array('annual_year' => $annual_year, 'company_id' => $company_id))->get()->row_array();
@@ -1007,7 +1027,10 @@ class MY_Model extends CI_Model{
                 $this->db->where(array('status' => 1, 'is_nscz' => -1, 'company_id' => $company_id))->update('event4company_record', array('is_nscz' => 1, 'annual_year' => $annual_year));
                 $this->db->where('id', $company_id)->set('total_score', 'event_score + sys_score + base_score', FALSE)->update('company_pending');
                 //更新company_pending的最新年审时间和信用等级
-                $this->db->where('id', $company_id)->where('annual_date <=', $annual_year)->update('company_pending', array('grade_no' => $insert_annual_year_['grade_no'], 'annual_date' => $annual_year, 'qx_num' => 0));
+                //2021-04-28 系统不再做信用等级修改, 信用等级使用线下核准
+                //$this->db->where('id', $company_id)->where('annual_date <=', $annual_year)->update('company_pending', array('grade_no' => $insert_annual_year_['grade_no'], 'annual_date' => $annual_year, 'qx_num' => 0));
+                $this->db->where('id', $company_id)->where('annual_date <=', $annual_year)->update('company_pending', array('annual_date' => $annual_year, 'qx_num' => 0));
+
                 $this->db->where('pass_id', $pass_id)->delete('company_pass_score_log');
                 $this->db->insert_batch('company_pass_score_log', $pass_score_log);
             }
@@ -1183,7 +1206,7 @@ class MY_Model extends CI_Model{
         $data['img'] = $this->db->get()->result_array();
         if($data['img'])
             $this->db->insert_batch('company_log_img',$data['img']);
-        $this->db->select("id agent_id,name,phone,job_code,card,company_id,{$log_id} log_id,wq,old_job_code")->from('agent');
+        $this->db->select("id agent_id,name,phone,job_code,card,company_id,{$log_id} log_id,wq,old_job_code,work_type,job_num")->from('agent');
         $this->db->where('company_id',$company_id);
         $data['agent'] = $this->db->get()->result_array();
         if($data['agent'])
@@ -1319,6 +1342,11 @@ class MY_Model extends CI_Model{
             $this->db->where('id', $agent_id)->update('agent', array('company_id' => -1, 'wq' => 1));
             $this->save_company_total_score($agent_info['company_id']);//重新计算企业信用分和异常状态
             $this->db->insert('agent_track',$data_insert);
+        }else{
+            //因从业人员可能会变成持证经纪人 所以不管如何都要重新计算所属企业的信用分和状态
+            if($company_info_){
+                $this->save_company_total_score($agent_info['company_id']);//重新计算企业信用分和异常状态
+            }
         }
         return true;
     }

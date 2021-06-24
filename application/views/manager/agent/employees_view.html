@@ -1,0 +1,290 @@
+{{include file='manager/public/head.html'}}
+<body class="no-skin">
+{{include file='manager/public/header.html'}}
+<link rel="stylesheet" href="/manager_statics/app/lightbox.min.css?v3"/>
+<div class="main-container" id="main-container">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('main-container', 'fixed')
+        } catch (e) {
+        }
+    </script>
+    <style>
+        pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+        .string { color: green; }
+        .number { color: darkorange; }
+        .boolean { color: blue; }
+        .null { color: magenta; }
+        .key { color: red; }
+    </style>
+    {{include file='manager/public/sidebar.html'}}
+    <div class="main-content">
+        <div class="main-content-inner">
+            <!-- #section:basics/content.breadcrumbs -->
+            {{include file='manager/public/breadcrumbs.html'}}
+
+            <!-- /section:basics/content.breadcrumbs -->
+            <div class="page-content">
+                {{include file='manager/public/set.html'}}
+
+                <!-- /section:settings.box -->
+                <div class="row">
+                    <div class="col-xs-12">
+                        <!-- PAGE CONTENT BEGINS -->
+                        <div class="tabbable">
+                             <ul class="nav nav-tabs padding-18 tab-size-bigger" id="myTab">
+                                        <li class="active">
+                                            <a data-toggle="tab" href="#faq-tab-1">
+                                                <i class="blue ace-icon fa fa-question-circle bigger-120"></i>
+                                                从业人员申请
+                                            </a>
+                                        </li>
+
+                                    </ul>
+
+                                     <div class="tab-content no-border padding-24">
+                                         
+                                            <div id="faq-tab-1" class="tab-pane fade in active">
+                                            <h4 class="blue">
+                                                <i class="green ace-icon fa fa-user bigger-110"></i>
+                                                从业人员申请
+                                            </h4>
+
+                                            <div class="space-8"></div>
+                                          
+                                             <div class="form-group">
+                                           
+                                    <div class="col-sm-9">
+                                        <form class="form-horizontal" role="form" id="post_form" action="" method="post">
+
+                            <input type="hidden" name="employees_id" id="employees_id" value="{{$data.id|default:''}}">
+                                          <div class="profile-user-info profile-user-info-striped">
+                                              <div class="profile-info-row">
+                                                  <div class="profile-info-name"> 姓名 </div>
+                                                  <div class="profile-info-value">
+                                                      <span>{{$data.name|default:''}}</span>
+                                                  </div>
+                                              </div>
+                                              <div class="profile-info-row">
+                                                  <div class="profile-info-name"> 身份证号 </div>
+
+                                                  <div class="profile-info-value">
+                                                      <span>{{$data.card|default:''}}</span>
+                                                  </div>
+                                              </div>
+                                              <div class="profile-info-row">
+                                                  <div class="profile-info-name"> 联系电话 </div>
+
+                                                  <div class="profile-info-value">
+                                                      <span>{{$data.phone|default:''}}</span>
+                                                  </div>
+                                              </div>
+                                              <div class="profile-info-row">
+                                                  <div class="profile-info-name"> 从业机构 </div>
+
+                                                  <div class="profile-info-value">
+                                                      <span>{{$data.company_name|default:''}}</span>
+                                                  </div>
+                                              </div>
+                                              <div class="profile-info-row">
+                                                  <div class="profile-info-name"> 所属社区 </div>
+
+                                                  <div class="profile-info-value">
+                                                      <span>{{$data.t_name|default:''}}</span>
+                                                  </div>
+                                              </div>
+
+                                              <div class="profile-info-row">
+                                                  <div class="profile-info-name"> 申请时间 </div>
+
+                                                  <div class="profile-info-value">
+                                                      <span>{{$data.cdate|default:''}}</span>
+                                                  </div>
+                                              </div>
+                                              <div class="profile-info-row">
+                                                  <div class="profile-info-name"> 状态 </div>
+
+                                                  <div class="profile-info-value">
+                                                      <span>
+                                                          {{if $data.flag == 2}}<span class="label label-success">通过</span>{{/if}}
+                                            {{if $data.flag == 1}}<span class="label label-default">待审</span>{{/if}}
+                                            {{if $data.flag == -1}}<span class="label label-danger">拒绝</span>{{/if}}
+                                                            {{if $data.flag == -2}}<span class="label label-warning">作废</span>{{/if}}
+                                                      </span>
+                                                  </div>
+                                              </div>
+                                              <!--<div class="profile-info-row">
+                                                  <div class="profile-info-name"> 申请备注 </div>
+
+                                                  <div class="profile-info-value">
+                                                      <span><textarea name="remark" maxlength="150" readonly="readonly" style="width:60%;height:100px;">{{$data.remark|default:''}}</textarea></span>
+                                                  </div>
+                                              </div>-->
+                                              <div class="profile-info-row">
+                                                  <div class="profile-info-name"> 审核备注 </div>
+
+                                                  <div class="profile-info-value">
+                                                      <span><textarea name="audit_remark" id="audit_remark" maxlength="150" style="width:60%;height:100px;">{{$data.audit_remark|default:''}}</textarea></span>
+                                                      <div class="space-4"></div>
+                                                      <span style="color: red">*拒绝时必须填写,且申请机构可见</span>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                        </form>
+                                          <h4 class="blue">
+                                              <i class="green ace-icon fa fa-list bigger-110"></i>
+                                              身份证图片
+                                          </h4>
+
+                                          <ul class="ace-thumbnails clearfix">
+                                              {{if !empty($data.code_img_list) }}
+                                              {{foreach from=$data.code_img_list key=k item=item}}
+                                              <li>
+                                                  <a class="example-image-link" href="{{$item.img}}" data-lightbox="example_num-2" data-title="经纪人身份证图片">
+                                                      <img width="150" height="150" alt="150x150" src="{{$item.img}}?imageView2/0/w/200/h/200/q/75|imageslim" />
+                                                  </a>
+                                              </li>
+
+                                              {{/foreach}}
+                                              {{/if}}
+
+                                          </ul>
+                        
+                                        <h4 class="blue">
+                                        <i class="green ace-icon fa fa-list bigger-110"></i>
+                                        个人证件照
+                                            </h4>
+                                        <ul class="ace-thumbnails clearfix">
+                                            {{if !empty($data.person_img_list) }}
+                                            {{foreach from=$data.person_img_list key=k item=item}}
+                                            <li>
+                                                <a class="example-image-link" href="{{$item.img}}" data-lightbox="example_num3" data-title="经纪人执业证图片">
+                                                    <img width="150" height="150" alt="150x150" src="{{$item.img}}?imageView2/0/w/200/h/200/q/75|imageslim" />
+                                                </a>
+                                            </li>
+
+                                            {{/foreach}}
+                                            {{/if}}
+
+                                        </ul>
+                                    </div>
+                              </div>
+                          
+                                         
+                                </div>
+
+                            
+                    
+                            </div>
+
+                        </div>
+                        <hr />
+                        <div class="col-md-offset-2 col-md-9">
+                            {{if $data.flag == 1}}<button id="pass_btn" class="btn btn-info" type="button">
+
+                                <i class="icon-ok bigger-110"></i>
+
+                                通过
+
+                            </button>{{/if}}
+                            &nbsp; &nbsp; &nbsp;
+                            <a href="/manager/employees_list" class="btn" type="reset">
+
+                                <i class="icon-undo bigger-110"></i>
+
+                                返 回
+
+                            </a>
+                            &nbsp; &nbsp; &nbsp;
+                            {{if $data.flag == 1}}<button id="cancel_btn" class="btn btn-danger" type="button">
+
+                                <i class="icon-ok bigger-110"></i>
+
+                                拒绝
+
+                            </button>{{/if}}
+
+                        </div>
+                        <!-- PAGE CONTENT ENDS -->
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.page-content -->
+        </div>
+    </div><!-- /.main-content -->
+    {{include file='manager/public/footer.html'}}
+
+</div><!-- /.main-container -->
+
+{{include file='manager/public/footerjs.html'}}
+<!-- inline scripts related to this page -->
+<script src="/manager_statics/qwadmin/js/date-time/bootstrap-datepicker.js"></script>
+<script src="/manager_statics/app/ajaxfileupload.js"></script>
+<script type="text/javascript" src="/manager_statics/app/lightbox-plus-jquery.min.js?v2"></script>
+<script type="text/javascript">
+    $("#pass_btn").click(function(){
+        layer.confirm('是否确定通过！', {
+            btn: ['确定','取消'], //按钮
+            area: ['400px', 'auto']
+        }, function(){
+            post_form('post_form', '/manager/employees_pass');
+        },function(){
+
+        });
+    })
+
+    $("#cancel_btn").click(function(){
+        layer.confirm('是否确定拒绝,拒绝时必须填写审核备注！', {
+            btn: ['确定','取消'], //按钮
+            area: ['400px', 'auto']
+        }, function(){
+            var audit_remark_ = $.trim($("#audit_remark").val());
+            if(audit_remark_ == ""){
+                layer.msg('拒绝时必须填写审核备注！');
+            }else{
+                post_form('post_form', '/manager/employees_cancel');
+            }
+
+        },function(){
+
+        });
+    })
+
+    function post_form(form_name, url_submit){
+        var index_load = layer.load(1, {
+            shade: [0.1,'#fff'] //0.1透明度的白色背景
+        });
+        var form = document.getElementById(form_name);
+
+        var formdata = new FormData(form);
+        $.ajax({
+            type : "POST",
+            url : url_submit,
+            data : formdata,
+            async: true,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success : function(data) {
+                layer.close(index_load);
+                var return_ = JSON.parse(data)
+                if(return_.status == 1){
+                    var url = '/manager/employees_list';
+                    layer.alert('操作成功!', {
+                        skin: 'layui-layer-molv' //样式类名
+                        ,closeBtn: 0
+                    }, function(){
+                        window.location.replace(url);
+                    });
+                }else{
+                    layer.msg(return_.msg);
+                }
+            },
+            error:function(){
+                layer.close(index_load);
+                layer.msg('网络异常!');
+            }
+        });
+    }
+</script>
+</body>
+</html>

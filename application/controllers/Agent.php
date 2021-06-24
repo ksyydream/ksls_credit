@@ -88,5 +88,19 @@ class Agent extends Home_Controller {
             $this->show_message($res['msg']);
         }
 	}
+
+	public function get_cert(){
+		if($this->is_whow_agent_cert_ != 1)
+			redirect('/home/index');
+		$data = $this->agent_model->get_detail4self($this->agent_id);
+		if(!$data)
+			redirect('/home/index');
+		$this->assign('data', $data);
+		$show_person_ = '';
+		if($data['person_img_list'])
+			$show_person_ = $data['person_img_list'][0]['img'];
+		$this->assign('show_person_', $show_person_);
+		$this->display('homepage/agent/dianzizhengshu.html');
+	}
 	
 }

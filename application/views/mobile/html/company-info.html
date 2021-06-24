@@ -29,6 +29,7 @@
         <input type="hidden" id="c_id" value="{{$data.id}}">
         <div class="am-padding am-bgfff ">          
           <span class="s01 snow-company snow-company-1"><i class="am-icon-bank"></i>{{$data.company_name}}</span>
+            {{if $data.zz_status == -1}}<p class="p1_2"><span class="label red">异常状态</span></p>{{/if}}
           <!--<p class="p1_2"><span class="label bule">信用等级：{{$data.b_grade_name_}}</span> </p>-->
           <div class="dl01">
             <!--<p class="p2_2"><span class="s02"><i class="am-icon-mobile"></i>企业电话：</span><span></span></p>-->

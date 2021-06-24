@@ -15,6 +15,7 @@
 <div class="container">
           <div class="company-info apply-info person-change">
             <ul class="credit-menu apply-menu">
+                {{if $is_whow_agent_cert_  == 1}}<li><a href="/agent/get_cert" class="menu-link"><span><em></em>经纪人证书下载</span></a></li>{{/if}}
               <li><a href="/agent/person_change" class="on"><span><em></em>信息修改</span></a></li>
               <li><a href="/agent/add_apply" class="menu-link"><span><em></em>人事申请</span></a></li>
               <li><a href="/agent/apply_list" class="menu-link"><span><em></em>申请列表</span></a></li>
@@ -33,10 +34,10 @@
                 <dt>电话号码</dt>
                 <dd><input type="text" name="phone" id="phone" value="{{$data.phone}}" class="input-txt-1 input-txt-3 js4phone"></dd>
               </dl> 
-              <dl class="dl-form dl-form1">
+              <!--<dl class="dl-form dl-form1">
                 <dt>身份证号</dt>
-                <dd><input type="text" value="{{$data.card}}" class="input-txt-1 input-txt-3" readonly style="color:#aaa"></dd>
-              </dl> 
+                <dd><input type="text" value="" class="input-txt-1 input-txt-3" readonly style="color:#aaa"></dd>
+              </dl> -->
               <dl class="dl-form dl-form1">
                 <dt>公司</dt>
                 <dd><input type="text" value="{{$data.company_name|default:''}}" class="input-txt-1 input-txt-3" readonly style="color:#aaa"></dd>

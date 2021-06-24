@@ -86,7 +86,7 @@ class Home_model extends MY_Model
         return $detail;
     }
 
-    public function show_agent($page = 1) {
+    public function show_agent($page = 1, $work_type = null) {
         $data['limit'] = 6;//每页显示多少调数据
         $data['c_id'] = $this->input->post('c_id') ? trim($this->input->post('c_id')) : null;
         $this->db->select('count(1) num');
@@ -97,6 +97,9 @@ class Home_model extends MY_Model
         }else{
             //如果没有企业ID，就故意不显示数据
             $this->db->where('a.id <', 0);
+        }
+        if($work_type){
+            $this->db->where('a.work_type', $work_type);
         }
         $this->db->where('a.flag', 2);
         $rs_total = $this->db->get()->row();
@@ -114,8 +117,12 @@ class Home_model extends MY_Model
         }else{
             $this->db->where('a.id <', 0);
         }
+        if($work_type){
+            $this->db->where('a.work_type', $work_type);
+        }
         $this->db->where('a.flag', 2);
         $this->db->limit($data['limit'], $offset = ($page - 1) * $data['limit']);
+        $this->db->order_by('a.last_work_time', 'desc');
         $this->db->order_by('a.id', 'desc');
         $data['res_list'] = $this->db->get()->result_array();
         return $data;
@@ -181,6 +188,7 @@ class Home_model extends MY_Model
             $this->db->group_start();
             $this->db->like('a.name', $data['a_k']);
             $this->db->or_like('a.job_code', $data['a_k']);
+            $this->db->or_like('a.job_num', $data['a_k']);
             $this->db->group_end();
         }
         $this->db->where('a.flag', 2);
@@ -198,6 +206,7 @@ class Home_model extends MY_Model
             $this->db->group_start();
             $this->db->like('a.name', $data['a_k']);
             $this->db->or_like('a.job_code', $data['a_k']);
+            $this->db->or_like('a.job_num', $data['a_k']);
             $this->db->group_end();
         }
         $this->db->where('a.flag', 2);
@@ -228,7 +237,10 @@ class Home_model extends MY_Model
         $this->db->join('company_pending b', 'a.company_id = b.id and b.flag = 2', 'left');
         $this->db->join('agent_grade c','a.grade_no = c.grade_no','left');
         $this->db->where('a.job_code', $job_code);
+        $this->db->or_where('a.job_num', $job_code);
         $data = $this->db->get()->row_array();
+        if($data)
+            $data['person_img_list'] = $this->db->select()->from('agent_person_img')->where('agent_id', $data['id'])->get()->result_array();
         return $data;
     }
 
@@ -422,6 +434,26 @@ class Home_model extends MY_Model
         $data['res_list'] = $this->db->get()->result_array();
         $data['count'] = count($data['res_list']);
         return $this->fun_success('查询成功', $data);
+    }
+
+    //获取经纪人信息,主要给企业添加 从业经纪人使用
+    public function get_agentByKey4add(){
+        $key_ = $this->input->post('keyword');
+        if(!$key_)
+            return null;
+        $this->db->select('a.*, b.company_name, c.grade_name');
+        $this->db->from('agent a');
+        $this->db->join('company_pending b', 'a.company_id = b.id', 'left');
+        $this->db->join('agent_grade c', 'a.grade_no = c.grade_no', 'left');
+        $this->db->group_start();
+        $this->db->where('a.card', $key_);
+        $this->db->or_where('a.job_num', $key_);
+        $this->db->group_end();
+        $this->db->where('a.flag', 2);
+        $agent_info_ =  $this->db->get()->row_array();
+        if(!$agent_info_)
+            return null;
+        return $agent_info_;
     }
 
 }
