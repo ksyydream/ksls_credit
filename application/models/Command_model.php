@@ -213,28 +213,51 @@ class Command_model extends MY_Model
         for ($row = 2; $row <= $highestRow; $row++) {
             $this->db->close();
             $this->db->initialize();
-            echo "$row";
-            echo "\n";
             $data_insert = array(
                 'job_code'      => trim((string)$sheet->getCellByColumnAndRow(1, $row)->getValue()),
                 'name'          => trim((string)$sheet->getCellByColumnAndRow(2, $row)->getValue()),
                 'phone'         => trim((string)$sheet->getCellByColumnAndRow(3, $row)->getValue()),
                 'card'          => trim((string)$sheet->getCellByColumnAndRow(4, $row)->getValue()),
+                'work_type'     => 1,
                 'old_job_code'  => "",
                 'flag'          => 2,
                 'pwd'           => sha1("666666"),
-                'cdate'         => date('Y-m-d H:i:s', time()),
+                'cdate'         => date('Y-m-d H:i:s', strtotime("+1 day")),
             );
+            echo "$row" . ' ' . $data_insert['job_code'];
+            echo "\n";
             $data_insert['card'] = strtoupper($data_insert['card']);
             $data_insert['score'] = $this->config->item('agent_score');
             $chenk_job = $this->db->select()->from('agent')->where('job_code', $data_insert['job_code'])->get()->row_array();
             $chenk_card = $this->db->select()->from('agent')->where('card', $data_insert['card'])->get()->row_array();
-            if($chenk_job)
-                continue;
-            if($chenk_card)
-                continue;
-            $this->db->insert('agent', $data_insert);
-            $id = $this->db->insert_id();
+            if($chenk_job){
+                //如果是 重复执业证号就跳过
+                echo "重复执业证号";
+                echo "\n";
+                $id = $chenk_job['id'];
+            }else{
+                if($chenk_card){
+                    echo "重复身份证 " . $chenk_card['job_code'];
+                    echo "\n";
+                    $id = $chenk_card['id'];
+                    //如果发现重复身份证号,需要查看是否是从业人员,如果是从业人员需要变为 持证人员
+                    if($chenk_card['work_type'] == 2 && trim($chenk_card['job_code']) == ''){
+                        $id = $chenk_card['id'];
+                        $update_ = array(
+                            'work_type' => 1,
+                            'job_code' => $data_insert['job_code']
+                        );
+                        $this->db->where('id', $id)->where('work_type', 2)->update('agent',$update_);
+                    }
+                }else{
+                    $data_insert['job_num'] = $this->get_job_num();
+                    $this->db->insert('agent', $data_insert);
+                    $id = $this->db->insert_id();
+                }
+            }
+
+
+
             //这里开始获取图片
             $this->upload_agent_img($id, $data_insert['card'], 'agent_code_img', 'a');
             $this->upload_agent_img($id, $data_insert['card'], 'agent_job_img', 'b');
@@ -247,6 +270,13 @@ class Command_model extends MY_Model
     }
 
     public function upload_agent_img($agent_id, $card, $table, $img_type){
+        //增加判断 是否存在图片
+        $check_ = $this->db->select()->from($table)->where('agent_id', $agent_id)->get()->row_array();
+        if ($check_){
+            echo "has " . $table;
+            echo "\n";
+            return false;
+        }
         if(!is_dir('./upload_files/upload_agent_temp/images/' . $card))
             return false;
         //$card = strtoupper($card);
