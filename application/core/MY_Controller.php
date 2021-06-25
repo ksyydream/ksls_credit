@@ -205,7 +205,7 @@ class Home_Controller extends MY_Controller{
 		//检查经纪人证书权限
 		if($this->agent_id){
 			$agent_detail = $this->agent_model->get_detail4power($this->agent_id);
-			if($agent_detail && strlen($agent_detail['job_code']) == 6 && in_array(substr($agent_detail['job_code'],0,2), array('20','19'))) {
+			if($agent_detail && strlen($agent_detail['job_code']) == 6 && in_array(substr($agent_detail['job_code'],0,2), array('20','19', '21'))) {
 				$this->is_whow_agent_cert_ = 1;
 			}
 		}
