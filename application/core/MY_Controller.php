@@ -169,7 +169,7 @@ class Home_Controller extends MY_Controller{
 		$this->load->model('home_model');
 		$this->load->model('agent_model');
 		$this->load->model('company_model');
-		$uncheck_action = array('logout', 'login', 'login_agent');
+		$uncheck_action = array('logout', 'login', 'login_agent', 'get_company_cert4api', 'get_agent_cert4api');
 		$this->assign('user_flag_', '');
 		$action_ = $this->router->fetch_method();
 		if(!in_array($action_, $uncheck_action)){

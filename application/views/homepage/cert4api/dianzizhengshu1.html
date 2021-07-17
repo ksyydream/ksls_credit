@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>备案电子证书下载</title>
+    <link rel="stylesheet" href="">
+</head>
+<style type="text/css" media="screen">
+html,body,div,p,span,input,a{margin:0;padding:0;}i{font-style: normal;}
+    body{color:#282828;} a{color:#282828;text-decoration: none;}
+    .wrap{width:638px;margin:0 auto;}
+    .congratulate-div{margin:30px auto 0;width:638px;height:1013px; text-align: left; background: url(/assets/cert4agent/images/xinxika-bg.jpg) no-repeat;}
+    .dl-div{padding: 0 0 0 0;color: #000;}
+    .peo_img{padding-top: 175px; text-align: center; display: block;}
+    .s_name{padding-top:26px;text-align: center; font-size: 40px;font-weight: bold;}
+    .s_id{padding:20px 0;text-align: center;font-size: 34px;font-weight: bold;}
+    .s_erweima{text-align: center; display: block;}
+
+    .okBtn,.downBtn{width:200px; height: 50px; background: #cc0000; display: block; color:#fff; border-radius: 5px; line-height: 50px; text-align: center; text-decoration: none; margin:30px auto;}
+    .input_time{font-size:17px;color:#58595b;min-width: 15px;text-align:center;}
+    .fl{float: left;}.sel-txt{display: inline-block; position:relative;}.sel-option{display:block; cursor: pointer;} .sel-hd{cursor: pointer;}
+    .sel-bd{ position:absolute; background: #ddd;width:140px;top:60px;left:-5px; font-size: 14px; line-height: 30px; display: none; z-index:999; }
+     .sel-bd .sel-option:hover{background: #ccc; display: inline-block;width: 140px;}
+
+  /*  .pop-div{ position: absolute;  width: 100%; height: 1016px;top:0; display: none;}
+    .pop-div .pop-bg{ position: fixed; background: #000; opacity: 0.8; width: 100%;height: 1050px;}
+    .pop-div .pop-bd{position: absolute;top:30px;left:50%; margin-left:-319px;}
+    .dianzizhengshu{padding: 328px 0 0 102px;}
+    .show_pic{float: left; margin-right: 25px;}*/
+</style>
+<script src="/assets/cert4agent/js/jquery-1.9.0.js"></script>
+<script src="/assets/cert4agent/js/html2canvas.min.js"></script>
+<script src="/assets/cert4agent/js/jsPdf.debug.js"></script>
+<script>
+ $(function(){             
+        $(".okBtn").click(function () {
+            window.scrollTo(0,0);
+            html2canvas($(".congratulate-div"),{
+                height:$(".congratulate-div").outerHeight(),
+                background: "#fff",
+                onrendered:function(canvas){
+                    var context = canvas.getContext('2d');
+                    context.fillStyle = '#fff';
+                    // canvas.setAttribute('id','thecanvas');
+                    // $("#images").html(canvas);
+                    //返回图片dataUrl
+                    var pageData = canvas.toDataURL('image/jpeg', 1.0);
+                    // // //方向默认竖直，尺寸ponits，格式a4[595.28,841.89]
+                    var pdf = new jsPDF('', 'cm', 'a4');
+                    // // //addImage 后两个参数设置图片的尺寸
+                    pdf.addImage(pageData, 'JPEG', 0, 0,5.7,9.05);
+                    pdf.save('xinxika.pdf');
+                }
+            });
+        })
+ })
+
+</script>
+<body>
+<div class="wrap">
+
+ <div class="congratulate-div">
+     <div class="dl-div">
+        <span class="peo_img">
+            {{if $show_person_ != ''}}
+
+            <img src="{{$show_person_}}?imageView2/0/w/200/h/200/q/75|imageslim" alt="" width="258" height="372">
+                {{else}}
+                <img src="/assets/dzzs/i/default.jpeg" width="258" height="372" />
+                {{/if}}</span>
+         <p class="s_name">{{$data.name}}</p>
+        <p class="s_id">从业编号：{{$data.job_num}}</p>
+        <span class="s_erweima"><img src="/home/qr_code_raw4agent/{{$data.job_code}}" alt="" width="200" height="200"></span>
+    </div>
+  
+ </div>
+
+</div>
+
+</body>
+</html>
