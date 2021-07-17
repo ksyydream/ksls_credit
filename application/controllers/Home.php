@@ -18,7 +18,7 @@ class Home extends Home_Controller {
 	 * map to /index.php/welcome/<method_name>
 	 * @see https://codeigniter.com/user_guide/general/urls.html
 	 */
-
+    private $percetage = 0.4;
 	public function __construct()
     {
         parent::__construct();
@@ -267,5 +267,196 @@ class Home extends Home_Controller {
         require_once (APPPATH . 'libraries/phpqrcode/phpqrcode.php');
         QRcode::png('http://'.$_SERVER['SERVER_NAME'] . '/mobile/mobile_get_agent_detail?job_code=' . $job_code);
     }
-	
+
+    public function get_img($ns_id){
+        require_once (APPPATH . 'libraries/phpqrcode/phpqrcode.php');
+        $qrpath  = '/Users/yangyang/www/ksls_credit/upload_files/share_img/1.png';
+        $URL= 'http://'.$_SERVER['SERVER_NAME'] . '/mobile/mobile_get_company_detail?c_id=' . $ns_id;
+        QRcode::png($URL, $qrpath, 3, 2);
+
+        $this->createGoodsPng(APPPATH . "../assets/dzzs/i/zhengshu1.jpg", $qrpath);
+    }
+
+    private function createGoodsPng($bg, $qrpath) {
+        //创建画布
+        $im = imagecreatetruecolor(800, 1300);
+
+        //填充画布背景色
+        $color = imagecolorallocate($im, 255, 255, 255);
+        imagefill($im, 0, 0, $color);
+
+        //字体文件
+        $font_file = APPPATH . "../assets/share/msyh.ttf";
+        $font_file_bold = APPPATH . "../assets/share/msyh_bold.ttf";
+
+        //设定字体的颜色
+        $font_color = ImageColorAllocate ($im, 255, 255, 255);
+
+        //背景图片
+        list($g_w,$g_h) = getimagesize($bg);
+        $bgImg = $this->createImageFromFile($bg);
+        imagecopyresized($im, $bgImg, 0, 0, 0, 0, $g_w, $g_h, $g_w, $g_h);
+
+        $img_ = APPPATH . "../assets/dzzs/i/gaizhang.png";
+        list($code_w,$code_h) = getimagesize($img_);
+        $mainImg = $this->createImageFromFile($img_);
+        imagecopyresized($im, $mainImg, 220, 220, 0, 0, 360, 360, $code_w, $code_h);
+
+        $title1 = $this->cn_row_substr('测试11', 1, 20);
+        imagettftext($im, 16,0, 200, 130, $font_color, $font_file_bold, $title1[1]);
+
+        imagettftext($im, 14,0, 220, 640, $font_color, $font_file, "原价111: " . 'market_price');
+        imagettftext($im, 20,0, 335, 640, $font_color, $font_file_bold, '￥');
+        imagettftext($im, 36,0, 360, 640, $font_color, $font_file_bold, "shop_price");
+
+        $title2 = $this->cn_row_substr("goods_name11", 1, 15);
+        imagettftext($im, 20,0, 170, 700, $font_color ,$font_file, $title2[1]);
+
+        //二维码
+        list($code_w,$code_h) = getimagesize($qrpath);
+        $codeImg = $this->createImageFromFile($qrpath);
+        imagecopyresized($im, $codeImg, 150, 910, 0, 0, 160, 160, $code_w, $code_h);
+
+        imagepng ($im, APPPATH . "../upload_files/share_img/222.jpg");
+//        Header("Content-Type: image/png");
+//        imagepng ($im);
+
+        $this->saveSmallImage(APPPATH . "../upload_files/share_img/222.jpg", APPPATH . "../upload_files/share_img/222_small.jpg");
+
+        //释放空间
+        imagedestroy($im);
+        imagedestroy($bgImg);
+        imagedestroy($mainImg);
+        imagedestroy($codeImg);
+
+        //$img_url = $this->getBaseUrl() . "/public/share/tmp/goods_{$goods_data['goods_id']}.jpg";
+        //$img_url_small = $this->getBaseUrl() . "/public/share/tmp/goods_{$goods_data['goods_id']}_small.jpg";
+        $this->ajaxReturn(['status' => 1, 'msg' => '获取成功', 'img_url' => '', 'img_url_small' => '', 'path' => '']);
+    }
+
+    private function saveSmallImage($oldPath, $newPath) {
+        list($width, $height) = getimagesize($oldPath);
+        $image = imagecreatefrompng($oldPath);
+        $new_width = $width * $this->percetage;
+        $new_height = $height * $this->percetage;
+        $image_small = imagecreatetruecolor($new_width, $new_height);
+        imagecopyresampled($image_small, $image,0,0,0,0, $new_width, $new_height, $width, $height);
+        imagedestroy($image);
+
+        imagepng($image_small, $newPath);
+    }
+
+    /**
+     * 从图片文件创建Image资源
+     * @param $file 图片文件，支持url
+     * @return bool|resource    成功返回图片image资源，失败返回false
+     */
+    private function createImageFromFile($file){
+        if(preg_match('/http(s)?:\/\//',$file)){
+            $fileSuffix = $this->getNetworkImgType($file);
+        } else {
+            $fileSuffix = pathinfo($file, PATHINFO_EXTENSION);
+        }
+        if(!$fileSuffix) return false;
+        switch ($fileSuffix){
+            case 'jpeg':
+                $theImage = @imagecreatefromjpeg($file);
+                break;
+            case 'jpg':
+                $theImage = @imagecreatefromjpeg($file);
+                break;
+            case 'png':
+                $theImage = @imagecreatefrompng($file);
+                break;
+            case 'gif':
+                $theImage = @imagecreatefromgif($file);
+                break;
+            default:
+                $theImage = @imagecreatefromstring(file_get_contents($file));
+                break;
+        }
+        return $theImage;
+    }
+
+    /**
+     * 获取网络图片类型
+     * @param $url  网络图片url,支持不带后缀名url
+     * @return bool
+     */
+    private function getNetworkImgType($url){
+        $ch = curl_init(); //初始化curl
+        curl_setopt($ch, CURLOPT_URL, $url); //设置需要获取的URL
+        curl_setopt($ch, CURLOPT_NOBODY, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);//设置超时
+        curl_setopt($ch, CURLOPT_TIMEOUT, 3);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); //支持https
+        curl_exec($ch);//执行curl会话
+        $http_code = curl_getinfo($ch);//获取curl连接资源句柄信息
+        curl_close($ch);//关闭资源连接
+        if ($http_code['http_code'] == 200) {
+            $theImgType = explode('/',$http_code['content_type']);
+            if($theImgType[0] == 'image'){
+                return $theImgType[1];
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    private function cn_row_substr($str,$row = 1,$number = 10,$suffix = true){
+        $result = array();
+        for ($r=1;$r<=$row;$r++){
+            $result[$r] = '';
+        }
+
+        $str = trim($str);
+        if(!$str) return $result;
+
+        $theStrlen = strlen($str);
+
+        //每行实际字节长度
+        $oneRowNum = $number * 3;
+        for($r=1;$r<=$row;$r++){
+            if($r == $row and $theStrlen > $r * $oneRowNum and $suffix){
+                $result[$r] = $this->mg_cn_substr($str,$oneRowNum-6,($r-1)* $oneRowNum).'...';
+            }else{
+                $result[$r] = $this->mg_cn_substr($str,$oneRowNum,($r-1)* $oneRowNum);
+            }
+            if($theStrlen < $r * $oneRowNum) break;
+        }
+
+        return $result;
+    }
+
+    private function mg_cn_substr($str,$len,$start = 0){
+        $q_str = '';
+        $q_strlen = ($start + $len)>strlen($str) ? strlen($str) : ($start + $len);
+
+        //如果start不为起始位置，若起始位置为乱码就按照UTF-8编码获取新start
+        if($start and json_encode(substr($str,$start,1)) === false){
+            for($a=0;$a<3;$a++){
+                $new_start = $start + $a;
+                $m_str = substr($str,$new_start,3);
+                if(json_encode($m_str) !== false) {
+                    $start = $new_start;
+                    break;
+                }
+            }
+        }
+
+        //切取内容
+        for($i=$start;$i<$q_strlen;$i++){
+            //ord()函数取得substr()的第一个字符的ASCII码，如果大于0xa0的话则是中文字符
+            if(ord(substr($str,$i,1))>0xa0){
+                $q_str .= substr($str,$i,3);
+                $i+=2;
+            }else{
+                $q_str .= substr($str,$i,1);
+            }
+        }
+        return $q_str;
+    }
+
 }
