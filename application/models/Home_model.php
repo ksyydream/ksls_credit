@@ -456,4 +456,24 @@ class Home_model extends MY_Model
         return $agent_info_;
     }
 
+    public function get_last_cert($company_id){
+        $this->db->select('a.*,c.record_num')->from('company_ns_cert a');
+        $this->db->join('company_ns_list b','a.ns_id = b.id','inner');
+        $this->db->join('company_pending c','a.company_id = c.id','left');
+        $this->db->where(array('a.status' => 1, 'a.company_id' => $company_id, 'b.status' => 2));
+        $this->db->order_by('a.end_date','desc');
+        $data = $this->db->get()->row_array();
+        return $data;
+    }
+
+    public function get_agent_cert($agent_id){
+        $this->db->select("a.*")->from("agent a");
+        $this->db->where(array('a.flag' => 2, 'a.id' => $agent_id));
+        $agent_info = $this->db->get()->row_array();
+        if(!$agent_info)
+            return $agent_info;
+        $agent_info['person_img_list'] = $this->db->select()->from('agent_person_img')->where('agent_id', $agent_id)->get()->result_array();
+        return $agent_info;
+    }
+
 }

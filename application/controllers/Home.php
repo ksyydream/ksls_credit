@@ -267,5 +267,29 @@ class Home extends Home_Controller {
         require_once (APPPATH . 'libraries/phpqrcode/phpqrcode.php');
         QRcode::png('http://'.$_SERVER['SERVER_NAME'] . '/mobile/mobile_get_agent_detail?job_code=' . $job_code);
     }
+
+    public function get_company_cert4api($company_id){
+        $data = $this->home_model->get_last_cert($company_id);
+        if(!$data){
+            echo '为找到对应证书';
+            die();
+        }
+        $this->assign('data', $data);
+        $this->display('homepage/cert4api/dianzizhengshu.html');
+    }
+
+    public function get_agent_cert4api($agent_id){
+        $data = $this->home_model->get_agent_cert($agent_id);
+        if(!$data){
+            echo '为找到对应证书';
+            die();
+        }
+        $this->assign('data', $data);
+        $show_person_ = '';
+        if($data['person_img_list'])
+            $show_person_ = $data['person_img_list'][0]['img'];
+        $this->assign('show_person_', $show_person_);
+        $this->display('homepage/cert4api/dianzizhengshu1.html');
+    }
 	
 }
