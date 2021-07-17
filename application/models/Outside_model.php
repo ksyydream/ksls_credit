@@ -82,6 +82,10 @@ class Outside_model extends MY_Model
         //获取有效期
         $company_ns_cert = $this->db->select('max(end_date) end_date')->from('company_ns_cert')->where(array('company_id' => $detail['id'], 'status' => 1))->get()->row_array();
         $detail['end_date'] = $company_ns_cert ? $company_ns_cert['end_date'] : null;
+        $detail['cert_url'] = '';
+        if($company_ns_cert){
+            $detail['cert_url'] = 'http://cx.ksls.com.cn/home/get_company_cert4api/' . $detail['id'];
+        }
         unset($detail['id']);
         return $this->fun_success("操作成功", $detail);
     }
@@ -90,7 +94,7 @@ class Outside_model extends MY_Model
         $card = trim($this->input->post('a_no'));
         if(!$card)
             return $this->fun_fail("缺少必要参数");
-        $this->db->select('a.name,a.job_num,a.job_code,a.work_type, b.company_name');
+        $this->db->select('a.name,a.job_num,a.job_code,a.work_type, b.company_name,a.id');
         $this->db->from('agent a');
         $this->db->join('company_pending b', 'a.company_id = b.id and b.flag = 2', 'left');
         $this->db->where('a.card', $card);
@@ -98,6 +102,8 @@ class Outside_model extends MY_Model
         $data = $this->db->get()->row_array();
         if(!$data)
             return $this->fun_fail("未找到信息");
+        $data['cert_url'] = 'http://cx.ksls.com.cn/home/get_agent_cert4api/' . $data['id'];
+        unset($data['id']);
         return $this->fun_success("操作成功", $data);
     }
 
